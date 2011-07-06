@@ -1,4 +1,5 @@
 cmake_minimum_required(VERSION 2.6)
+enable_testing()
 set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules)
 project(marray)
 include_directories(include include/marray)
