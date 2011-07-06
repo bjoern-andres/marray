@@ -1,0 +1,19 @@
+#cmake generated files
+CMakeCache.txt
+CMakeFiles
+CTestTestfile.cmake
+cmake_install.cmake
+Makefile
+
+#documentation
+Doxyfile
+doc/
+tutorial-marray
+
+#testing
+Testing
+test-marray
+test-marray-hdf5
+test.h5
+testfile.h5
+
