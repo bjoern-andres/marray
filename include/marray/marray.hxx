@@ -80,6 +80,7 @@
 
 #include <cassert>
 #include <stdexcept> // runtime_error
+#include <cstddef> // ptrdiff_t
 #include <limits>
 #include <string>
 #include <sstream>
