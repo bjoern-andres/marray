@@ -5403,19 +5403,41 @@ public:
         { return static_cast<const E&>(*this)(c0, c1, c2, c3, c4); }
     const T& operator[](const size_t offset) const
         { return static_cast<const E&>(*this)[offset]; }
+#ifdef __INTEL_COMPILER
+    E& get_ref()
+#else
     operator E&() 
+#endif
         { return static_cast<E&>(*this); }
+#ifdef __INTEL_COMPILER
+    const E& get_const_ref() const
+#else
     operator E const&() const 
+#endif
         { return static_cast<const E&>(*this); }
 
     // \cond suppress doxygen
     class ExpressionIterator {
     public:
         ExpressionIterator(const ViewExpression<E, T>& expression)
-        : expression_(expression), // cast!
+        : 
+#ifdef __INTEL_COMPILER
+          expression_(expression.get_const_ref()), // cast!
+#else
+          expression_(expression), // cast!
+#endif
           data_(&expression_(0)),
           offset_(0)
             {}
+            
+#ifdef __INTEL_COMPILER
+        ExpressionIterator(ViewExpression<E, T>& expression)
+        : expression_(expression.get_ref()), // cast!
+          data_(&expression_(0)),
+          offset_(0)
+            {}
+#endif
+            
         void incrementCoordinate(const size_t coordinateIndex)
             { offset_ += expression_.strides(coordinateIndex); }
         void resetCoordinate(const size_t coordinateIndex)
@@ -5446,9 +5468,22 @@ public:
     typedef T value_type;
 
     UnaryViewExpression(const ViewExpression<E, T>& e)
-        : e_(e), // cast!
+        : 
+#ifdef __INTEL_COMPILER
+          e_(e.get_const_ref()), // cast!
+#else
+          e_(e), // cast!
+#endif
           unaryFunctor_(UnaryFunctor()) 
         {}
+        
+#ifdef __INTEL_COMPILER
+    UnaryViewExpression(ViewExpression<E, T>& e)
+        : e_(e.get_ref()), // cast!
+          unaryFunctor_(UnaryFunctor()) 
+        {}
+#endif
+
     const size_t dimension() const 
         { return e_.dimension(); }
     const size_t size() const 
@@ -5519,7 +5554,12 @@ public:
 
     BinaryViewExpression(const ViewExpression<E1, T1>& e1, 
         const ViewExpression<E2, T2>& e2) 
-        : e1_(e1), e2_(e2), // cast!
+        : 
+#ifdef __INTEL_COMPILER
+          e1_(e1.get_const_ref()), e2_(e2.get_const_ref()), // cast!
+#else
+          e1_(e1), e2_(e2), // cast!
+#endif
           binaryFunctor_(BinaryFunctor()) 
         {
             if(!MARRAY_NO_DEBUG) {
@@ -5530,6 +5570,23 @@ public:
                 }
             }
         }
+        
+#ifdef __INTEL_COMPILER
+    BinaryViewExpression(ViewExpression<E1, T1>& e1, 
+        const ViewExpression<E2, T2>& e2) 
+        : e1_(e1.get_ref()), e2_(e2.get_ref()), // cast!
+          binaryFunctor_(BinaryFunctor()) 
+        {
+            if(!MARRAY_NO_DEBUG) {
+                marray_detail::Assert(e1_.size() != 0 && e2_.size() != 0);
+                marray_detail::Assert(e1_.dimension() == e2_.dimension());
+                for(size_t j=0; j<e1_.dimension(); ++j) {
+                    marray_detail::Assert(e1_.shape(j) == e2_.shape(j));
+                }
+            }
+        }
+#endif
+        
     const size_t dimension() const 
         { return e1_.dimension() < e2_.dimension() ? e2_.dimension() : e1_.dimension(); }
     const size_t size() const 
@@ -5604,9 +5661,23 @@ public:
 
     BinaryViewExpressionScalarFirst(const ViewExpression<E, T>& e, 
         const scalar_type& scalar) 
-        : e_(e), // cast!
+        : 
+#ifdef __INTEL_COMPILER
+          e_(e.get_const_ref()), // cast!
+#else
+          e_(e), // cast!
+#endif
           scalar_(scalar), binaryFunctor_(BinaryFunctor()) 
         { }
+        
+#ifdef __INTEL_COMPILER
+    BinaryViewExpressionScalarFirst(ViewExpression<E, T>& e, 
+        const scalar_type& scalar) 
+        : e_(e.get_ref()), // cast!
+          scalar_(scalar), binaryFunctor_(BinaryFunctor()) 
+        { }
+#endif
+    
     const size_t dimension() const 
         { return e_.dimension(); }
     const size_t size() const 
@@ -5678,9 +5749,23 @@ public:
 
     BinaryViewExpressionScalarSecond(const ViewExpression<E, T>& e, 
         const scalar_type& scalar) 
-        : e_(e), // cast!
+        : 
+#ifdef __INTEL_COMPILER
+          e_(e.get_const_ref()), // cast!
+#else
+          e_(e), // cast!
+#endif
           scalar_(scalar), binaryFunctor_(BinaryFunctor())
         { }
+
+#ifdef __INTEL_COMPILER
+    BinaryViewExpressionScalarSecond(ViewExpression<E, T>& e, 
+        const scalar_type& scalar) 
+        : e_(e.get_ref()), // cast!
+          scalar_(scalar), binaryFunctor_(BinaryFunctor())
+        { }
+#endif
+        
     const size_t dimension() const 
         { return e_.dimension(); }
     const size_t size() const 
@@ -6729,7 +6814,11 @@ inline void operate
     Functor f
 )
 {
+#ifdef __INTEL_COMPILER
+    const E& e = expression.get_const_ref(); // cast
+#else
     const E& e = expression; // cast
+#endif
     if(!MARRAY_NO_DEBUG) {
         Assert(v.size() != 0 && e.size() != 0);
         Assert(e.dimension() == v.dimension());
