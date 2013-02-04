@@ -80,6 +80,7 @@
 
 #include <cassert>
 #include <stdexcept> // runtime_error
+#include <cstddef> // ptrdiff_t
 #include <limits>
 #include <string>
 #include <sstream>
@@ -90,6 +91,10 @@
 #include <iostream> // cout
 #include <memory> // allocator
 #include <numeric> // accumulate
+
+#if defined(_OPENMP)
+#include <omp.h>
+#endif
 
 /// The public API.
 namespace marray {
@@ -313,6 +318,13 @@ public:
             const allocator_type& = allocator_type());
     #endif
     
+    View(const View<T, true, A> & other) :
+        data_(other.data_),
+        geometry_(other.geometry_)
+    {}
+
+    virtual ~View() {}
+
     // assignment
     View<T, isConst, A>& operator=(const T&);
     View<T, isConst, A>& operator=(const View<T, true, A>&); // over-write default
@@ -345,16 +357,16 @@ public:
     #endif
         
     // query
-    const size_t dimension() const;
-    const size_t size() const;
-    const size_t shape(const size_t) const;
+    size_t dimension() const;
+    size_t size() const;
+    size_t shape(const size_t) const;
     const size_t* shapeBegin() const;
     const size_t* shapeEnd() const;
-    const size_t strides(const size_t) const;
+    size_t strides(const size_t) const;
     const size_t* stridesBegin() const;
     const size_t* stridesEnd() const;
     const CoordinateOrder& coordinateOrder() const;
-    const bool isSimple() const; 
+    bool isSimple() const;
     template<class TLocal, bool isConstLocal, class ALocal> 
         bool overlaps(const View<TLocal, isConstLocal, ALocal>&) const;
 
@@ -564,6 +576,24 @@ public:
     Iterator(const View<T, true, A>&, const size_t = 0);
     Iterator(const Iterator<T, false, A>&);
         // conversion from mutable to const
+
+    Iterator(const Iterator<T, true, A> & other) :
+        view_(other.view_),
+        pointer_(other.pointer_),
+        index_(other.index_),
+        coordinates_(other.coordinates_)
+    {}
+
+    Iterator & operator=(const Iterator & other)
+    {
+        if (this != &other) {
+            view_ = other.view_;
+            pointer_ = other.pointer_;
+            index_ = other.index_;
+            coordinates_ = other.coordinates_;
+        }
+        return *this;
+    }
 
     // STL random access iterator operations
     reference operator*() const;
@@ -833,7 +863,9 @@ View<T, isConst, A>::coordinatesToIndex
 {
     testInvariant();
     out = 0;
-    for(size_t j=0; j<this->dimension(); ++j, ++it) {
+
+    size_t this_dimension = this->dimension();
+    for(size_t j=0; j < this_dimension; ++j, ++it) {
         marray_detail::Assert(MARRAY_NO_ARG_TEST || static_cast<size_t>(*it) < shape(j));
         out += static_cast<size_t>(*it) * geometry_.shapeStrides(j);
     }
@@ -875,7 +907,9 @@ View<T, isConst, A>::coordinatesToOffset
 {
     testInvariant();
     out = 0;
-    for(size_t j=0; j<this->dimension(); ++j, ++it) {
+
+    size_t this_dimension = this->dimension();
+    for(size_t j=0; j < this_dimension; ++j, ++it) {
         marray_detail::Assert(MARRAY_NO_ARG_TEST || static_cast<size_t>(*it) < shape(j));
         out += static_cast<size_t>(*it) * strides(j);
     }
@@ -945,7 +979,8 @@ View<T, isConst, A>::indexToOffset
     else {
         out = 0;
         if(coordinateOrder() == FirstMajorOrder) {
-            for(size_t j=0; j<this->dimension(); ++j) {
+            size_t this_dimension = this->dimension();
+            for(size_t j=0; j < this_dimension; ++j) {
                 out += geometry_.strides(j) * (index / geometry_.shapeStrides(j));
                 index = index % geometry_.shapeStrides(j);
             }
@@ -1041,9 +1076,9 @@ View<T, isConst, A>::View
 
 /// Construct unstrided View
 /// 
-/// \param begin Iterator to the beginning of a sequence that
+/// \param begin_rhs Iterator to the beginning of a sequence that
 /// defines the shape.
-/// \param end Iterator to the end of this sequence.
+/// \param end_rhs Iterator to the end of this sequence.
 /// \param data Pointer to data.
 /// \param externalCoordinateOrder Flag specifying the order
 /// of coordinates based on which the strides are computed.
@@ -1057,15 +1092,15 @@ template<class ShapeIterator>
 inline
 View<T, isConst, A>::View
 (
-    ShapeIterator begin,
-    ShapeIterator end,
+    ShapeIterator begin_rhs,
+    ShapeIterator end_rhs,
     pointer data,
     const CoordinateOrder& externalCoordinateOrder,
     const CoordinateOrder& internalCoordinateOrder,
     const allocator_type& allocator
 ) 
 :   data_(data),
-    geometry_(begin, end, externalCoordinateOrder, 
+    geometry_(begin_rhs, end_rhs, externalCoordinateOrder,
         internalCoordinateOrder, allocator)
 {
     testInvariant();
@@ -1073,9 +1108,9 @@ View<T, isConst, A>::View
 
 /// Construct strided View
 /// 
-/// \param begin Iterator to the beginning of a sequence that
+/// \param begin_rhs Iterator to the beginning of a sequence that
 /// defines the shape.
-/// \param end Iterator to the end of this sequence.
+/// \param end_rhs Iterator to the end of this sequence.
 /// \param it Iterator to the beginning of a sequence that
 /// defines the strides.
 /// \param data Pointer to data.
@@ -1088,15 +1123,15 @@ template<class ShapeIterator, class StrideIterator>
 inline
 View<T, isConst, A>::View
 (
-    ShapeIterator begin,
-    ShapeIterator end,
+    ShapeIterator begin_rhs,
+    ShapeIterator end_rhs,
     StrideIterator it,
     pointer data,
     const CoordinateOrder& internalCoordinateOrder,
     const allocator_type& allocator
 )
 : data_(data),
-  geometry_(begin, end, it, internalCoordinateOrder, allocator)  
+  geometry_(begin_rhs, end_rhs, it, internalCoordinateOrder, allocator)
 {
     testInvariant();
 }
@@ -1176,9 +1211,9 @@ View<T, isConst, A>::assign
 
 /// Initialize unstrided View
 /// 
-/// \param begin Iterator to the beginning of a sequence that
+/// \param begin_rhs Iterator to the beginning of a sequence that
 /// defines the shape.
-/// \param end Iterator to the end of this sequence.
+/// \param end_rhs Iterator to the end of this sequence.
 /// \param data Pointer to data.
 /// \param externalCoordinateOrder Flag specifying the order
 /// of coordinates based on which the strides are computed.
@@ -1191,8 +1226,8 @@ template<class ShapeIterator>
 inline void
 View<T, isConst, A>::assign
 (
-    ShapeIterator begin,
-    ShapeIterator end,
+    ShapeIterator begin_rhs,
+    ShapeIterator end_rhs,
     pointer data,
     const CoordinateOrder& externalCoordinateOrder,
     const CoordinateOrder& internalCoordinateOrder,
@@ -1202,7 +1237,7 @@ View<T, isConst, A>::assign
     // the invariant is not tested as a pre-condition of this
     // function to allow for unsafe manipulations prior to its
     // call
-    geometry_ = typename marray_detail::Geometry<A>(begin, end, 
+    geometry_ = typename marray_detail::Geometry<A>(begin_rhs, end_rhs,
         externalCoordinateOrder, internalCoordinateOrder, allocator);
     data_ = data;
     testInvariant();    
@@ -1210,9 +1245,9 @@ View<T, isConst, A>::assign
 
 /// Initialize strided View
 /// 
-/// \param begin Iterator to the beginning of a sequence that
+/// \param begin_rhs Iterator to the beginning of a sequence that
 /// defines the shape.
-/// \param end Iterator to the end of this sequence.
+/// \param end_rhs Iterator to the end of this sequence.
 /// \param it Iterator to the beginning of a sequence that
 /// defines the strides.
 /// \param data Pointer to data.
@@ -1225,8 +1260,8 @@ template<class ShapeIterator, class StrideIterator>
 inline void
 View<T, isConst, A>::assign
 (
-    ShapeIterator begin,
-    ShapeIterator end,
+    ShapeIterator begin_rhs,
+    ShapeIterator end_rhs,
     StrideIterator it,
     pointer data,
     const CoordinateOrder& internalCoordinateOrder,
@@ -1236,7 +1271,7 @@ View<T, isConst, A>::assign
     // the invariant is not tested as a pre-condition of this
     // function to allow for unsafe manipulations prior to its
     // call
-    geometry_ = typename marray_detail::Geometry<A>(begin, end, 
+    geometry_ = typename marray_detail::Geometry<A>(begin_rhs, end_rhs,
         it, internalCoordinateOrder, allocator);
     data_ = data;
     testInvariant();
@@ -1757,8 +1792,7 @@ View<T, isConst, A>::operator()
 /// \return Size.
 ///
 template<class T, bool isConst, class A> 
-inline const size_t
-View<T, isConst, A>::size() const
+inline size_t View<T, isConst, A>::size() const
 {
     return geometry_.size();
 }
@@ -1770,8 +1804,7 @@ View<T, isConst, A>::size() const
 /// \return Dimension.
 ///
 template<class T, bool isConst, class A> 
-inline const size_t
-View<T, isConst, A>::dimension() const
+inline size_t View<T, isConst, A>::dimension() const
 {
     marray_detail::Assert(MARRAY_NO_DEBUG || this->data_ != 0);
     return geometry_.dimension();
@@ -1779,20 +1812,18 @@ View<T, isConst, A>::dimension() const
 
 /// Get the shape in one dimension.
 ///
-/// \param dimension Dimension
+/// \param dimension_rhs Dimension
 /// \return Shape in that dimension.
 ///
 template<class T, bool isConst, class A> 
-inline const size_t
-View<T, isConst, A>::shape
-(
-    const size_t dimension
+inline size_t View<T, isConst, A>::shape(
+    const size_t dimension_rhs
 ) const
 {
     testInvariant();
     marray_detail::Assert(MARRAY_NO_DEBUG || data_ != 0);
-    marray_detail::Assert(MARRAY_NO_ARG_TEST || dimension < this->dimension());
-    return geometry_.shape(dimension);
+    marray_detail::Assert(MARRAY_NO_ARG_TEST || dimension_rhs < this->dimension());
+    return geometry_.shape(dimension_rhs);
 }
 
 /// Get a constant iterator to the beginning of the shape vector.
@@ -1825,20 +1856,18 @@ View<T, isConst, A>::shapeEnd() const
 
 /// Get the strides in one dimension.
 ///
-/// \param dimension Dimension
+/// \param dimension_rhs Dimension
 /// \return Stride in that dimension.
 ///
 template<class T, bool isConst, class A> 
-inline const size_t
-View<T, isConst, A>::strides
-(
-    const size_t dimension
+inline size_t View<T, isConst, A>::strides(
+    const size_t dimension_rhs
 ) const
 {
     testInvariant();
     marray_detail::Assert(MARRAY_NO_DEBUG || data_ != 0);
-    marray_detail::Assert(MARRAY_NO_ARG_TEST || dimension < this->dimension());
-    return geometry_.strides(dimension);
+    marray_detail::Assert(MARRAY_NO_ARG_TEST || dimension_rhs < this->dimension());
+    return geometry_.strides(dimension_rhs);
 }
 
 /// Get a constant iterator to the beginning of the strides vector.
@@ -1886,8 +1915,7 @@ View<T, isConst, A>::coordinateOrder() const
 /// \return bool.
 ///
 template<class T, bool isConst, class A> 
-inline const bool
-View<T, isConst, A>::isSimple() const
+inline bool View<T, isConst, A>::isSimple() const
 {
     testInvariant();
     return geometry_.isSimple();
@@ -1991,9 +2019,14 @@ View<T, isConst, A>::operator=
 {
     marray_detail::Assert(MARRAY_NO_DEBUG || data_ != 0);
     if(isSimple()) {
-        for(size_t j=0; j<geometry_.size(); ++j) {
+        ptrdiff_t geometry_size = geometry_.size();
+        #if defined(_OPENMP)
+        #pragma omp parallel for
+        #endif
+        for(ptrdiff_t j=0; j < geometry_size; ++j) {
             data_[j] = value;
         }
+
     }
     else if(dimension() == 1)
         marray_detail::OperateHelperBinaryScalar<1, marray_detail::Assign<T, T>, T, T, A>::operate(*this, value, marray_detail::Assign<T, T>(), data_);
@@ -2325,9 +2358,9 @@ View<T, isConst, A>::constView
 /// - The view must be simple, cf. isSimple().
 /// .
 /// 
-/// \param begin Iterator to the beginning of a sequence that determines
+/// \param begin_rhs Iterator to the beginning of a sequence that determines
 /// the new shape.
-/// \param end Iterator to the end of that sequence.
+/// \param end_rhs Iterator to the end of that sequence.
 ///
 /// \sa reshapedView(), isSimple()
 ///
@@ -2336,17 +2369,17 @@ template<class ShapeIterator>
 inline void
 View<T, isConst, A>::reshape
 (
-    ShapeIterator begin,
-    ShapeIterator end
+    ShapeIterator begin_rhs,
+    ShapeIterator end_rhs
 )
 {
     testInvariant();
     marray_detail::Assert(MARRAY_NO_DEBUG || isSimple());
     if(!MARRAY_NO_ARG_TEST) {
-        size_t size = std::accumulate(begin, end, 1, std::multiplies<size_t>());
-        marray_detail::Assert(size == this->size());
+        size_t size_local = std::accumulate(begin_rhs, end_rhs, 1, std::multiplies<size_t>());
+        marray_detail::Assert(size_local == this->size());
     }
-    assign(begin, end, data_, coordinateOrder(), coordinateOrder());
+    assign(begin_rhs, end_rhs, data_, coordinateOrder(), coordinateOrder());
     testInvariant();
 }
 
@@ -2357,9 +2390,9 @@ View<T, isConst, A>::reshape
 /// - The view must be simple, cf. isSimple().
 /// .
 /// 
-/// \param begin Iterator to the beginning of a sequence that determines
+/// \param begin_rhs Iterator to the beginning of a sequence that determines
 /// the new shape.
-/// \param end Iterator to the end of that sequence.
+/// \param end_rhs Iterator to the end of that sequence.
 ///
 /// \sa reshape(), isSimple()
 ///
@@ -2368,12 +2401,12 @@ template<class ShapeIterator>
 inline View<T, isConst, A>
 View<T, isConst, A>::reshapedView
 (
-    ShapeIterator begin,
-    ShapeIterator end
+    ShapeIterator begin_rhs,
+    ShapeIterator end_rhs
 ) const
 {
     View<T, isConst, A> out = *this;
-    out.reshape(begin, end);
+    out.reshape(begin_rhs, end_rhs);
     return out;
 }
 
@@ -2426,7 +2459,7 @@ View<T, isConst, A>::reshapedView
 /// Binds one coordinate to a certain value. This reduces the
 /// dimension by 1.
 ///
-/// \param dimension Dimension of the coordinate to bind.
+/// \param dimension_rhs Dimension of the coordinate to bind.
 /// \param value Value to assign to the coordinate.
 /// \return The bound view.
 /// \sa squeeze(), squeezeView()
@@ -2435,25 +2468,25 @@ template<class T, bool isConst, class A>
 View<T, isConst, A>
 View<T, isConst, A>::boundView
 (
-    const size_t dimension,
+    const size_t dimension_rhs,
     const size_t value
 ) const
 {
     testInvariant();
-    marray_detail::Assert(MARRAY_NO_ARG_TEST || (dimension < this->dimension()
-        && value < shape(dimension)));
-    if(this->dimension() == 1) {
+    marray_detail::Assert(MARRAY_NO_ARG_TEST || (dimension_rhs < dimension()
+        && value < shape(dimension_rhs)));
+    if(dimension() == 1) {
         View v(&((*this)(value)));
         v.geometry_.coordinateOrder() = coordinateOrder();
         return v;
     }
     else {
         View v;
-        v.geometry_.resize(this->dimension()-1);
+        v.geometry_.resize(dimension()-1);
         v.geometry_.coordinateOrder() = coordinateOrder();
-        v.geometry_.size() = size() / shape(dimension);
-        for(size_t j=0, k=0; j<this->dimension(); ++j) {
-            if(j != dimension) {
+        v.geometry_.size() = size() / shape(dimension_rhs);
+        for(size_t j=0, k=0; j<dimension(); ++j) {
+            if(j != dimension_rhs) {
                 v.geometry_.shape(k) = shape(j);
                 v.geometry_.strides(k) = strides(j);
                 ++k;
@@ -2461,7 +2494,7 @@ View<T, isConst, A>::boundView
         }
         marray_detail::stridesFromShape(v.geometry_.shapeBegin(), v.geometry_.shapeEnd(),
             v.geometry_.shapeStridesBegin(), v.geometry_.coordinateOrder());
-        v.data_ = data_ + strides(dimension) * value;
+        v.data_ = data_ + strides(dimension_rhs) * value;
         v.updateSimplicity();
         v.testInvariant();
         return v;
@@ -2477,14 +2510,15 @@ void
 View<T, isConst, A>::squeeze()
 {
     testInvariant();
-    if(dimension() != 0) {
-        size_t newDimension = dimension();
-        for(size_t j=0; j<dimension(); ++j) {
+    size_t dimension_local = dimension();
+    if(dimension_local != 0) {
+        size_t newDimension = dimension_local;
+        for(size_t j=0; j < dimension_local; ++j) {
             if(shape(j) == 1) {
                 --newDimension;
             }
         }
-        if(newDimension != dimension()) {
+        if(newDimension != dimension_local) {
             if(newDimension == 0) {
                 geometry_.resize(0);
                 geometry_.size() = 1;
@@ -2543,7 +2577,7 @@ View<T, isConst, A>::permute
 
 /// Permute dimensions.
 ///
-/// \param begin Iterator to the beginning of a sequence which
+/// \param begin_rhs Iterator to the beginning of a sequence which
 /// has to contain the integers 0, ..., dimension()-1 in any
 /// order. Otherwise, a runtime error is thrown.
 /// \sa permutedView(), transpose(), transposedView(), shift(),
@@ -2554,14 +2588,14 @@ template<class CoordinateIterator>
 void
 View<T, isConst, A>::permute
 (
-    CoordinateIterator begin
+    CoordinateIterator begin_rhs
 )
 {
     testInvariant();
     if(!MARRAY_NO_ARG_TEST) {
         marray_detail::Assert(dimension() != 0);
         std::set<size_t> s1, s2;
-        CoordinateIterator it = begin;
+        CoordinateIterator it = begin_rhs;
         for(size_t j=0; j<dimension(); ++j) {
             s1.insert(j);
             s2.insert(*it);
@@ -2573,11 +2607,16 @@ View<T, isConst, A>::permute
     std::vector<size_t> newShape = std::vector<size_t>(dimension());
     std::vector<size_t> newStrides = std::vector<size_t>(dimension());
     for(size_t j=0; j<dimension(); ++j) {
-        newShape[j] = geometry_.shape(static_cast<size_t>(*begin));
-        newStrides[j] = geometry_.strides(static_cast<size_t>(*begin));
-        ++begin;
+        newShape[j] = geometry_.shape(static_cast<size_t>(*begin_rhs));
+        newStrides[j] = geometry_.strides(static_cast<size_t>(*begin_rhs));
+        ++begin_rhs;
     }
-    for(size_t j=0; j<dimension(); ++j) {
+
+    ptrdiff_t dimension_local = dimension();
+    #if defined(_OPENMP)
+    #pragma omp parallel for
+    #endif
+    for(ptrdiff_t j=0; j < dimension_local; ++j) {
         geometry_.shape(j) = newShape[j];
         geometry_.strides(j) = newStrides[j];
     }
@@ -2589,7 +2628,7 @@ View<T, isConst, A>::permute
 
 /// Get a View with permuted dimensions.
 ///
-/// \param begin Iterator to the beginning of a sequence which
+/// \param begin_rhs Iterator to the beginning of a sequence which
 /// has to contain the integers 0, ..., dimension()-1 in any
 /// order. Otherwise, a runtime error is thrown.
 /// \return Permuted View.
@@ -2601,11 +2640,11 @@ template<class CoordinateIterator>
 inline View<T, isConst, A>
 View<T, isConst, A>::permutedView
 (
-    CoordinateIterator begin
+    CoordinateIterator begin_rhs
 ) const
 {
     View<T, isConst, A> out = *this;
-    out.permute(begin);
+    out.permute(begin_rhs);
     return out;
 }
 
@@ -2660,8 +2699,9 @@ void
 View<T, isConst, A>::transpose()
 {
     testInvariant();
-    for(size_t j=0; j<dimension()/2; ++j) {
-        size_t k = dimension()-j-1;
+    size_t dimension_local = dimension();
+    for(size_t j=0; j<dimension_local/2; ++j) {
+        size_t k = dimension_local-j-1;
 
         // transpose shape
         size_t tmp = geometry_.shape(j);
@@ -2729,17 +2769,21 @@ View<T, isConst, A>::shift
 ) 
 {
     testInvariant();
-    marray_detail::Assert(MARRAY_NO_DEBUG || dimension() != 0);
-    if(n <= -static_cast<int>(dimension()) || n >= static_cast<int>(dimension())) {
-        shift(n % static_cast<int>(dimension()));
+    ptrdiff_t dimension_local = dimension();
+    marray_detail::Assert(MARRAY_NO_DEBUG || dimension_local != 0);
+    if(n <= -static_cast<int>(dimension_local) || n >= static_cast<int>(dimension_local)) {
+        shift(n % static_cast<int>(dimension_local));
     }
     else {
         if(n > 0) {
-            shift(n - static_cast<int>(dimension()));
+            shift(n - static_cast<int>(dimension_local));
         }
         else {
-            std::vector<size_t> p(dimension());
-            for(size_t j=0; j<dimension(); ++j) {
+            std::vector<size_t> p(dimension_local);
+            #if defined(_OPENMP)
+            #pragma omp parallel for
+            #endif
+            for(ptrdiff_t j=0; j<dimension_local; ++j) {
                 p[j] = static_cast<size_t>((static_cast<int>(j) - n)) % dimension();
             }
             permute(p.begin());
@@ -3440,7 +3484,7 @@ Marray<T, A>::Marray
 /// Construct 0-dimensional (scalar) array.
 ///
 /// \param value Value of the single data item.
-/// \param coordinateOrder Flag specifying whether FirstMajorOrder or
+/// \param coordinateOrder_rhs Flag specifying whether FirstMajorOrder or
 /// LastMajorOrder is to be used. As the Marray can be resized after 
 /// construction, the coordinate order has to be set even for a
 /// 0-dimensional Marray.
@@ -3451,14 +3495,14 @@ inline
 Marray<T, A>::Marray
 (
     const T& value,
-    const CoordinateOrder& coordinateOrder,
+    const CoordinateOrder& coordinateOrder_rhs,
     const allocator_type& allocator
 ) 
 :   dataAllocator_(allocator)
 {
     this->data_ = dataAllocator_.allocate(1);
     this->data_[0] = value;
-    this->geometry_ = geometry_type(0, coordinateOrder, 1, true, allocator);
+    this->geometry_ = geometry_type(0, coordinateOrder_rhs, 1, true, allocator);
     testInvariant();
 }
 
@@ -3472,7 +3516,8 @@ Marray<T, A>::Marray
 (
     const Marray<T, A>& in
 )
-:   dataAllocator_(in.dataAllocator_) 
+:   Marray::View(in),
+    dataAllocator_(in.dataAllocator_)
 {
     if(!MARRAY_NO_ARG_TEST) {
         in.testInvariant();
@@ -3507,7 +3552,11 @@ Marray<T, A>::Marray
 
     // adapt geometry
     this->geometry_ = in.geometry_;
-    for(size_t j=0; j<in.dimension(); ++j) {
+    ptrdiff_t in_dimension = in.dimension();
+    #if defined(_OPENMP)
+    #pragma omp parallel for
+    #endif
+    for(ptrdiff_t j=0; j < in_dimension; ++j) {
         this->geometry_.strides(j) = in.geometry_.shapeStrides(j); // !
     }
     this->geometry_.isSimple() = true;
@@ -3576,11 +3625,11 @@ Marray<T, A>::Marray
 
 /// Construct Marray with initialization.
 ///
-/// \param begin Iterator to the beginning of a sequence that determines
+/// \param begin_rhs Iterator to the beginning of a sequence that determines
 /// the shape.
-/// \param end Iterator to the end of that sequence.
+/// \param end_rhs Iterator to the end of that sequence.
 /// \param value Value with which all entries are initialized.
-/// \param coordinateOrder Flag specifying whether FirstMajorOrder or
+/// \param coordinateOrder_rhs Flag specifying whether FirstMajorOrder or
 /// LastMajorOrder is to be used.
 /// \param allocator Allocator.
 ///
@@ -3589,19 +3638,20 @@ template<class ShapeIterator>
 inline
 Marray<T, A>::Marray
 (
-    ShapeIterator begin,
-    ShapeIterator end,
+    ShapeIterator begin_rhs,
+    ShapeIterator end_rhs,
     const T& value,
-    const CoordinateOrder& coordinateOrder,
+    const CoordinateOrder& coordinateOrder_rhs,
     const allocator_type& allocator
 )
 : dataAllocator_(allocator)
 {
-    size_t size = std::accumulate(begin, end, 1, std::multiplies<size_t>());
-    marray_detail::Assert(MARRAY_NO_ARG_TEST || size != 0);
-    base::assign(begin, end, dataAllocator_.allocate(size), coordinateOrder, 
-        coordinateOrder, allocator); 
-    for(size_t j=0; j<size; ++j) {
+    size_t size_local = std::accumulate(begin_rhs, end_rhs, 1, std::multiplies<size_t>());
+    marray_detail::Assert(MARRAY_NO_ARG_TEST || size_local != 0);
+    base::assign(begin_rhs, end_rhs, dataAllocator_.allocate(size_local), coordinateOrder_rhs,
+        coordinateOrder_rhs, allocator);
+    ptrdiff_t size_local_int = size_local;
+    for(ptrdiff_t j=0; j < size_local_int; ++j) {
         this->data_[j] = value;
     }
     testInvariant();
@@ -3610,10 +3660,10 @@ Marray<T, A>::Marray
 /// Construct Marray without initialization.
 ///
 /// \param is Flag to be set to SkipInitialization.
-/// \param begin Iterator to the beginning of a sequence that determines
+/// \param begin_rhs Iterator to the beginning of a sequence that determines
 /// the shape.
-/// \param end Iterator to the end of that sequence.
-/// \param coordinateOrder Flag specifying whether FirstMajorOrder or
+/// \param end_rhs Iterator to the end of that sequence.
+/// \param coordinateOrder_rhs Flag specifying whether FirstMajorOrder or
 /// LastMajorOrder is to be used.
 /// \param allocator Allocator.
 ///
@@ -3623,17 +3673,17 @@ inline
 Marray<T, A>::Marray
 (
     const InitializationSkipping& is,
-    ShapeIterator begin,
-    ShapeIterator end,
-    const CoordinateOrder& coordinateOrder,
+    ShapeIterator begin_rhs,
+    ShapeIterator end_rhs,
+    const CoordinateOrder& coordinateOrder_rhs,
     const allocator_type& allocator
 ) 
 : dataAllocator_(allocator)
 {
-    size_t size = std::accumulate(begin, end, 1, std::multiplies<size_t>());
-    marray_detail::Assert(MARRAY_NO_ARG_TEST || size != 0);
-    base::assign(begin, end, dataAllocator_.allocate(size), coordinateOrder, 
-        coordinateOrder, allocator); 
+    size_t size_local = std::accumulate(begin_rhs, end_rhs, 1, std::multiplies<size_t>());
+    marray_detail::Assert(MARRAY_NO_ARG_TEST || size_local != 0);
+    base::assign(begin_rhs, end_rhs, dataAllocator_.allocate(size_local), coordinateOrder_rhs,
+        coordinateOrder_rhs, allocator);
     testInvariant();
 }
 
@@ -3658,12 +3708,13 @@ Marray<T, A>::Marray
 ) 
 : dataAllocator_(allocator)
 {
-    size_t size = std::accumulate(shape.begin(), shape.end(), 
+    size_t size_local = std::accumulate(shape.begin(), shape.end(),
         1, std::multiplies<size_t>());
-    marray_detail::Assert(MARRAY_NO_ARG_TEST || size != 0);
-    base::assign(shape.begin(), shape.end(), dataAllocator_.allocate(size), 
+    marray_detail::Assert(MARRAY_NO_ARG_TEST || size_local != 0);
+    base::assign(shape.begin(), shape.end(), dataAllocator_.allocate(size_local),
                  coordinateOrder, coordinateOrder, allocator); 
-    for(size_t j=0; j<size; ++j) {
+    ptrdiff_t size_local_int = size_local;
+    for(ptrdiff_t j=0; j<size_local_int; ++j) {
         this->data_[j] = value;
     }
     testInvariant();
@@ -3768,8 +3819,12 @@ Marray<T, A>::operator=
             }
 
             // copy geometry
-            this->geometry_.resize(in.dimension());
-            for(size_t j=0; j<in.dimension(); ++j) {
+            ptrdiff_t in_dimension = in.dimension();
+            this->geometry_.resize(in_dimension);
+            #if defined(_OPENMP)
+            #pragma omp parallel for
+            #endif
+            for(ptrdiff_t j=0; j<in_dimension; ++j) {
                 this->geometry_.shape(j) = in.geometry_.shape(j);
                 this->geometry_.shapeStrides(j) = in.geometry_.shapeStrides(j);
                 this->geometry_.strides(j) = in.geometry_.shapeStrides(j); // !
@@ -3804,7 +3859,8 @@ Marray<T, A>::operator=
                 marray_detail::OperateHelperBinary<10, marray_detail::Assign<T, TLocal>, T, TLocal, isConstLocal, A, ALocal>::operate(*this, in, marray_detail::Assign<T, TLocal>(), this->data_, &in(0));
             else {
                 typename View<TLocal, isConstLocal, ALocal>::const_iterator it = in.begin();
-                for(size_t j=0; j<this->size(); ++j, ++it) {
+                size_t this_size = this->size();
+                for(size_t j=0; j < this_size; ++j, ++it) {
                     this->data_[j] = static_cast<T>(*it);
                 }
             }
@@ -3828,7 +3884,11 @@ Marray<T, A>::operator=
 )
 {
     marray_detail::Assert(MARRAY_NO_DEBUG || this->data_ != 0);
-    for(size_t j=0; j<this->size(); ++j) {
+    ptrdiff_t this_size = this->size();
+    #if defined(_OPENMP)
+    #pragma omp parallel for
+    #endif
+    for(ptrdiff_t j=0; j<this_size; ++j) {
         this->data_[j] = value;
     }
     return *this;
@@ -3854,8 +3914,12 @@ Marray<T, A>::operator=
         }
         
         // copy geometry
-        this->geometry_.resize(expression.dimension());
-        for(size_t j=0; j<expression.dimension(); ++j) {
+        ptrdiff_t expression_dimension = expression.dimension();
+        this->geometry_.resize(expression_dimension);
+        #if defined(_OPENMP)
+        #pragma omp parallel for
+        #endif
+        for(ptrdiff_t j=0; j<expression_dimension; ++j) {
             this->geometry_.shape(j) = expression.shape(j);
         }
         this->geometry_.size() = expression.size();
@@ -3879,8 +3943,8 @@ template<bool SKIP_INITIALIZATION, class ShapeIterator>
 inline void
 Marray<T, A>::resizeHelper
 (
-    ShapeIterator begin,
-    ShapeIterator end,
+    ShapeIterator begin_rhs,
+    ShapeIterator end_rhs,
     const T& value
 )
 {   
@@ -3888,7 +3952,7 @@ Marray<T, A>::resizeHelper
     // compute size
     std::vector<size_t> newShape;
     size_t newSize = 1;
-    for(ShapeIterator it = begin; it != end; ++it) {
+    for(ShapeIterator it = begin_rhs; it != end_rhs; ++it) {
         size_t x = static_cast<size_t>(*it);
         marray_detail::Assert(MARRAY_NO_ARG_TEST || x > 0);
         newShape.push_back(x);
@@ -3897,7 +3961,11 @@ Marray<T, A>::resizeHelper
     // allocate new
     value_type* newData = dataAllocator_.allocate(newSize); 
     if(!SKIP_INITIALIZATION) {
-        for(size_t j=0; j<newSize; ++j) {
+        ptrdiff_t newSizeInt = newSize;
+        #if defined(_OPENMP)
+        #pragma omp parallel for
+        #endif
+        for(ptrdiff_t j=0; j<newSizeInt; ++j) {
             newData[j] = value;
         }
     }
@@ -3907,11 +3975,16 @@ Marray<T, A>::resizeHelper
             newData[0] = this->data_[0];
         }
         else {
-            std::vector<size_t> base1(this->dimension());
-            std::vector<size_t> base2(newShape.size());
-            std::vector<size_t> shape1(this->dimension(), 1);
-            std::vector<size_t> shape2(newShape.size(), 1);
-            for(size_t j=0; j<std::min(this->dimension(), newShape.size()); ++j) {
+            ptrdiff_t this_dimension = this->dimension();
+            ptrdiff_t newShapeSize = newShape.size();
+            std::vector<size_t> base1(this_dimension);
+            std::vector<size_t> base2(newShapeSize);
+            std::vector<size_t> shape1(this_dimension, 1);
+            std::vector<size_t> shape2(newShapeSize, 1);
+            #if defined(_OPENMP)
+            #pragma omp parallel for
+            #endif
+            for(ptrdiff_t j=0; j<std::min(this_dimension, newShapeSize); ++j) {
                 shape1[j] = std::min(this->shape(j), newShape[j]);
                 shape2[j] = shape1[j];
             }
@@ -3929,16 +4002,16 @@ Marray<T, A>::resizeHelper
         dataAllocator_.deallocate(this->data_, this->size()); 
         this->data_ = 0;
     }
-    base::assign(begin, end, newData, this->geometry_.coordinateOrder(),
+    base::assign(begin_rhs, end_rhs, newData, this->geometry_.coordinateOrder(),
         this->geometry_.coordinateOrder());
     testInvariant();
 }
 
 /// Resize (existing entries are preserved, new entries are initialized).
 ///
-/// \param begin Iterator to the beginning of a sequence that determines
+/// \param begin_rhs Iterator to the beginning of a sequence that determines
 /// the new shape.
-/// \param end Iterator to the end of that sequence.
+/// \param end_rhs Iterator to the end of that sequence.
 /// \param value Initial value to be assigned to newly allocated entries.
 ///
 template<class T, class A> 
@@ -3946,12 +4019,12 @@ template<class ShapeIterator>
 void
 Marray<T, A>::resize
 (
-    ShapeIterator begin,
-    ShapeIterator end,
+    ShapeIterator begin_rhs,
+    ShapeIterator end_rhs,
     const T& value
 )
 {   
-    resizeHelper<false>(begin, end, value);
+    resizeHelper<false>(begin_rhs, end_rhs, value);
 }
 
 /// Resize (existing entries are preserved).
@@ -4039,7 +4112,7 @@ Iterator<T, isConst, A>::testInvariant() const
                     && pointer_ == 0);
             }
             else { // initialized view
-                marray_detail::Assert(index_ >= 0 && index_ <= view_->size());
+                marray_detail::Assert(index_ <= view_->size());
                 if(index_ == view_->size()) { // end iterator
                     marray_detail::Assert(pointer_ == &((*view_)(view_->size()-1)) + 1);
                 }
@@ -4090,50 +4163,58 @@ inline Iterator<T, isConst, A>::Iterator()
 /// Construct from View on constant data.
 ///
 /// \param view View
-/// \param index Index into the View.
+/// \param index_rhs Index into the View.
 ///
 template<class T, bool isConst, class A>
 inline Iterator<T, isConst, A>::Iterator
 (
     const View<T, true, A>& view,
-    const size_t index
+    const size_t index_rhs
 )
 :   view_(&view),
     pointer_(0),
-    index_(index),
+    index_(index_rhs),
     coordinates_(std::vector<size_t>(view.dimension()))
     // Note for developers: If isConst==false, the construction view_(&view)
     // fails due to incompatible types. This is intended because it should 
     // not be possible to construct a mutable iterator on constant data.
 {
     if(view.size() == 0) { // un-initialized view
-        marray_detail::Assert(MARRAY_NO_ARG_TEST || index == 0);
+        marray_detail::Assert(MARRAY_NO_ARG_TEST || index_rhs == 0);
     }
     else {
         if(view.isSimple()) {
-            marray_detail::Assert(MARRAY_NO_ARG_TEST || index <= view.size());
-            pointer_ = &view(0) + index;
+            marray_detail::Assert(MARRAY_NO_ARG_TEST || index_rhs <= view.size());
+            pointer_ = &view(0) + index_rhs;
         }
         else {
-            if(index >= view.size()) { // end iterator
+            if(index_rhs >= view.size()) { // end iterator
                 if(view_->coordinateOrder() == LastMajorOrder) {
                     coordinates_[0] = view.shape(0);
-                    for(size_t j=1; j<view.dimension(); ++j) {
+                    ptrdiff_t view_dimension = view.dimension();
+                    #if defined(_OPENMP)
+                    #pragma omp parallel for
+                    #endif
+                    for(ptrdiff_t j=1; j<view_dimension; ++j) {
                         coordinates_[j] = view.shape(j)-1;
                     }
                 }
                 else { // FirstMajorOrder
                     size_t d = view_->dimension() - 1;
                     coordinates_[d] = view.shape(d);
-                    for(size_t j=0; j<d; ++j) {
+                    ptrdiff_t d_int = d;
+                    #if defined(_OPENMP)
+                    #pragma omp parallel for
+                    #endif
+                    for(ptrdiff_t j=0; j<d_int; ++j) {
                         coordinates_[j] = view.shape(j)-1;
                     }
                 }
                 pointer_ = &view(view.size()-1) + 1;
             }
             else {
-                view.indexToCoordinates(index, coordinates_.begin());
-                pointer_ = &view(index);
+                view.indexToCoordinates(index_rhs, coordinates_.begin());
+                pointer_ = &view(index_rhs);
             }
         }
     }
@@ -4143,17 +4224,17 @@ inline Iterator<T, isConst, A>::Iterator
 /// Construct from View on mutable data.
 ///
 /// \param view View
-/// \param index Index into the View.
+/// \param index_rhs Index into the View.
 ///
 template<class T, bool isConst, class A>
 inline Iterator<T, isConst, A>::Iterator
 (
     const View<T, false, A>& view,
-    const size_t index
+    const size_t index_rhs
 )
 :   view_(reinterpret_cast<view_pointer>(&view)),
     pointer_(0),
-    index_(index),
+    index_(index_rhs),
     coordinates_(std::vector<size_t>(view.dimension()))
     // Note for developers: If isConst==true, the construction
     // view_(reinterpret_cast<view_pointer>(&view)) works as well.
@@ -4161,33 +4242,41 @@ inline Iterator<T, isConst, A>::Iterator
     // a constant iterator on mutable data.
 {
     if(view.size() == 0) { // un-initialized view
-        marray_detail::Assert(MARRAY_NO_ARG_TEST || index == 0);
+        marray_detail::Assert(MARRAY_NO_ARG_TEST || index_rhs == 0);
     }
     else {
         if(view.isSimple()) {
-            marray_detail::Assert(MARRAY_NO_ARG_TEST || index <= view.size());
-            pointer_ = &view(0) + index;
+            marray_detail::Assert(MARRAY_NO_ARG_TEST || index_rhs <= view.size());
+            pointer_ = &view(0) + index_rhs;
         }
         else {
-            if(index >= view.size()) { // end iterator
+            if(index_rhs >= view.size()) { // end iterator
                 if(view_->coordinateOrder() == LastMajorOrder) {
                     coordinates_[0] = view.shape(0);
-                    for(size_t j=1; j<view.dimension(); ++j) {
+                    ptrdiff_t view_dimension = view.dimension();
+                    #if defined(_OPENMP)
+                    #pragma omp parallel for
+                    #endif
+                    for(ptrdiff_t j=1; j<view_dimension; ++j) {
                         coordinates_[j] = view.shape(j)-1;
                     }
                 }
                 else { // FirstMajorOrder
                     size_t d = view_->dimension() - 1;
                     coordinates_[d] = view.shape(d);
-                    for(size_t j=0; j<d; ++j) {
+                    ptrdiff_t d_int = d;
+                    #if defined(_OPENMP)
+                    #pragma omp parallel for
+                    #endif
+                    for(ptrdiff_t j=0; j<d_int; ++j) {
                         coordinates_[j] = view.shape(j)-1;
                     }
                 }
                 pointer_ = &view(view.size()-1) + 1;
             }
             else {
-                view.indexToCoordinates(index, coordinates_.begin());
-                pointer_ = &view(index);
+                view.indexToCoordinates(index_rhs, coordinates_.begin());
+                pointer_ = &view(index_rhs);
             }
         }
     }
@@ -4197,17 +4286,17 @@ inline Iterator<T, isConst, A>::Iterator
 /// Construct from View on mutable data.
 ///
 /// \param view View
-/// \param index Index into the View.
+/// \param index_rhs Index into the View.
 ///
 template<class T, bool isConst, class A>
 inline Iterator<T, isConst, A>::Iterator
 (
     View<T, false, A>& view,
-    const size_t index
+    const size_t index_rhs
 )
 :   view_(reinterpret_cast<view_pointer>(&view)),
     pointer_(0),
-    index_(index),
+    index_(index_rhs),
     coordinates_(std::vector<size_t>(view.dimension()))
     // Note for developers: If isConst==true, the construction
     // view_(reinterpret_cast<view_pointer>(&view)) works as well.
@@ -4215,33 +4304,41 @@ inline Iterator<T, isConst, A>::Iterator
     // a constant iterator on mutable data.
 {
     if(view.size() == 0) { // un-initialized view
-        marray_detail::Assert(MARRAY_NO_ARG_TEST || index == 0);
+        marray_detail::Assert(MARRAY_NO_ARG_TEST || index_rhs == 0);
     }
     else {
         if(view.isSimple()) {
-            marray_detail::Assert(MARRAY_NO_ARG_TEST || index <= view.size());
-            pointer_ = &view(0) + index;
+            marray_detail::Assert(MARRAY_NO_ARG_TEST || index_rhs <= view.size());
+            pointer_ = &view(0) + index_rhs;
         }
         else {
-            if(index >= view.size()) { // end iterator
+            if(index_rhs >= view.size()) { // end iterator
                 if(view_->coordinateOrder() == LastMajorOrder) {
                     coordinates_[0] = view.shape(0);
-                    for(size_t j=1; j<view.dimension(); ++j) {
+                    ptrdiff_t view_dimension = view.dimension();
+                    #if defined(_OPENMP)
+                    #pragma omp parallel for
+                    #endif
+                    for(ptrdiff_t j=1; j<view_dimension; ++j) {
                         coordinates_[j] = view.shape(j)-1;
                     }
                 }
                 else { // FirstMajorOrder
                     size_t d = view_->dimension() - 1;
                     coordinates_[d] = view.shape(d);
-                    for(size_t j=0; j<d; ++j) {
+                    ptrdiff_t d_int = d;
+                    #if defined(_OPENMP)
+                    #pragma omp parallel for
+                    #endif
+                    for(ptrdiff_t j=0; j<d_int; ++j) {
                         coordinates_[j] = view.shape(j)-1;
                     }
                 }
                 pointer_ = &view(view.size()-1) + 1;
             }
             else {
-                view.indexToCoordinates(index, coordinates_.begin());
-                pointer_ = &view(index);
+                view.indexToCoordinates(index_rhs, coordinates_.begin());
+                pointer_ = &view(index_rhs);
             }
         }
     }
@@ -4726,7 +4823,11 @@ Vector<T, A>::Vector
                 memcpy(this->data_, in.data_, (this->size())*sizeof(T));
             }
             else {
-                for(size_t j=0; j<in.size(); ++j) {
+                ptrdiff_t in_size = in.size();
+                #if defined(_OPENMP)
+                #pragma omp parallel for
+                #endif
+                for(ptrdiff_t j=0; j<in_size; ++j) {
                     this->data_[j] = static_cast<T>(in(j));
                 }
             }
@@ -4737,7 +4838,7 @@ Vector<T, A>::Vector
 
 /// Construct Vector with initialization.
 ///
-/// \param size Size.
+/// \param size_local Size.
 /// \param value Initial value of entries.
 /// \param allocator Allocator.
 /// 
@@ -4745,17 +4846,21 @@ template<class T, class A>
 inline
 Vector<T, A>::Vector
 (
-    const size_t size,
+    const size_t size_local,
     const T& value,
     const allocator_type& allocator
 ) 
 : base(allocator)
 {
-    if(size != 0) {
-        size_t shape[1] = {size};
-        this->data_ = this->dataAllocator_.allocate(size);
-        base::base::assign(&shape[0], &shape[1], this->data_); 
-        for(size_t j=0; j<size; ++j) {
+    if(size_local != 0) {
+        size_t shape_local[1] = {size_local};
+        this->data_ = this->dataAllocator_.allocate(size_local);
+        base::base::assign(&shape_local[0], &shape_local[1], this->data_);
+        ptrdiff_t size_local_int = size_local;
+        #if defined(_OPENMP)
+        #pragma omp parallel for
+        #endif
+        for(ptrdiff_t j=0; j<size_local_int; ++j) {
             this->data_[j] = value;
         }
     }
@@ -4765,7 +4870,7 @@ Vector<T, A>::Vector
 /// Construct Vector without initialization.
 ///
 /// \param is Flag to be set to SkipInitialization.
-/// \param size Size.
+/// \param size_local Size.
 /// \param allocator Allocator.
 /// 
 template<class T, class A>
@@ -4773,15 +4878,15 @@ inline
 Vector<T, A>::Vector
 (
     const InitializationSkipping& is,
-    const size_t size,
+    const size_t size_local,
     const allocator_type& allocator
 ) 
 : base(allocator)
 {
-    if(size != 0) {
-        size_t shape[1] = {size};
-        this->data_ = this->dataAllocator_.allocate(size);
-        base::base::assign(&shape[0], &shape[1], this->data_); 
+    if(size_local != 0) {
+        size_t shape_local[1] = {size_local};
+        this->data_ = this->dataAllocator_.allocate(size_local);
+        base::base::assign(&shape_local[0], &shape_local[1], this->data_);
     }
     testInvariant();
 }
@@ -4848,7 +4953,11 @@ Vector<T, A>::operator=
 )
 {
     marray_detail::Assert(MARRAY_NO_DEBUG || this->data_ != 0);
-    for(size_t j=0; j<this->size(); ++j) {
+    ptrdiff_t this_size = this->size();
+    #if defined(_OPENMP)
+    #pragma omp parallel for
+    #endif
+    for(ptrdiff_t j=0; j<this_size; ++j) {
         this->data_[j] = value;
     }
     return *this;
@@ -4953,23 +5062,23 @@ Vector<T, A>::reshape
 
 /// Resize (existing entries are preserved, new entries are initialized).
 ///
-/// \param size New size.
+/// \param size_rhs New size.
 /// \param value Value to be assigned to newly allocated entries.
 ///
 template<class T, class A>
 inline void
 Vector<T, A>::resize
 (
-    const size_t size,
+    const size_t size_rhs,
     const T& value
 )
 {
-    if(size == 0) {
+    if(size_rhs == 0) {
         base::assign();
     }
     else {
-        size_t shape[1] = {size};
-        base::resize(&shape[0], &shape[1], value); 
+        size_t shape_local[1] = {size_rhs};
+        base::resize(&shape_local[0], &shape_local[1], value);
     }
     testInvariant();
 }
@@ -5094,7 +5203,11 @@ Matrix<T, A>::Matrix
                 memcpy(this->data_, in.data_, (this->size())*sizeof(T));
             }
             else {
-                for(size_t j=0; j<in.size(); ++j) {
+                ptrdiff_t in_size = in.size();
+                #if defined(_OPENMP)
+                #pragma omp parallel for
+                #endif
+                for(ptrdiff_t j=0; j<in_size; ++j) {
                     this->data_[j] = static_cast<T>(in(j));
                 }
             }
@@ -5108,7 +5221,7 @@ Matrix<T, A>::Matrix
 /// \param n1 size in 1st dimension.
 /// \param n2 size in 2nd dimension.
 /// \param value Initial value of entries.
-/// \param coordinateOrder Flag specifying whether FirstMajorOrder or
+/// \param coordinateOrder_rhs Flag specifying whether FirstMajorOrder or
 /// LastMajorOrder is to be used.
 /// \param allocator Allocator.
 ///
@@ -5119,17 +5232,22 @@ Matrix<T, A>::Matrix
     const size_t n1,
     const size_t n2,
     const T& value,
-    const CoordinateOrder& coordinateOrder,
+    const CoordinateOrder& coordinateOrder_rhs,
     const allocator_type& allocator
 )
 : base(allocator)
 {
     if(n1 > 0 && n2 > 0) {
-        size_t shape[2] = {n1, n2};
+        size_t shape_local[2] = {n1, n2};
         T* data = this->dataAllocator_.allocate(n1 * n2);
-        base::base::assign(&shape[0], &shape[2], data,
-            coordinateOrder, coordinateOrder);
-        for(size_t j=0; j<this->size(); ++j) {
+        base::base::assign(&shape_local[0], &shape_local[2], data,
+            coordinateOrder_rhs, coordinateOrder_rhs);
+
+        ptrdiff_t this_size = this->size();
+        #if defined(_OPENMP)
+        #pragma omp parallel for
+        #endif
+        for(ptrdiff_t j=0; j<this_size; ++j) {
             this->data_[j] = value;
         }
     }
@@ -5142,7 +5260,7 @@ Matrix<T, A>::Matrix
 /// \param is Flag to be set to SkipInitialization.
 /// \param n1 Size in 1st dimension.
 /// \param n2 Size in 2nd dimension.
-/// \param coordinateOrder Flag specifying whether FirstMajorOrder or
+/// \param coordinateOrder_rhs Flag specifying whether FirstMajorOrder or
 /// LastMajorOrder is to be used.
 /// \param allocator Allocator.
 ///
@@ -5153,16 +5271,16 @@ Matrix<T, A>::Matrix
     const InitializationSkipping& is, 
     const size_t n1,
     const size_t n2,
-    const CoordinateOrder& coordinateOrder,
+    const CoordinateOrder& coordinateOrder_rhs,
     const allocator_type& allocator
 ) 
 : base(allocator)
 {
     if(n1 > 0 && n2 > 0) {
-        size_t shape[2] = {n1, n2};
+        size_t shape_local[2] = {n1, n2};
         this->data_ = this->dataAllocator_.allocate(n1 * n2);
-        base::base::assign(&shape[0], &shape[2], this->data_, 
-            coordinateOrder, coordinateOrder);
+        base::base::assign(&shape_local[0], &shape_local[2], this->data_,
+            coordinateOrder_rhs, coordinateOrder_rhs);
     }
     testInvariant();
 }
@@ -5201,7 +5319,11 @@ Matrix<T, A>::operator=
 )
 {
     marray_detail::Assert(MARRAY_NO_DEBUG || this->data_ != 0);
-    for(size_t j=0; j<this->size(); ++j) {
+    ptrdiff_t this_size = this->size();
+    #if defined(_OPENMP)
+    #pragma omp parallel for
+    #endif
+    for(ptrdiff_t j=0; j<this_size; ++j) {
         this->data_[j] = value;
     }
     return *this;
@@ -5302,8 +5424,8 @@ Matrix<T, A>::resize
         base::assign();
     }
     else {
-        size_t shape[2] = {n1, n2};
-        base::resize(&shape[0], &shape[2], value);
+        size_t shape_local[2] = {n1, n2};
+        base::resize(&shape_local[0], &shape_local[2], value);
     }
     testInvariant();
 }
@@ -5349,8 +5471,8 @@ Matrix<T, A>::reshape
 )
 {
     marray_detail::Assert(MARRAY_NO_ARG_TEST || (n2 > 0 && n1 > 0));
-    size_t shape[2] = {n1, n2};
-    base::reshape(&shape[0], &shape[2]); 
+    size_t shape_local[2] = {n1, n2};
+    base::reshape(&shape_local[0], &shape_local[2]);
     testInvariant();
 }
 
@@ -5373,11 +5495,11 @@ public:
     typedef E expression_type;
     typedef T value_type;
 
-    const size_t dimension() const 
+    size_t dimension() const
         { return static_cast<const E&>(*this).dimension(); }
-    const size_t size() const 
+    size_t size() const
         { return static_cast<const E&>(*this).size(); }
-    const size_t shape(const size_t j) const 
+    size_t shape(const size_t j) const
         { return static_cast<const E&>(*this).shape(j); }
     const size_t* shapeBegin() const 
         { return static_cast<const E&>(*this).shapeBegin(); }
@@ -5388,7 +5510,7 @@ public:
             { return static_cast<const E&>(*this).overlaps(v); }
     const CoordinateOrder& coordinateOrder() const 
         { return static_cast<const E&>(*this).coordinateOrder(); }
-    const bool isSimple() const
+    bool isSimple() const
         { return static_cast<const E&>(*this).isSimple(); }
     template<class Accessor>
         const T& operator()(Accessor it) const
@@ -5403,19 +5525,43 @@ public:
         { return static_cast<const E&>(*this)(c0, c1, c2, c3, c4); }
     const T& operator[](const size_t offset) const
         { return static_cast<const E&>(*this)[offset]; }
+#ifdef __INTEL_COMPILER
+    E& get_ref()
+#else
     operator E&() 
+#endif
         { return static_cast<E&>(*this); }
+#ifdef __INTEL_COMPILER
+    const E& get_const_ref() const
+#else
     operator E const&() const 
+#endif
         { return static_cast<const E&>(*this); }
+
+    virtual ~ViewExpression() {}
 
     // \cond suppress doxygen
     class ExpressionIterator {
     public:
         ExpressionIterator(const ViewExpression<E, T>& expression)
-        : expression_(expression), // cast!
+        : 
+#ifdef __INTEL_COMPILER
+          expression_(expression.get_const_ref()), // cast!
+#else
+          expression_(expression), // cast!
+#endif
           data_(&expression_(0)),
           offset_(0)
             {}
+            
+#ifdef __INTEL_COMPILER
+        ExpressionIterator(ViewExpression<E, T>& expression)
+        : expression_(expression.get_ref()), // cast!
+          data_(&expression_(0)),
+          offset_(0)
+            {}
+#endif
+            
         void incrementCoordinate(const size_t coordinateIndex)
             { offset_ += expression_.strides(coordinateIndex); }
         void resetCoordinate(const size_t coordinateIndex)
@@ -5446,14 +5592,27 @@ public:
     typedef T value_type;
 
     UnaryViewExpression(const ViewExpression<E, T>& e)
-        : e_(e), // cast!
+        : 
+#ifdef __INTEL_COMPILER
+          e_(e.get_const_ref()), // cast!
+#else
+          e_(e), // cast!
+#endif
           unaryFunctor_(UnaryFunctor()) 
         {}
+        
+#ifdef __INTEL_COMPILER
+    UnaryViewExpression(ViewExpression<E, T>& e)
+        : e_(e.get_ref()), // cast!
+          unaryFunctor_(UnaryFunctor()) 
+        {}
+#endif
+
     const size_t dimension() const 
         { return e_.dimension(); }
-    const size_t size() const 
+    size_t size() const
         { return e_.size(); }
-    const size_t shape(const size_t j) const 
+    size_t shape(const size_t j) const
         { return e_.shape(j); }
     const size_t* shapeBegin() const 
         { return e_.shapeBegin(); }
@@ -5464,7 +5623,7 @@ public:
             { return e_.overlaps(v); }
     const CoordinateOrder& coordinateOrder() const 
         { return e_.coordinateOrder(); }
-    const bool isSimple() const
+    bool isSimple() const
         { return e_.isSimple(); }
     template<class Accessor>
         const T operator()(Accessor it) const
@@ -5519,7 +5678,12 @@ public:
 
     BinaryViewExpression(const ViewExpression<E1, T1>& e1, 
         const ViewExpression<E2, T2>& e2) 
-        : e1_(e1), e2_(e2), // cast!
+        : 
+#ifdef __INTEL_COMPILER
+          e1_(e1.get_const_ref()), e2_(e2.get_const_ref()), // cast!
+#else
+          e1_(e1), e2_(e2), // cast!
+#endif
           binaryFunctor_(BinaryFunctor()) 
         {
             if(!MARRAY_NO_DEBUG) {
@@ -5530,11 +5694,28 @@ public:
                 }
             }
         }
+        
+#ifdef __INTEL_COMPILER
+    BinaryViewExpression(ViewExpression<E1, T1>& e1, 
+        const ViewExpression<E2, T2>& e2) 
+        : e1_(e1.get_ref()), e2_(e2.get_ref()), // cast!
+          binaryFunctor_(BinaryFunctor()) 
+        {
+            if(!MARRAY_NO_DEBUG) {
+                marray_detail::Assert(e1_.size() != 0 && e2_.size() != 0);
+                marray_detail::Assert(e1_.dimension() == e2_.dimension());
+                for(size_t j=0; j<e1_.dimension(); ++j) {
+                    marray_detail::Assert(e1_.shape(j) == e2_.shape(j));
+                }
+            }
+        }
+#endif
+        
     const size_t dimension() const 
         { return e1_.dimension() < e2_.dimension() ? e2_.dimension() : e1_.dimension(); }
-    const size_t size() const 
+    size_t size() const
         { return e1_.size() < e2_.size() ? e2_.size() : e1_.size(); }
-    const size_t shape(const size_t j) const 
+    size_t shape(const size_t j) const
         { return e1_.dimension() < e2_.dimension() ? e2_.shape(j) : e1_.shape(j); }
     const size_t* shapeBegin() const 
         { return e1_.dimension() < e2_.dimension() ? e2_.shapeBegin() : e1_.shapeBegin(); }
@@ -5545,7 +5726,7 @@ public:
             { return e1_.overlaps(v) || e2_.overlaps(v); }
     const CoordinateOrder& coordinateOrder() const 
         { return e1_.coordinateOrder(); }
-    const bool isSimple() const
+    bool isSimple() const
         { return e1_.isSimple() && e2_.isSimple() 
                  && e1_.coordinateOrder() == e2_.coordinateOrder(); }
     template<class Accessor>
@@ -5604,14 +5785,28 @@ public:
 
     BinaryViewExpressionScalarFirst(const ViewExpression<E, T>& e, 
         const scalar_type& scalar) 
-        : e_(e), // cast!
+        : 
+#ifdef __INTEL_COMPILER
+          e_(e.get_const_ref()), // cast!
+#else
+          e_(e), // cast!
+#endif
           scalar_(scalar), binaryFunctor_(BinaryFunctor()) 
         { }
-    const size_t dimension() const 
+        
+#ifdef __INTEL_COMPILER
+    BinaryViewExpressionScalarFirst(ViewExpression<E, T>& e, 
+        const scalar_type& scalar) 
+        : e_(e.get_ref()), // cast!
+          scalar_(scalar), binaryFunctor_(BinaryFunctor()) 
+        { }
+#endif
+    
+    size_t dimension() const 
         { return e_.dimension(); }
-    const size_t size() const 
+    size_t size() const
         { return e_.size(); }
-    const size_t shape(const size_t j) const 
+    size_t shape(const size_t j) const
         { return e_.shape(j); }
     const size_t* shapeBegin() const 
         { return e_.shapeBegin(); }
@@ -5622,7 +5817,7 @@ public:
             { return e_.overlaps(v); }
     const CoordinateOrder& coordinateOrder() const 
         { return e_.coordinateOrder(); }
-    const bool isSimple() const
+    bool isSimple() const
         { return e_.isSimple(); }
     template<class Accessor>
         const value_type operator()(Accessor it) const
@@ -5678,14 +5873,28 @@ public:
 
     BinaryViewExpressionScalarSecond(const ViewExpression<E, T>& e, 
         const scalar_type& scalar) 
-        : e_(e), // cast!
+        : 
+#ifdef __INTEL_COMPILER
+          e_(e.get_const_ref()), // cast!
+#else
+          e_(e), // cast!
+#endif
           scalar_(scalar), binaryFunctor_(BinaryFunctor())
         { }
-    const size_t dimension() const 
+
+#ifdef __INTEL_COMPILER
+    BinaryViewExpressionScalarSecond(ViewExpression<E, T>& e, 
+        const scalar_type& scalar) 
+        : e_(e.get_ref()), // cast!
+          scalar_(scalar), binaryFunctor_(BinaryFunctor())
+        { }
+#endif
+        
+    size_t dimension() const 
         { return e_.dimension(); }
-    const size_t size() const 
+    size_t size() const
         { return e_.size(); }
-    const size_t shape(const size_t j) const 
+    size_t shape(const size_t j) const
         { return e_.shape(j); }
     const size_t* shapeBegin() const 
         { return e_.shapeBegin(); }
@@ -5696,7 +5905,7 @@ public:
             { return e_.overlaps(v); }
     const CoordinateOrder& coordinateOrder() const 
         { return e_.coordinateOrder(); }
-    const bool isSimple() const
+    bool isSimple() const
         { return e_.isSimple(); }
     template<class Accessor>
         const value_type operator()(Accessor it) const
@@ -5768,12 +5977,12 @@ public:
     Geometry<A>& operator=(const Geometry<A>&);
 
     void resize(const size_t dimension);
-    const size_t dimension() const;
-    const size_t shape(const size_t) const;
+    size_t dimension() const;
+    const size_t & shape(const size_t) const;
     size_t& shape(const size_t);
-    const size_t shapeStrides(const size_t) const;
+    const size_t & shapeStrides(const size_t) const;
     size_t& shapeStrides(const size_t);
-    const size_t strides(const size_t) const;
+    const size_t & strides(const size_t) const;
     size_t& strides(const size_t);
     const size_t* shapeBegin() const;
     size_t* shapeBegin();
@@ -5787,11 +5996,11 @@ public:
     size_t* stridesBegin();
     const size_t* stridesEnd() const;
     size_t* stridesEnd();
-    const size_t size() const;
+    const size_t & size() const;
     size_t& size();
     const CoordinateOrder& coordinateOrder() const;
     CoordinateOrder& coordinateOrder();
-    const bool isSimple() const;
+    const bool & isSimple() const;
     void updateSimplicity();
     bool& isSimple();
 
@@ -5851,27 +6060,38 @@ Geometry<A>::Geometry
         strides_[j] = g.strides_[j];
     }
     */
+
+#if defined(_OPENMP)
+    ptrdiff_t dimensiol_int_ = dimension_;
+    #pragma omp parallel for
+    for(ptrdiff_t j=0; j<dimensiol_int_; ++j) {
+        shape_[j] = g.shape_[j];
+        shapeStrides_[j] = g.shapeStrides_[j];
+        strides_[j] = g.strides_[j];
+    }
+#else
     memcpy(shape_, g.shape_, (dimension_*3)*sizeof(size_t));
+#endif
 }
 
 template<class A>
 inline 
 Geometry<A>::Geometry
 (
-    const size_t dimension,
+    const size_t dimension_rhs,
     const CoordinateOrder& order,
-    const size_t size,
-    const bool isSimple,
+    const size_t size_rhs,
+    const bool isSimple_rhs,
     const typename Geometry<A>::allocator_type& allocator
 )
 : allocator_(allocator),
-  shape_(allocator_.allocate(dimension*3)), 
-  shapeStrides_(shape_+dimension),
-  strides_(shapeStrides_+dimension), 
-  dimension_(dimension),
-  size_(size),
+  shape_(allocator_.allocate(dimension_rhs*3)),
+  shapeStrides_(shape_+dimension_rhs),
+  strides_(shapeStrides_+dimension_rhs),
+  dimension_(dimension_rhs),
+  size_(size_rhs),
   coordinateOrder_(order),
-  isSimple_(isSimple)
+  isSimple_(isSimple_rhs)
 {
 }
 
@@ -5897,7 +6117,8 @@ Geometry<A>::Geometry
 {
     if(dimension_ != 0) { // if the array is not a scalar
         isSimple_ = (externalCoordinateOrder == internalCoordinateOrder);
-        for(size_t j=0; j<dimension(); ++j, ++begin) {
+	size_t dimension_local = dimension();
+        for(size_t j=0; j<dimension_local; ++j, ++begin) {
             const size_t s = static_cast<size_t>(*begin);
             shape(j) = s;
             size() *= s;
@@ -5929,8 +6150,9 @@ Geometry<A>::Geometry
   coordinateOrder_(internalCoordinateOrder),
   isSimple_(true)
 {
-    if(dimension() != 0) {
-        for(size_t j=0; j<dimension(); ++j, ++begin, ++it) {
+    size_t dimension_local = dimension();
+    if(dimension_local != 0) {
+        for(size_t j=0; j<dimension_local; ++j, ++begin, ++it) {
             const size_t s = static_cast<size_t>(*begin);
             shape(j) = s;
             size() *= s;
@@ -5972,7 +6194,18 @@ Geometry<A>::operator=
             strides_[j] = g.strides_[j];
         }
         */
+
+#if defined(_OPENMP)
+        ptrdiff_t dimension_int_ = dimension_;
+        #pragma omp parallel for
+        for(ptrdiff_t j=0; j<dimension_int_; ++j) {
+            shape_[j] = g.shape_[j];
+            shapeStrides_[j] = g.shapeStrides_[j];
+            strides_[j] = g.strides_[j];
+        }
+#else
         memcpy(shape_, g.shape_, (dimension_*3)*sizeof(size_t));
+#endif
         size_ = g.size_;
         coordinateOrder_ = g.coordinateOrder_;
         isSimple_ = g.isSimple_;
@@ -5984,14 +6217,20 @@ template<class A>
 inline void 
 Geometry<A>::resize
 (
-    const size_t dimension
+    const size_t dimension_rhs
 )
 {
-    if(dimension != dimension_) {
-        size_t* newShape = allocator_.allocate(dimension*3);
-        size_t* newShapeStrides = newShape + dimension;
-        size_t* newStrides = newShapeStrides + dimension; 
-        for(size_t j=0; j<( (dimension < dimension_) ? dimension : dimension_); ++j) {
+    if(dimension_rhs != dimension_) {
+        size_t* newShape = allocator_.allocate(dimension_rhs*3);
+        size_t* newShapeStrides = newShape + dimension_rhs;
+        size_t* newStrides = newShapeStrides + dimension_rhs;
+
+        ptrdiff_t dimension_cond = ( (dimension_rhs < dimension_) ? dimension_rhs : dimension_);
+
+        #if defined(_OPENMP)
+        #pragma omp parallel for
+        #endif
+        for(ptrdiff_t j=0; j<dimension_cond; ++j) {
             // save existing entries
             newShape[j] = shape(j);
             newShapeStrides[j] = shapeStrides(j);
@@ -6001,27 +6240,26 @@ Geometry<A>::resize
         shape_ = newShape;
         shapeStrides_ = newShapeStrides;
         strides_ = newStrides;
-        dimension_ = dimension;
+        dimension_ = dimension_rhs;
     }
 }
 
 template<class A>
-inline const size_t 
-Geometry<A>::dimension() const
+inline size_t Geometry<A>::dimension() const
 {
     return dimension_; 
 }
 
 template<class A>
-inline const size_t 
+inline const size_t &
 Geometry<A>::shape(const size_t j) const
-{ 
-    Assert(MARRAY_NO_DEBUG || j<dimension_); 
-    return shape_[j]; 
+{
+    Assert(MARRAY_NO_DEBUG || j<dimension_);
+    return shape_[j];
 }
 
 template<class A>
-inline size_t& 
+inline size_t&
 Geometry<A>::shape(const size_t j)
 { 
     Assert(MARRAY_NO_DEBUG || j<dimension_); 
@@ -6029,7 +6267,7 @@ Geometry<A>::shape(const size_t j)
 }
 
 template<class A>
-inline const size_t 
+inline const size_t &
 Geometry<A>::shapeStrides
 (
     const size_t j
@@ -6051,7 +6289,7 @@ Geometry<A>::shapeStrides
 }
 
 template<class A>
-inline const size_t 
+inline const size_t &
 Geometry<A>::strides
 (
     const size_t j
@@ -6157,7 +6395,7 @@ Geometry<A>::stridesEnd()
 }
 
 template<class A>
-inline const size_t 
+inline const size_t &
 Geometry<A>::size() const
 { 
     return size_; 
@@ -6185,7 +6423,7 @@ Geometry<A>::coordinateOrder()
 }
 
 template<class A>
-inline const bool 
+inline const bool &
 Geometry<A>::isSimple() const 
 { 
     return isSimple_; 
@@ -6202,7 +6440,8 @@ template<class A>
 inline void
 Geometry<A>::updateSimplicity()
 { 
-    for(size_t j=0; j<dimension(); ++j) {
+    size_t dimension_local = dimension();
+    for(size_t j=0; j < dimension_local; ++j) {
         if(shapeStrides(j) != strides(j)) {
             isSimple_ = false;
             return;
@@ -6377,8 +6616,10 @@ struct AssignmentOperatorHelper<false, TFrom, TTo, AFrom, ATo>
         typedef typename View<TFrom, true, AFrom>::const_iterator FromIterator;
         typedef typename View<TTo, false, ATo>::iterator ToIterator;
         if(!MARRAY_NO_ARG_TEST) {
-            Assert(from.data_ != 0 && from.dimension() == to.dimension());
-            for(size_t j=0; j<from.dimension(); ++j) {
+            size_t from_dimension = from.dimension();
+            Assert(from.data_ != 0 && from_dimension == to.dimension());
+            
+            for(size_t j=0; j<from_dimension; ++j) {
                 Assert(from.shape(j) == to.shape(j));
             }
         }
@@ -6441,8 +6682,9 @@ struct AssignmentOperatorHelper<false, TFrom, TTo, AFrom, ATo>
             }
             else { // if the view 'to' is initialized
                 if(!MARRAY_NO_ARG_TEST) {
-                    Assert(from.data_ != 0 && from.dimension() == to.dimension());
-                    for(size_t j=0; j<from.dimension(); ++j) {
+		    size_t from_dimension = from.dimension();
+                    Assert(from.data_ != 0 && from_dimension == to.dimension());
+                    for(size_t j=0; j<from_dimension; ++j) {
                         Assert(from.shape(j) == to.shape(j));
                     }
                 }
@@ -6549,7 +6791,11 @@ operate
 {
     if(v.isSimple()) {
         T* data = &v(0);
-        for(size_t j=0; j<v.size(); ++j) {
+        ptrdiff_t v_size = v.size();
+        #if defined(_OPENMP)
+        #pragma omp parallel for
+        #endif
+        for(ptrdiff_t j=0; j<v_size; ++j) {
             f(data[j]);
         }
     }
@@ -6591,7 +6837,11 @@ operate
 {
     if(v.isSimple()) {
         T* data = &v(0);
-        for(size_t j=0; j<v.size(); ++j) {
+        ptrdiff_t v_size = v.size();
+        #if defined(_OPENMP)
+        #pragma omp parallel for
+        #endif
+        for(ptrdiff_t j=0; j<v_size; ++j) {
             f(data[j], x);
         }
     }
@@ -6635,7 +6885,8 @@ operate
         Assert(v.size() != 0 && w.size() != 0);
         Assert(w.dimension() == 0 || v.dimension() == w.dimension());
         if(w.dimension() != 0) {
-            for(size_t j=0; j<v.dimension(); ++j) {
+	    size_t v_dimension = v.dimension();
+            for(size_t j=0; j<v_dimension; ++j) {
                 Assert(v.shape(j) == w.shape(j));
             }
         }
@@ -6644,7 +6895,8 @@ operate
         T2 x = w(0);
         if(v.isSimple()) {
             T1* dataV = &v(0);
-            for(size_t j=0; j<v.size(); ++j) {
+	    size_t v_size = v.size();
+            for(size_t j=0; j<v_size; ++j) {
                 f(dataV[j], x);
             }
         }
@@ -6684,7 +6936,11 @@ operate
                 && v.isSimple() && w.isSimple()) {
                 T1* dataV = &v(0);
                 const T2* dataW = &w(0);
-                for(size_t j=0; j<v.size(); ++j) {
+                ptrdiff_t v_size = v.size();
+                #if defined(_OPENMP)
+                #pragma omp parallel for
+                #endif
+                for(ptrdiff_t j=0; j<v_size; ++j) {
                     f(dataV[j], dataW[j]);
                 }
             }
@@ -6729,7 +6985,11 @@ inline void operate
     Functor f
 )
 {
+#ifdef __INTEL_COMPILER
+    const E& e = expression.get_const_ref(); // cast
+#else
     const E& e = expression; // cast
+#endif
     if(!MARRAY_NO_DEBUG) {
         Assert(v.size() != 0 && e.size() != 0);
         Assert(e.dimension() == v.dimension());
@@ -6737,7 +6997,8 @@ inline void operate
             Assert(v.size() == 1 && e.size() == 1);
         }
         else {
-            for(size_t j=0; j<v.dimension(); ++j) {
+	    size_t v_dimension = v.dimension();
+            for(size_t j=0; j<v_dimension; ++j) {
                 Assert(v.shape(j) == e.shape(j));
             }
         }
@@ -6751,7 +7012,11 @@ inline void operate
     }
     else if(v.isSimple() && e.isSimple() 
     && v.coordinateOrder() == e.coordinateOrder()) {
-        for(size_t j=0; j<v.size(); ++j) {
+        ptrdiff_t v_size = v.size();
+        #if defined(_OPENMP)
+        #pragma omp parallel for
+        #endif
+        for(ptrdiff_t j=0; j<v_size; ++j) {
             f(v[j], e[j]);
         }
     }
@@ -6763,7 +7028,8 @@ inline void operate
         size_t maxDimension = v.dimension() - 1;
         for(;;) {
             f(v[offsetV], *itE);
-            for(size_t j=0; j<v.dimension(); ++j) {
+	    size_t v_dimension = v.dimension();
+            for(size_t j=0; j<v_dimension; ++j) {
                 if(coordinate[j]+1 == v.shape(j)) {
                     if(j == maxDimension) {
                         return;
