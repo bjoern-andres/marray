@@ -1,12 +1,7 @@
-// Copyright (c) 2011 by Bjoern Andres (bjoern@andres.sc).
+// Copyright (c) 2013 by Bjoern Andres, bjoern@andres.sc
 //
 // This software was developed by Bjoern Andres.
 // Enquiries shall be directed to bjoern@andres.sc.
-//
-// All advertising materials mentioning features or use of this software must
-// display the following acknowledgement: ``This product includes the Marray 
-// package developed by Bjoern Andres. Please direct enquiries concerning the 
-// Marray package to bjoern@andres.sc''.
 //
 // Redistribution and use in source and binary forms, with or without 
 // modification, are permitted provided that the following conditions are met:
@@ -16,10 +11,6 @@
 // - Redistributions in binary form must reproduce the above copyright notice, 
 //   this list of conditions and the following disclaimer in the documentation
 //   and/or other materials provided with the distribution.
-// - All advertising materials mentioning features or use of this software must 
-//   display the following acknowledgement: ``This product includes the Marray 
-//   package developed by Bjoern Andres. Please direct enquiries concerning the 
-//   Marray package to bjoern@andres.sc''.
 // - The name of the author must not be used to endorse or promote products 
 //   derived from this software without specific prior written permission.
 //
@@ -37,7 +28,7 @@
 #include <vector>
 #include <iostream>
 
-#include "marray/marray.hxx"
+#include "andres/marray.hxx"
 
 inline void test(const bool& x)
     { if(!x) throw std::logic_error("test failed."); }
@@ -81,7 +72,7 @@ public:
         void shapeStrideConstructorTest();
     template<bool constTarget>
         void shapeStrideAssignTest();
-    template<marray::CoordinateOrder internalFirstMajorOrder>   
+    template<andres::CoordinateOrder internalFirstMajorOrder>   
         void assignmentOperatorTest();
     template<bool constTarget>
         void queryTest();
@@ -98,7 +89,7 @@ public:
         void transposeTest();
     template<bool constTarget>
         void permuteTest();
-    template<bool constTarget, marray::CoordinateOrder internalFirstMajorOrder>
+    template<bool constTarget, andres::CoordinateOrder internalFirstMajorOrder>
         void shiftOperatorTest();
     void arithmeticOperatorsTest();
     template<bool constTarget>
@@ -146,46 +137,8 @@ public:
     template<bool constTarget>
         void assignmentOperatorTest();
     void reshapeTest();
-    template<marray::CoordinateOrder coordinateOrder>
+    template<andres::CoordinateOrder coordinateOrder>
         void resizeTest();
-};
-
-class VectorTest {
-private:
-    int scalar_;
-    int data_[24];
-    int data100_[100];
-
-public:
-    VectorTest(); 
-    template<bool constTarget>
-        void constructorTest();
-    template<bool constTarget>
-        void assignmentOperatorTest();
-    template<bool constTarget>
-        void elementAccessTest();
-    template<bool constTarget>
-        void resizeTest();
-};
-
-class MatrixTest {
-private:
-    int scalar_;
-    int data_[24];
-    int data100_[100];
-
-public:
-    MatrixTest(); 
-    template<bool constTarget>
-        void constructorTest();
-    template<bool constTarget>
-        void assignmentOperatorTest();
-    template<bool constTarget>
-        void transposeTest();
-    template<bool constTarget>
-        void resizeTest();
-    template<bool constTarget>
-        void reshapeTest();
 };
 
 class ExpressionTemplateTest
@@ -218,13 +171,13 @@ public:
 void GlobalFunctionTest::shapeStrideTest() {
     // firstMajorOrder == false
     {
-        std::vector<int> shape(3);
+        std::vector<size_t> shape(3);
         shape[0] = 7;
         shape[1] = 3;
         shape[2] = 5;
-        std::vector<int> strides(3);
-        marray::marray_detail::stridesFromShape(shape.begin(), shape.end(),
-            strides.begin(), marray::LastMajorOrder);
+        std::vector<size_t> strides(3);
+        andres::marray_detail::stridesFromShape(shape.begin(), shape.end(),
+            strides.begin(), andres::LastMajorOrder);
 
         test(strides[0] == 1 &&
                strides[1] == shape[0] &&
@@ -233,13 +186,13 @@ void GlobalFunctionTest::shapeStrideTest() {
     }
     // firstMajorOrder == true
     {
-        std::vector<int> shape(3);
+        std::vector<size_t> shape(3);
         shape[0] = 7;
         shape[1] = 3;
         shape[2] = 5;
-        std::vector<int> strides(3);
-        marray::marray_detail::stridesFromShape(shape.begin(), shape.end(),
-            strides.begin(), marray::FirstMajorOrder);
+        std::vector<size_t> strides(3);
+        andres::marray_detail::stridesFromShape(shape.begin(), shape.end(),
+            strides.begin(), andres::FirstMajorOrder);
 
         test(strides[0] == shape[1]*shape[2] &&
                strides[1] == shape[2] &&
@@ -249,11 +202,11 @@ void GlobalFunctionTest::shapeStrideTest() {
 }
 
 ViewTest::ViewTest() : scalar_(42) {
-    for(size_t j=0; j<24; ++j) {
+    for(int j=0; j<24; ++j) {
         data_[j] = j;
         data2x_[j] = j*2;
     }
-    for(size_t j=0; j<100; ++j) {
+    for(int j=0; j<100; ++j) {
         data100_[j] = j;
     }
 }
@@ -266,8 +219,8 @@ void ViewTest::coordinatesToOffsetTest() {
         shape[0] = 3;
         shape[1] = 2;
         shape[2] = 4;
-        marray::View<int, constTarget> v(shape.begin(), shape.end(),
-            data_, marray::LastMajorOrder);
+        andres::View<int, constTarget> v(shape.begin(), shape.end(),
+            data_, andres::LastMajorOrder);
         
         std::vector<size_t> c(3);
         size_t trueOffset = 0;
@@ -286,8 +239,8 @@ void ViewTest::coordinatesToOffsetTest() {
         shape[0] = 3;
         shape[1] = 2;
         shape[2] = 4;
-        marray::View<int, constTarget> v(shape.begin(), shape.end(),
-            data_, marray::FirstMajorOrder);
+        andres::View<int, constTarget> v(shape.begin(), shape.end(),
+            data_, andres::FirstMajorOrder);
 
         std::vector<size_t> c(3);
         size_t trueOffset = 0;
@@ -314,8 +267,8 @@ void ViewTest::coordinatesToOffsetTest() {
         strides[0] = 2;
         strides[1] = 10;
         strides[2] = 35;
-        marray::View<int, constTarget> v(shape.begin(), shape.end(), strides.begin(),
-            data100_+30, marray::LastMajorOrder);
+        andres::View<int, constTarget> v(shape.begin(), shape.end(), strides.begin(),
+            data100_+30, andres::LastMajorOrder);
         
         std::vector<size_t> c(3);
         size_t index = 0;
@@ -340,8 +293,8 @@ void ViewTest::coordinatesToOffsetTest() {
         strides[0] = 2;
         strides[1] = 10;
         strides[2] = 35;
-        marray::View<int, constTarget> v(shape.begin(), shape.end(), strides.begin(),
-            data100_+30, marray::FirstMajorOrder);
+        andres::View<int, constTarget> v(shape.begin(), shape.end(), strides.begin(),
+            data100_+30, andres::FirstMajorOrder);
 
         std::vector<size_t> c(3);
         size_t index = 0;
@@ -364,8 +317,8 @@ void ViewTest::coordinatesToIndexTest() {
         shape[0] = 3;
         shape[1] = 2;
         shape[2] = 4;
-        marray::View<int, constTarget> v(shape.begin(), shape.end(),
-            data_, marray::LastMajorOrder, marray::LastMajorOrder);
+        andres::View<int, constTarget> v(shape.begin(), shape.end(),
+            data_, andres::LastMajorOrder, andres::LastMajorOrder);
 
         std::vector<size_t> c(3);
         size_t trueIndex = 0;
@@ -384,8 +337,8 @@ void ViewTest::coordinatesToIndexTest() {
         shape[0] = 3;
         shape[1] = 2;
         shape[2] = 4;
-        marray::View<int, constTarget> v(shape.begin(), shape.end(),
-            data_, marray::LastMajorOrder, marray::FirstMajorOrder);
+        andres::View<int, constTarget> v(shape.begin(), shape.end(),
+            data_, andres::LastMajorOrder, andres::FirstMajorOrder);
 
         std::vector<size_t> c(3);
         size_t trueIndex = 0;
@@ -408,8 +361,8 @@ void ViewTest::indexToCoordinatesTest() {
         shape[0] = 3;
         shape[1] = 2;
         shape[2] = 4;
-        marray::View<int, constTarget> v(shape.begin(), shape.end(),
-            data_, marray::LastMajorOrder, marray::LastMajorOrder);
+        andres::View<int, constTarget> v(shape.begin(), shape.end(),
+            data_, andres::LastMajorOrder, andres::LastMajorOrder);
 
         std::vector<size_t> c(3);
         size_t index = 0;
@@ -428,8 +381,8 @@ void ViewTest::indexToCoordinatesTest() {
         shape[0] = 3;
         shape[1] = 2;
         shape[2] = 4;
-        marray::View<int, constTarget> v(shape.begin(), shape.end(),
-            data_, marray::LastMajorOrder, marray::FirstMajorOrder);
+        andres::View<int, constTarget> v(shape.begin(), shape.end(),
+            data_, andres::LastMajorOrder, andres::FirstMajorOrder);
 
         std::vector<size_t> c(3);
         size_t index = 0;
@@ -453,8 +406,8 @@ void ViewTest::indexToOffsetTest() {
         shape[0] = 3;
         shape[1] = 2;
         shape[2] = 4;
-        marray::View<int, constTarget> v(shape.begin(), shape.end(),
-            data_, marray::LastMajorOrder, marray::LastMajorOrder);
+        andres::View<int, constTarget> v(shape.begin(), shape.end(),
+            data_, andres::LastMajorOrder, andres::LastMajorOrder);
 
         size_t trueOffset = 0;
         for(size_t index=0; index<v.size(); ++index) {
@@ -470,10 +423,10 @@ void ViewTest::indexToOffsetTest() {
         shape[0] = 3;
         shape[1] = 2;
         shape[2] = 4;
-        marray::View<int, constTarget> v(shape.begin(), shape.end(),
-            data_, marray::LastMajorOrder, marray::FirstMajorOrder);
-        marray::View<int> w(shape.begin(), shape.end(),
-            data_, marray::LastMajorOrder, marray::LastMajorOrder);
+        andres::View<int, constTarget> v(shape.begin(), shape.end(),
+            data_, andres::LastMajorOrder, andres::FirstMajorOrder);
+        andres::View<int> w(shape.begin(), shape.end(),
+            data_, andres::LastMajorOrder, andres::LastMajorOrder);
     
         std::vector<size_t> c(3);
         size_t index = 0;
@@ -495,8 +448,8 @@ void ViewTest::indexToOffsetTest() {
         shape[0] = 3;
         shape[1] = 2;
         shape[2] = 4;
-        marray::View<int, constTarget> v(shape.begin(), shape.end(),
-            data_, marray::FirstMajorOrder, marray::LastMajorOrder);
+        andres::View<int, constTarget> v(shape.begin(), shape.end(),
+            data_, andres::FirstMajorOrder, andres::LastMajorOrder);
 
         for(size_t index=0; index<v.size(); ++index) {
             size_t offset = 0;
@@ -511,8 +464,8 @@ void ViewTest::indexToOffsetTest() {
         shape[0] = 3;
         shape[1] = 2;
         shape[2] = 4;
-        marray::View<int, constTarget> v(shape.begin(), shape.end(),
-            data_, marray::FirstMajorOrder, marray::FirstMajorOrder);
+        andres::View<int, constTarget> v(shape.begin(), shape.end(),
+            data_, andres::FirstMajorOrder, andres::FirstMajorOrder);
 
         size_t trueOffset = 0;
         for(size_t index=0; index<v.size(); ++index) {
@@ -536,8 +489,8 @@ void ViewTest::indexToOffsetTest() {
         strides[0] = 2;
         strides[1] = 10;
         strides[2] = 35;
-        marray::View<int, constTarget> v(shape.begin(), shape.end(), strides.begin(),
-            data100_+30, marray::LastMajorOrder);
+        andres::View<int, constTarget> v(shape.begin(), shape.end(), strides.begin(),
+            data100_+30, andres::LastMajorOrder);
         
         for(size_t index=0; index<v.size(); ++index) {
             size_t offset = 0;
@@ -557,8 +510,8 @@ void ViewTest::indexToOffsetTest() {
         strides[0] = 2;
         strides[1] = 10;
         strides[2] = 35;
-        marray::View<int, constTarget> v(shape.begin(), shape.end(), strides.begin(),
-            data100_+30, marray::FirstMajorOrder);
+        andres::View<int, constTarget> v(shape.begin(), shape.end(), strides.begin(),
+            data100_+30, andres::FirstMajorOrder);
         
         for(size_t index=0; index<v.size(); ++index) {
             size_t offset = 0;
@@ -570,7 +523,7 @@ void ViewTest::indexToOffsetTest() {
 
 template<bool constTarget>
 void ViewTest::emptyConstructorTest() {
-    marray::View<int, constTarget> v;   
+    andres::View<int, constTarget> v;   
     
     test(v.size() == 0
         );
@@ -578,7 +531,7 @@ void ViewTest::emptyConstructorTest() {
 
 template<bool constTarget>
 void ViewTest::scalarConstructorTest() {
-    marray::View<int, constTarget> v(&scalar_); 
+    andres::View<int, constTarget> v(&scalar_); 
     
     test(v.size() == 1 &&
            v.dimension() == 0);
@@ -589,8 +542,8 @@ void ViewTest::copyConstructorTest() {
     {
         // false, false
         {
-            marray::View<int, false> v(&scalar_);
-            marray::View<int, false> w(v);
+            andres::View<int, false> v(&scalar_);
+            andres::View<int, false> w(v);
 
             test(w.dimension() == v.dimension() &&
                    w.size() == v.size() &&
@@ -598,8 +551,8 @@ void ViewTest::copyConstructorTest() {
         }
         // false, true
         {
-            marray::View<int, false> v(&scalar_);
-            marray::View<int, true> w(v);
+            andres::View<int, false> v(&scalar_);
+            andres::View<int, true> w(v);
 
             test(w.dimension() == v.dimension() &&
                    w.size() == v.size() &&
@@ -607,8 +560,8 @@ void ViewTest::copyConstructorTest() {
         }
         // true, true
         {
-            marray::View<int, true> v(&scalar_);
-            marray::View<int, true> w(v);
+            andres::View<int, true> v(&scalar_);
+            andres::View<int, true> w(v);
 
             test(w.dimension() == v.dimension() &&
                    w.size() == v.size() &&
@@ -621,8 +574,8 @@ void ViewTest::copyConstructorTest() {
         {
             std::vector<size_t> shape(1);
             shape[0] = 24;
-            marray::View<int, false> v(shape.begin(), shape.end(), data_);
-            marray::View<int, false> w(v);
+            andres::View<int, false> v(shape.begin(), shape.end(), data_);
+            andres::View<int, false> w(v);
 
             test(w.dimension() == v.dimension() &&
                    w.size() == v.size() &&
@@ -639,8 +592,8 @@ void ViewTest::copyConstructorTest() {
         {
             std::vector<size_t> shape(1);
             shape[0] = 24;
-            marray::View<int, false> v(shape.begin(), shape.end(), data_);
-            marray::View<int, true> w(v);
+            andres::View<int, false> v(shape.begin(), shape.end(), data_);
+            andres::View<int, true> w(v);
 
             test(w.dimension() == v.dimension() &&
                    w.size() == v.size() &&
@@ -657,8 +610,8 @@ void ViewTest::copyConstructorTest() {
         {
             std::vector<size_t> shape(1);
             shape[0] = 24;
-            marray::View<int, true> v(shape.begin(), shape.end(), data_);
-            marray::View<int, true> w(v);
+            andres::View<int, true> v(shape.begin(), shape.end(), data_);
+            andres::View<int, true> w(v);
 
             test(w.dimension() == v.dimension() &&
                    w.size() == v.size() &&
@@ -679,8 +632,8 @@ void ViewTest::copyConstructorTest() {
             std::vector<size_t> shape(2);
             shape[0] = 6;
             shape[1] = 4;
-            marray::View<int> v(shape.begin(), shape.end(), data_);
-            marray::View<int> w(v);
+            andres::View<int> v(shape.begin(), shape.end(), data_);
+            andres::View<int> w(v);
 
             test(w.dimension() == v.dimension() &&
                    w.size() == v.size() &&
@@ -703,8 +656,8 @@ void ViewTest::copyConstructorTest() {
             std::vector<size_t> shape(2);
             shape[0] = 6;
             shape[1] = 4;
-            marray::View<int, false> v(shape.begin(), shape.end(), data_);
-            marray::View<int, true> w(v);
+            andres::View<int, false> v(shape.begin(), shape.end(), data_);
+            andres::View<int, true> w(v);
 
             test(w.dimension() == v.dimension() &&
                    w.size() == v.size() &&
@@ -727,8 +680,8 @@ void ViewTest::copyConstructorTest() {
             std::vector<size_t> shape(2);
             shape[0] = 6;
             shape[1] = 4;
-            marray::View<int, true> v(shape.begin(), shape.end(), data_);
-            marray::View<int, true> w(v);
+            andres::View<int, true> v(shape.begin(), shape.end(), data_);
+            andres::View<int, true> w(v);
             
             test(w.dimension() == v.dimension() &&
                    w.size() == v.size() &&
@@ -755,8 +708,8 @@ void ViewTest::copyConstructorTest() {
             shape[0] = 3;
             shape[1] = 4;
             shape[2] = 2;
-            marray::View<int, false> v(shape.begin(), shape.end(), data_);
-            marray::View<int, false> w(v);
+            andres::View<int, false> v(shape.begin(), shape.end(), data_);
+            andres::View<int, false> w(v);
             
             test(w.dimension() == v.dimension() &&
                    w.size() == v.size() &&
@@ -782,8 +735,8 @@ void ViewTest::copyConstructorTest() {
             shape[0] = 3;
             shape[1] = 4;
             shape[2] = 2;
-            marray::View<int, false> v(shape.begin(), shape.end(), data_);
-            marray::View<int, true> w(v);
+            andres::View<int, false> v(shape.begin(), shape.end(), data_);
+            andres::View<int, true> w(v);
             
             test(w.dimension() == v.dimension() &&
                    w.size() == v.size() &&
@@ -809,8 +762,8 @@ void ViewTest::copyConstructorTest() {
             shape[0] = 3;
             shape[1] = 4;
             shape[2] = 2;
-            marray::View<int, true> v(shape.begin(), shape.end(), data_);
-            marray::View<int, true> w(v);
+            andres::View<int, true> v(shape.begin(), shape.end(), data_);
+            andres::View<int, true> w(v);
             
             test(w.dimension() == v.dimension() &&
                    w.size() == v.size() &&
@@ -839,7 +792,7 @@ void ViewTest::shapeConstructorTest() {
     {
         std::vector<size_t> shape(1);
         shape[0] = 24;
-        marray::View<int, constTarget> v(shape.begin(), shape.end(), data_);
+        andres::View<int, constTarget> v(shape.begin(), shape.end(), data_);
         
         test(v.dimension() == shape.size() &&
                v.size() == 24
@@ -856,7 +809,7 @@ void ViewTest::shapeConstructorTest() {
         std::vector<size_t> shape(2);
         shape[0] = 6;
         shape[1] = 4;
-        marray::View<int, constTarget> v(shape.begin(), shape.end(), data_);
+        andres::View<int, constTarget> v(shape.begin(), shape.end(), data_);
         
         test(v.dimension() == shape.size() &&
                v.size() == 24
@@ -879,7 +832,7 @@ void ViewTest::shapeConstructorTest() {
         shape[0] = 2;
         shape[1] = 4;
         shape[2] = 3;
-        marray::View<int, constTarget> v(shape.begin(), shape.end(), data_);
+        andres::View<int, constTarget> v(shape.begin(), shape.end(), data_);
         
         test(v.dimension() == shape.size() &&
                v.size() == 24
@@ -906,7 +859,7 @@ void ViewTest::shapeAssignTest() {
     {
         // to scalar
         {
-            marray::View<int, constTarget> v(&scalar_);
+            andres::View<int, constTarget> v(&scalar_);
             std::vector<size_t> shape(0);
             v.assign(shape.begin(), shape.end(), data_);
 
@@ -916,7 +869,7 @@ void ViewTest::shapeAssignTest() {
         }
         // to 1D
         {
-            marray::View<int, constTarget> v(&scalar_);
+            andres::View<int, constTarget> v(&scalar_);
             std::vector<size_t> shape(1);
             shape[0] = 24;
             v.assign(shape.begin(), shape.end(), data_);
@@ -933,7 +886,7 @@ void ViewTest::shapeAssignTest() {
         }
         // to 2D
         {
-            marray::View<int, constTarget> v(&scalar_);
+            andres::View<int, constTarget> v(&scalar_);
             std::vector<size_t> shape(2);
             shape[0] = 6;
             shape[1] = 4;
@@ -953,7 +906,7 @@ void ViewTest::shapeAssignTest() {
         }
         // to 3D
         {
-            marray::View<int, constTarget> v(&scalar_);
+            andres::View<int, constTarget> v(&scalar_);
             std::vector<size_t> shape(3);
             shape[0] = 2;
             shape[1] = 4;
@@ -984,7 +937,7 @@ void ViewTest::shapeAssignTest() {
         { 
             std::vector<size_t> shape(1), shape0(0);
             shape[0] = 24;
-            marray::View<int, constTarget> v(shape.begin(), shape.end(), data_);
+            andres::View<int, constTarget> v(shape.begin(), shape.end(), data_);
             v.assign(shape0.begin(), shape0.end(), data_);
 
             test(v.dimension() == shape0.size() &&
@@ -995,7 +948,7 @@ void ViewTest::shapeAssignTest() {
         {
             std::vector<size_t> shape(1);
             shape[0] = 24;
-            marray::View<int, constTarget> v(shape.begin(), shape.end(), data_);
+            andres::View<int, constTarget> v(shape.begin(), shape.end(), data_);
             v.assign(shape.begin(), shape.end(), data2x_);
 
             test(v.dimension() == shape.size() &&
@@ -1014,7 +967,7 @@ void ViewTest::shapeAssignTest() {
             shape1D[0] = 24;
             shape2D[0] = 6;
             shape2D[1] = 4;
-            marray::View<int, constTarget> v(shape1D.begin(), shape1D.end(), data_);
+            andres::View<int, constTarget> v(shape1D.begin(), shape1D.end(), data_);
             v.assign(shape2D.begin(), shape2D.end(), data2x_);
 
             test(v.dimension() == shape2D.size() &&
@@ -1039,7 +992,7 @@ void ViewTest::shapeAssignTest() {
             shape3D[0] = 2;
             shape3D[1] = 4;
             shape3D[2] = 3;
-            marray::View<int, constTarget> v(shape1D.begin(), shape1D.end(), data_);
+            andres::View<int, constTarget> v(shape1D.begin(), shape1D.end(), data_);
             v.assign(shape3D.begin(), shape3D.end(), data2x_);
 
             test(v.dimension() == shape3D.size() &&
@@ -1067,7 +1020,7 @@ void ViewTest::shapeAssignTest() {
             std::vector<size_t> shape2D(2), shape0(0);
             shape2D[0] = 6;
             shape2D[1] = 4; 
-            marray::View<int, constTarget> v(shape2D.begin(), shape2D.end(), data_);
+            andres::View<int, constTarget> v(shape2D.begin(), shape2D.end(), data_);
             v.assign(shape0.begin(), shape0.end(), data_);
 
             test(v.dimension() == shape0.size() &&
@@ -1080,7 +1033,7 @@ void ViewTest::shapeAssignTest() {
             shape2D[0] = 6;
             shape2D[1] = 4; 
             shape1D[0] = 24;
-            marray::View<int, constTarget> v(shape2D.begin(), shape2D.end(), data_);
+            andres::View<int, constTarget> v(shape2D.begin(), shape2D.end(), data_);
             v.assign(shape1D.begin(), shape1D.end(), data2x_);
 
             test(v.dimension() == shape1D.size() &&
@@ -1098,7 +1051,7 @@ void ViewTest::shapeAssignTest() {
             std::vector<size_t> shape(2);
             shape[0] = 6;
             shape[1] = 4;
-            marray::View<int, constTarget> v(shape.begin(), shape.end(), data_);
+            andres::View<int, constTarget> v(shape.begin(), shape.end(), data_);
             v.assign(shape.begin(), shape.end(), data2x_);
 
             test(v.dimension() == shape.size() &&
@@ -1120,7 +1073,7 @@ void ViewTest::shapeAssignTest() {
             shapeBefore[1] = 6;
             shape[0] = 6;
             shape[1] = 4;
-            marray::View<int, constTarget> v(shapeBefore.begin(), shapeBefore.end(), data_);
+            andres::View<int, constTarget> v(shapeBefore.begin(), shapeBefore.end(), data_);
             v.assign(shape.begin(), shape.end(), data2x_);
 
             test(v.dimension() == shape.size() &&
@@ -1140,7 +1093,7 @@ void ViewTest::shapeAssignTest() {
             std::vector<size_t> shape2D(2), shape3D(3);
             shape2D[0] = 6;
             shape2D[1] = 4;
-            marray::View<int, constTarget> v(shape2D.begin(), shape2D.end(), data_);
+            andres::View<int, constTarget> v(shape2D.begin(), shape2D.end(), data_);
             shape3D[0] = 2;
             shape3D[1] = 4;
             shape3D[2] = 3;
@@ -1172,7 +1125,7 @@ void ViewTest::shapeAssignTest() {
             shape3D[0] = 3;
             shape3D[1] = 4;
             shape3D[2] = 2;
-            marray::View<int, constTarget> v(shape3D.begin(), shape3D.end(), data_);
+            andres::View<int, constTarget> v(shape3D.begin(), shape3D.end(), data_);
             v.assign(shape0.begin(), shape0.end(), data_);
 
             test(v.dimension() == shape0.size() &&
@@ -1186,7 +1139,7 @@ void ViewTest::shapeAssignTest() {
             shape3D[1] = 4;
             shape3D[2] = 2;
             shape1D[0] = 24; 
-            marray::View<int, constTarget> v(shape3D.begin(), shape3D.end(), data_);
+            andres::View<int, constTarget> v(shape3D.begin(), shape3D.end(), data_);
             v.assign(shape1D.begin(), shape1D.end(), data2x_);
 
             test(v.dimension() == shape1D.size() &&
@@ -1205,7 +1158,7 @@ void ViewTest::shapeAssignTest() {
             shape3D[0] = 2;
             shape3D[1] = 4;
             shape3D[2] = 3;
-            marray::View<int, constTarget> v(shape3D.begin(), shape3D.end(), data_);
+            andres::View<int, constTarget> v(shape3D.begin(), shape3D.end(), data_);
             shape2D[0] = 6;
             shape2D[1] = 4;
             v.assign(shape2D.begin(), shape2D.end(), data_);
@@ -1231,7 +1184,7 @@ void ViewTest::shapeAssignTest() {
             shape[0] = 2;
             shape[1] = 4;
             shape[2] = 3;
-            marray::View<int, constTarget> v(shape.begin(), shape.end(), data_);
+            andres::View<int, constTarget> v(shape.begin(), shape.end(), data_);
             v.assign(shape.begin(), shape.end(), data2x_);
 
             for(unsigned short j=0; j<shape.size(); ++j) {
@@ -1257,7 +1210,7 @@ void ViewTest::shapeAssignTest() {
             shape[0] = 2;
             shape[1] = 4;
             shape[2] = 3;
-            marray::View<int, constTarget> v(shapeBefore.begin(), shapeBefore.end(), data_);
+            andres::View<int, constTarget> v(shapeBefore.begin(), shapeBefore.end(), data_);
             v.assign(shape.begin(), shape.end(), data2x_);
 
             for(unsigned short j=0; j<shape.size(); ++j) {
@@ -1287,8 +1240,8 @@ void ViewTest::shapeStrideConstructorTest() {
             shape[0] = 6;
             std::vector<size_t> strides(1);
             strides[0] = 4;
-            marray::View<int, constTarget> v(shape.begin(), shape.end(),
-                strides.begin(), data_, marray::LastMajorOrder);
+            andres::View<int, constTarget> v(shape.begin(), shape.end(),
+                strides.begin(), data_, andres::LastMajorOrder);
 
             int i = 0; 
             for(int x = 0; x < 6; ++x){
@@ -1304,8 +1257,8 @@ void ViewTest::shapeStrideConstructorTest() {
             shape[0] = 6;
             std::vector<size_t> strides(1);
             strides[0] = 4;
-            marray::View<int, constTarget> v(shape.begin(), shape.end(),
-                strides.begin(), data_+2, marray::LastMajorOrder);
+            andres::View<int, constTarget> v(shape.begin(), shape.end(),
+                strides.begin(), data_+2, andres::LastMajorOrder);
 
             int i = 2; 
             for(int x = 0; x < 6; ++x){
@@ -1326,7 +1279,7 @@ void ViewTest::shapeStrideConstructorTest() {
             std::vector<size_t> strides(2);
             strides[0] = 1;
             strides[1] = 3;
-            marray::View<int, constTarget> v(shape.begin(), shape.end(), strides.begin(), data_, marray::LastMajorOrder);
+            andres::View<int, constTarget> v(shape.begin(), shape.end(), strides.begin(), data_, andres::LastMajorOrder);
 
             int i = 0; 
             for(int y = 0; y < 2; ++y){
@@ -1346,8 +1299,8 @@ void ViewTest::shapeStrideConstructorTest() {
             std::vector<size_t> strides(2);
             strides[0] = 1;
             strides[1] = 3;
-            marray::View<int, constTarget> v(shape.begin(), shape.end(), strides.begin(),
-                data100_+50, marray::LastMajorOrder);
+            andres::View<int, constTarget> v(shape.begin(), shape.end(), strides.begin(),
+                data100_+50, andres::LastMajorOrder);
 
             int i = 50; 
             for(int y = 0; y < 2; ++y){
@@ -1374,8 +1327,8 @@ void ViewTest::shapeStrideConstructorTest() {
             strides[0] = 2;
             strides[1] = 10;
             strides[2] = 35;
-            marray::View<int, constTarget> v(shape.begin(), shape.end(), strides.begin(),
-                data100_, marray::LastMajorOrder);
+            andres::View<int, constTarget> v(shape.begin(), shape.end(), strides.begin(),
+                data100_, andres::LastMajorOrder);
 
             test(v.dimension() == shape.size() && v.size() == 24
             );
@@ -1399,8 +1352,8 @@ void ViewTest::shapeStrideConstructorTest() {
             strides[0] = 2;
             strides[1] = 10;
             strides[2] = 35;
-            marray::View<int, constTarget> v(shape.begin(), shape.end(), strides.begin(),
-                data100_+30, marray::LastMajorOrder);
+            andres::View<int, constTarget> v(shape.begin(), shape.end(), strides.begin(),
+                data100_+30, andres::LastMajorOrder);
 
             test(v.dimension() == shape.size() && v.size() == 24
             );
@@ -1424,12 +1377,12 @@ void ViewTest::shapeStrideAssignTest()
         {
             // without offset
             {
-                marray::View<int, constTarget> v(&scalar_);
+                andres::View<int, constTarget> v(&scalar_);
                 std::vector<size_t> shape(0);
                 std::vector<size_t> strides(1);
                 strides[0] = 2;
                 v.assign(shape.begin(), shape.end(), strides.begin(),
-                    data_, marray::LastMajorOrder);
+                    data_, andres::LastMajorOrder);
                 
                 test(v.dimension() == shape.size() &&
                        v.size() == 1 &&
@@ -1438,13 +1391,13 @@ void ViewTest::shapeStrideAssignTest()
             }
             // to with offset 
             {
-                marray::View<int, constTarget> v(&scalar_);
+                andres::View<int, constTarget> v(&scalar_);
                 std::vector<size_t> shape(0);
                 std::vector<size_t> strides(1);
                 strides[0] = 2;
 
                 v.assign(shape.begin(), shape.end(), strides.begin(),
-                    data_+10, marray::LastMajorOrder);
+                    data_+10, andres::LastMajorOrder);
                 test(v.dimension() == shape.size() &&
                        v.size() == 1 &&
                        v(0) == 10
@@ -1455,14 +1408,14 @@ void ViewTest::shapeStrideAssignTest()
         {
             // without offset
             {
-                marray::View<int, constTarget> v(&scalar_);
+                andres::View<int, constTarget> v(&scalar_);
                 std::vector<size_t> shape(1);
                 shape[0] = 6;
                 std::vector<size_t> strides(1);
                 strides[0] = 2;
 
                 v.assign(shape.begin(), shape.end(), strides.begin(),
-                    data_, marray::LastMajorOrder);
+                    data_, andres::LastMajorOrder);
                 test(v.dimension() == shape.size() &&
                        v.size() == 6
                 );
@@ -1474,13 +1427,13 @@ void ViewTest::shapeStrideAssignTest()
             }
             // with offset 
             {
-                marray::View<int, constTarget> v(&scalar_);
+                andres::View<int, constTarget> v(&scalar_);
                 std::vector<size_t> shape(1);
                 shape[0] = 6;
                 std::vector<size_t> strides(1);
                 strides[0] = 2;
                 v.assign(shape.begin(), shape.end(), strides.begin(),
-                    data100_+1, marray::LastMajorOrder);
+                    data100_+1, andres::LastMajorOrder);
 
                 test(v.dimension() == shape.size() &&
                        v.size() == 6
@@ -1497,7 +1450,7 @@ void ViewTest::shapeStrideAssignTest()
             // without offset
             {
                 int list[] = {0, 2, 4, 4, 6, 8};
-                marray::View<int, constTarget> v(&scalar_);
+                andres::View<int, constTarget> v(&scalar_);
                 std::vector<size_t> shape(2);
                 shape[0] = 3;
                 shape[1] = 2;
@@ -1505,7 +1458,7 @@ void ViewTest::shapeStrideAssignTest()
                 strides[0] = 2;
                 strides[1] = 4;
                 v.assign(shape.begin(), shape.end(), strides.begin(),
-                    data_, marray::LastMajorOrder);
+                    data_, andres::LastMajorOrder);
 
                 test(v.dimension() == shape.size() &&
                        v.size() == 6
@@ -1520,7 +1473,7 @@ void ViewTest::shapeStrideAssignTest()
             // with offset 
             {
                 int list[] = {50, 52, 54, 54, 56, 58};
-                marray::View<int, constTarget> v(&scalar_);
+                andres::View<int, constTarget> v(&scalar_);
                 std::vector<size_t> shape(2);
                 shape[0] = 3;
                 shape[1] = 2;
@@ -1528,7 +1481,7 @@ void ViewTest::shapeStrideAssignTest()
                 strides[0] = 2;
                 strides[1] = 4;
                 v.assign(shape.begin(), shape.end(), strides.begin(),
-                    data100_+50, marray::LastMajorOrder);
+                    data100_+50, andres::LastMajorOrder);
 
                 test(v.dimension() == shape.size() &&
                        v.size() == 6
@@ -1547,7 +1500,7 @@ void ViewTest::shapeStrideAssignTest()
             {
                 int list[] = {0, 2, 4, 10, 12, 14, 20, 22, 24, 30, 32, 34,
                     35, 37, 39, 45, 47, 49, 55, 57, 59, 65, 67, 69};
-                marray::View<int, constTarget> v(&scalar_);
+                andres::View<int, constTarget> v(&scalar_);
                 std::vector<size_t> shape(3);
                 shape[0] = 3;
                 shape[1] = 4;
@@ -1557,7 +1510,7 @@ void ViewTest::shapeStrideAssignTest()
                 strides[1] = 10;
                 strides[2] = 35;
                 v.assign(shape.begin(), shape.end(), strides.begin(),
-                    data100_, marray::LastMajorOrder);
+                    data100_, andres::LastMajorOrder);
 
                 test(v.dimension() == shape.size() &&
                        v.size() == 24
@@ -1574,7 +1527,7 @@ void ViewTest::shapeStrideAssignTest()
             {
                 int list[] = {30, 32, 34, 40, 42, 44, 50, 52, 54, 60, 62, 64,
                     65, 67, 69, 75, 77, 79, 85, 87, 89, 95, 97, 99};
-                marray::View<int, constTarget> v(&scalar_);
+                andres::View<int, constTarget> v(&scalar_);
                 std::vector<size_t> shape(3);
                 shape[0] = 3;
                 shape[1] = 4;
@@ -1585,7 +1538,7 @@ void ViewTest::shapeStrideAssignTest()
                 strides[1] = 10;
                 strides[2] = 35; 
                 v.assign(shape.begin(), shape.end(), strides.begin(),
-                    data100_+30, marray::LastMajorOrder);
+                    data100_+30, andres::LastMajorOrder);
 
                 test(v.dimension() == shape.size() &&
                        v.size() == 24
@@ -1608,10 +1561,10 @@ void ViewTest::shapeStrideAssignTest()
             shape[0] = 6;
             std::vector<size_t> strides(1);
             strides[0] = 1;
-            marray::View<int, constTarget> v(shape.begin(), shape.end(),
-                strides.begin(), data_, marray::LastMajorOrder);
+            andres::View<int, constTarget> v(shape.begin(), shape.end(),
+                strides.begin(), data_, andres::LastMajorOrder);
             v.assign(shape0.begin(), shape0.end(), strides.begin(),
-                  data_, marray::LastMajorOrder);
+                  data_, andres::LastMajorOrder);
 
             test(v.dimension() == shape0.size() &&
                      v.size() == 1
@@ -1625,11 +1578,11 @@ void ViewTest::shapeStrideAssignTest()
                 shape[0] = 6;
                 std::vector<size_t> strides(1);
                 strides[0] = 1;
-                marray::View<int, constTarget> v(shape.begin(), shape.end(),
-                    strides.begin(), data_, marray::LastMajorOrder);
+                andres::View<int, constTarget> v(shape.begin(), shape.end(),
+                    strides.begin(), data_, andres::LastMajorOrder);
                 strides[0] = 2;
                 v.assign(shape.begin(), shape.end(), strides.begin(),
-                    data_, marray::LastMajorOrder);
+                    data_, andres::LastMajorOrder);
 
                 test(v.dimension() == shape.size() &&
                        v.size() == 6
@@ -1646,11 +1599,11 @@ void ViewTest::shapeStrideAssignTest()
                 shape[0] = 6;
                 std::vector<size_t> strides(1);
                 strides[0] = 1;
-                marray::View<int, constTarget> v(shape.begin(), shape.end(), strides.begin(),
-                    data_+5, marray::LastMajorOrder);
+                andres::View<int, constTarget> v(shape.begin(), shape.end(), strides.begin(),
+                    data_+5, andres::LastMajorOrder);
                 strides[0] = 2;
                 v.assign(shape.begin(), shape.end(), strides.begin(), data_+1,
-                    marray::LastMajorOrder);
+                    andres::LastMajorOrder);
 
                 test(v.dimension() == shape.size() &&
                        v.size() == 6
@@ -1667,11 +1620,11 @@ void ViewTest::shapeStrideAssignTest()
                 shape[0] = 6;
                 std::vector<size_t> strides(1);
                 strides[0] = 1;
-                marray::View<int, constTarget> v(shape.begin(), shape.end(),
-                    strides.begin(), data_, marray::LastMajorOrder);
+                andres::View<int, constTarget> v(shape.begin(), shape.end(),
+                    strides.begin(), data_, andres::LastMajorOrder);
                 strides[0] = 2;
                 v.assign(shape.begin(), shape.end(), strides.begin(),
-                    data_+1, marray::LastMajorOrder);
+                    data_+1, andres::LastMajorOrder);
 
                 test(v.dimension() == shape.size() &&
                        v.size() == 6
@@ -1685,11 +1638,11 @@ void ViewTest::shapeStrideAssignTest()
                 shape[0] = 6;
                 std::vector<size_t> strides(1);
                 strides[0] = 1;
-                marray::View<int, constTarget> v(shape.begin(), shape.end(), strides.begin(),
-                    data_+5, marray::LastMajorOrder);
+                andres::View<int, constTarget> v(shape.begin(), shape.end(), strides.begin(),
+                    data_+5, andres::LastMajorOrder);
                 strides[0] = 2;
                 v.assign(shape.begin(), shape.end(), strides.begin(),
-                    data_, marray::LastMajorOrder);
+                    data_, andres::LastMajorOrder);
 
                 test(v.dimension() == shape.size() &&
                        v.size() == 6
@@ -1707,8 +1660,8 @@ void ViewTest::shapeStrideAssignTest()
                 shape[0] = 24;
                 std::vector<size_t> strides(1);
                 strides[0] = 3; 
-                marray::View<int, constTarget> v(shape.begin(), shape.end(),
-                    strides.begin(), data100_, marray::LastMajorOrder);
+                andres::View<int, constTarget> v(shape.begin(), shape.end(),
+                    strides.begin(), data100_, andres::LastMajorOrder);
                 shape.resize(2);
                 shape[0] = 3;
                 shape[1] = 2;
@@ -1716,7 +1669,7 @@ void ViewTest::shapeStrideAssignTest()
                 strides[0] = 2;
                 strides[1] = 4;
                 v.assign(shape.begin(), shape.end(), strides.begin(),
-                    data_, marray::LastMajorOrder);
+                    data_, andres::LastMajorOrder);
 
                 test(v.dimension() == shape.size() &&
                        v.size() == 6
@@ -1735,8 +1688,8 @@ void ViewTest::shapeStrideAssignTest()
                 shape[0] = 24;
                 std::vector<size_t> strides(1);
                 strides[0] = 4;
-                marray::View<int, constTarget> v(shape.begin(), shape.end(), strides.begin(),
-                    data100_+1, marray::LastMajorOrder);
+                andres::View<int, constTarget> v(shape.begin(), shape.end(), strides.begin(),
+                    data100_+1, andres::LastMajorOrder);
                 shape.resize(2);
                 shape[0] = 3;
                 shape[1] = 2;
@@ -1744,7 +1697,7 @@ void ViewTest::shapeStrideAssignTest()
                 strides[0] = 2;
                 strides[1] = 4;
                 v.assign(shape.begin(), shape.end(), strides.begin(), 
-                    data100_+50, marray::LastMajorOrder);
+                    data100_+50, andres::LastMajorOrder);
                 
                 test(v.dimension() == shape.size() &&
                        v.size() == 6
@@ -1762,8 +1715,8 @@ void ViewTest::shapeStrideAssignTest()
                 shape[0] = 24;
                 std::vector<size_t> strides(1);
                 strides[0] = 3;
-                marray::View<int, constTarget> v(shape.begin(), shape.end(), strides.begin(),
-                    data100_, marray::LastMajorOrder);
+                andres::View<int, constTarget> v(shape.begin(), shape.end(), strides.begin(),
+                    data100_, andres::LastMajorOrder);
                 shape.resize(2);
                 shape[0] = 3;
                 shape[1] = 2;
@@ -1771,7 +1724,7 @@ void ViewTest::shapeStrideAssignTest()
                 strides[0] = 2;
                 strides[1] = 4;
                 v.assign(shape.begin(), shape.end(), strides.begin(), 
-                    data100_+50, marray::LastMajorOrder);
+                    data100_+50, andres::LastMajorOrder);
 
                 test(v.dimension() == shape.size() &&
                        v.size() == 6
@@ -1789,8 +1742,8 @@ void ViewTest::shapeStrideAssignTest()
                 shape[0] = 24;
                 std::vector<size_t> strides(1);
                 strides[0] = 3;
-                marray::View<int, constTarget> v(shape.begin(), shape.end(), strides.begin(),
-                    data100_+1, marray::LastMajorOrder);
+                andres::View<int, constTarget> v(shape.begin(), shape.end(), strides.begin(),
+                    data100_+1, andres::LastMajorOrder);
                 shape.resize(2);
                 shape[0] = 3;
                 shape[1] = 2;
@@ -1798,7 +1751,7 @@ void ViewTest::shapeStrideAssignTest()
                 strides[0] = 2;
                 strides[1] = 4;
                 v.assign(shape.begin(), shape.end(), strides.begin(),
-                    data100_, marray::LastMajorOrder);
+                    data100_, andres::LastMajorOrder);
 
                 test(v.dimension() == shape.size() &&
                        v.size() == 6
@@ -1821,8 +1774,8 @@ void ViewTest::shapeStrideAssignTest()
                 shape[0] = 24;
                 std::vector<size_t> strides(1);
                 strides[0] = 3;
-                marray::View<int, constTarget> v(shape.begin(), shape.end(),
-                    strides.begin(), data100_, marray::LastMajorOrder);
+                andres::View<int, constTarget> v(shape.begin(), shape.end(),
+                    strides.begin(), data100_, andres::LastMajorOrder);
                 shape.resize(3);
                 shape[0] = 3;
                 shape[1] = 4;
@@ -1832,7 +1785,7 @@ void ViewTest::shapeStrideAssignTest()
                 strides[1] = 10;
                 strides[2] = 35;
                 v.assign(shape.begin(), shape.end(), strides.begin(),
-                    data100_, marray::LastMajorOrder);
+                    data100_, andres::LastMajorOrder);
 
                 test(v.dimension() == shape.size() &&
                        v.size() == 24
@@ -1853,8 +1806,8 @@ void ViewTest::shapeStrideAssignTest()
                 shape[0] = 24;
                 std::vector<size_t> strides(1);
                 strides[0] = 3;
-                marray::View<int, constTarget> v(shape.begin(), shape.end(),
-                    strides.begin(), data100_+1, marray::LastMajorOrder);
+                andres::View<int, constTarget> v(shape.begin(), shape.end(),
+                    strides.begin(), data100_+1, andres::LastMajorOrder);
                 shape.resize(3);
                 shape[0] = 3;
                 shape[1] = 4;
@@ -1864,7 +1817,7 @@ void ViewTest::shapeStrideAssignTest()
                 strides[1] = 10;
                 strides[2] = 35;
                 v.assign(shape.begin(), shape.end(), strides.begin(), 
-                    data100_+30, marray::LastMajorOrder);
+                    data100_+30, andres::LastMajorOrder);
 
                 test(v.dimension() == shape.size() &&
                        v.size() == 24
@@ -1884,8 +1837,8 @@ void ViewTest::shapeStrideAssignTest()
                 shape[0] = 24;
                 std::vector<size_t> strides(1);
                 strides[0] = 3;
-                marray::View<int, constTarget> v(shape.begin(), shape.end(),
-                    strides.begin(), data100_, marray::LastMajorOrder);
+                andres::View<int, constTarget> v(shape.begin(), shape.end(),
+                    strides.begin(), data100_, andres::LastMajorOrder);
                 shape.resize(3);
                 shape[0] = 3;
                 shape[1] = 4;
@@ -1895,7 +1848,7 @@ void ViewTest::shapeStrideAssignTest()
                 strides[1] = 10;
                 strides[2] = 35;
                 v.assign(shape.begin(), shape.end(), strides.begin(), 
-                    data100_+30, marray::LastMajorOrder);
+                    data100_+30, andres::LastMajorOrder);
 
                 test(v.dimension() == shape.size() &&
                        v.size() == 24
@@ -1915,8 +1868,8 @@ void ViewTest::shapeStrideAssignTest()
                 shape[0] = 24;
                 std::vector<size_t> strides(1);
                 strides[0] = 3;
-                marray::View<int, constTarget> v(shape.begin(), shape.end(),
-                    strides.begin(), data100_+2, marray::LastMajorOrder);
+                andres::View<int, constTarget> v(shape.begin(), shape.end(),
+                    strides.begin(), data100_+2, andres::LastMajorOrder);
                 shape.resize(3);
                 shape[0] = 3;
                 shape[1] = 4;
@@ -1926,7 +1879,7 @@ void ViewTest::shapeStrideAssignTest()
                 strides[1] = 10;
                 strides[2] = 35;
                 v.assign(shape.begin(), shape.end(), strides.begin(),
-                    data100_, marray::LastMajorOrder);
+                    data100_, andres::LastMajorOrder);
                 
                 test(v.dimension() == shape.size() &&
                        v.size() == 24
@@ -1953,14 +1906,14 @@ void ViewTest::shapeStrideAssignTest()
                 std::vector<size_t> strides(2);
                 strides[0] = 1;
                 strides[1] = 3; 
-                marray::View<int, constTarget> v(shape.begin(), shape.end(),
-                    strides.begin(), data100_, marray::LastMajorOrder);
+                andres::View<int, constTarget> v(shape.begin(), shape.end(),
+                    strides.begin(), data100_, andres::LastMajorOrder);
                 shape.resize(1);
                 shape[0] = 6; 
                 strides.resize(1);
                 strides[0] = 2;
                 v.assign(shape.begin(), shape.end(), strides.begin(),
-                    data100_, marray::LastMajorOrder);
+                    data100_, andres::LastMajorOrder);
 
                 test(v.dimension() == shape.size() &&
                        v.size() == 6
@@ -1979,14 +1932,14 @@ void ViewTest::shapeStrideAssignTest()
                 std::vector<size_t> strides(2);
                 strides[0] = 1;
                 strides[1] = 3;
-                marray::View<int, constTarget> v(shape.begin(), shape.end(),
-                    strides.begin(), data100_+5, marray::LastMajorOrder);
+                andres::View<int, constTarget> v(shape.begin(), shape.end(),
+                    strides.begin(), data100_+5, andres::LastMajorOrder);
                 shape.resize(1);
                 shape[0] = 6; 
                 strides.resize(1);
                 strides[0] = 2;
                 v.assign(shape.begin(), shape.end(), strides.begin(),
-                    data100_+1, marray::LastMajorOrder);
+                    data100_+1, andres::LastMajorOrder);
 
                 test(v.dimension() == shape.size() &&
                        v.size() == 6
@@ -2005,14 +1958,14 @@ void ViewTest::shapeStrideAssignTest()
                 std::vector<size_t> strides(2);
                 strides[0] = 1;
                 strides[1] = 3;
-                marray::View<int, constTarget> v(shape.begin(), shape.end(),
-                    strides.begin(), data100_, marray::LastMajorOrder);
+                andres::View<int, constTarget> v(shape.begin(), shape.end(),
+                    strides.begin(), data100_, andres::LastMajorOrder);
                 shape.resize(1);
                 shape[0] = 6;
                 strides.resize(1);
                 strides[0] = 2;
                 v.assign(shape.begin(), shape.end(), strides.begin(), 
-                    data100_+1, marray::LastMajorOrder);
+                    data100_+1, andres::LastMajorOrder);
 
                 test(v.dimension() == shape.size() &&
                        v.size() == 6
@@ -2027,14 +1980,14 @@ void ViewTest::shapeStrideAssignTest()
                 std::vector<size_t> strides(2);
                 strides[0] = 1;
                 strides[1] = 3;
-                marray::View<int, constTarget> v(shape.begin(), shape.end(),
-                    strides.begin(), data100_+5, marray::LastMajorOrder);
+                andres::View<int, constTarget> v(shape.begin(), shape.end(),
+                    strides.begin(), data100_+5, andres::LastMajorOrder);
                 shape.resize(1);
                 shape[0] = 6; 
                 strides.resize(1);
                 strides[0] = 2;
                 v.assign(shape.begin(), shape.end(), strides.begin(),
-                    data100_, marray::LastMajorOrder);
+                    data100_, andres::LastMajorOrder);
 
                 test(v.dimension() == shape.size() &&
                        v.size() == 6
@@ -2057,12 +2010,12 @@ void ViewTest::shapeStrideAssignTest()
                 std::vector<size_t> strides(2);
                 strides[0] = 1;
                 strides[1] = 3;
-                marray::View<int, constTarget> v(shape.begin(), shape.end(),
-                    strides.begin(), data_, marray::LastMajorOrder);
+                andres::View<int, constTarget> v(shape.begin(), shape.end(),
+                    strides.begin(), data_, andres::LastMajorOrder);
                 strides[0] = 2;
                 strides[1] = 4;
                 v.assign(shape.begin(), shape.end(), strides.begin(), 
-                    data_, marray::LastMajorOrder);
+                    data_, andres::LastMajorOrder);
 
                 test(v.dimension() == shape.size() &&
                        v.size() == 6
@@ -2083,14 +2036,14 @@ void ViewTest::shapeStrideAssignTest()
                 std::vector<size_t> strides(2);
                 strides[0] = 1;
                 strides[1] = 3;
-                marray::View<int, constTarget> v(shape.begin(), shape.end(),
-                    strides.begin(), data_, marray::LastMajorOrder);
+                andres::View<int, constTarget> v(shape.begin(), shape.end(),
+                    strides.begin(), data_, andres::LastMajorOrder);
                 shape[0] = 3;
                 shape[1] = 2;
                 strides[0] = 2;
                 strides[1] = 4;
                 v.assign(shape.begin(), shape.end(), strides.begin(),
-                    data_, marray::LastMajorOrder);
+                    data_, andres::LastMajorOrder);
 
                 test(v.dimension() == shape.size() &&
                        v.size() == 6
@@ -2111,12 +2064,12 @@ void ViewTest::shapeStrideAssignTest()
                 std::vector<size_t> strides(2);
                 strides[0] = 1;
                 strides[1] = 3;
-                marray::View<int, constTarget> v(shape.begin(), shape.end(),
-                    strides.begin(), data_+1, marray::LastMajorOrder);
+                andres::View<int, constTarget> v(shape.begin(), shape.end(),
+                    strides.begin(), data_+1, andres::LastMajorOrder);
                 strides[0] = 2;
                 strides[1] = 4;
                 v.assign(shape.begin(), shape.end(), strides.begin(), 
-                    data100_+50, marray::LastMajorOrder);
+                    data100_+50, andres::LastMajorOrder);
                 
                 test(v.dimension() == shape.size() &&
                        v.size() == 6
@@ -2136,12 +2089,12 @@ void ViewTest::shapeStrideAssignTest()
                 std::vector<size_t> strides(2);
                 strides[0] = 1;
                 strides[1] = 3;
-                marray::View<int, constTarget> v(shape.begin(), shape.end(),
-                    strides.begin(), data_, marray::LastMajorOrder);
+                andres::View<int, constTarget> v(shape.begin(), shape.end(),
+                    strides.begin(), data_, andres::LastMajorOrder);
                 strides[0] = 2;
                 strides[1] = 4;
                 v.assign(shape.begin(), shape.end(), strides.begin(), 
-                    data100_+50, marray::LastMajorOrder);
+                    data100_+50, andres::LastMajorOrder);
 
                 test(v.dimension() == shape.size() &&
                        v.size() == 6
@@ -2161,12 +2114,12 @@ void ViewTest::shapeStrideAssignTest()
                 std::vector<size_t> strides(2);
                 strides[0] = 1;
                 strides[1] = 3;
-                marray::View<int, constTarget> v(shape.begin(), shape.end(),
-                    strides.begin(), data_+1, marray::LastMajorOrder);
+                andres::View<int, constTarget> v(shape.begin(), shape.end(),
+                    strides.begin(), data_+1, andres::LastMajorOrder);
                 strides[0] = 2;
                 strides[1] = 4;
                 v.assign(shape.begin(), shape.end(), strides.begin(),
-                    data100_, marray::LastMajorOrder);
+                    data100_, andres::LastMajorOrder);
 
                 test(v.dimension() == shape.size() &&
                        v.size() == 6
@@ -2187,14 +2140,14 @@ void ViewTest::shapeStrideAssignTest()
                 std::vector<size_t> strides(2);
                 strides[0] = 1;
                 strides[1] = 3;
-                marray::View<int, constTarget> v(shape.begin(), shape.end(),
-                    strides.begin(), data_+1, marray::LastMajorOrder);
+                andres::View<int, constTarget> v(shape.begin(), shape.end(),
+                    strides.begin(), data_+1, andres::LastMajorOrder);
                 shape[0] = 3;
                 shape[1] = 2;
                 strides[0] = 2;
                 strides[1] = 4;
                 v.assign(shape.begin(), shape.end(), strides.begin(), 
-                    data100_+50, marray::LastMajorOrder);
+                    data100_+50, andres::LastMajorOrder);
                 
                 test(v.dimension() == shape.size() &&
                        v.size() == 6
@@ -2214,14 +2167,14 @@ void ViewTest::shapeStrideAssignTest()
                 std::vector<size_t> strides(2);
                 strides[0] = 1;
                 strides[1] = 3;
-                marray::View<int, constTarget> v(shape.begin(), shape.end(),
-                    strides.begin(), data_, marray::LastMajorOrder);
+                andres::View<int, constTarget> v(shape.begin(), shape.end(),
+                    strides.begin(), data_, andres::LastMajorOrder);
                 shape[0] = 3;
                 shape[1] = 2;
                 strides[0] = 2;
                 strides[1] = 4;
                 v.assign(shape.begin(), shape.end(), strides.begin(), 
-                    data100_+50, marray::LastMajorOrder);
+                    data100_+50, andres::LastMajorOrder);
 
                 test(v.dimension() == shape.size() &&
                        v.size() == 6
@@ -2241,14 +2194,14 @@ void ViewTest::shapeStrideAssignTest()
                 std::vector<size_t> strides(2);
                 strides[0] = 1;
                 strides[1] = 3;
-                marray::View<int, constTarget> v(shape.begin(), shape.end(),
-                    strides.begin(), data_+1, marray::LastMajorOrder);
+                andres::View<int, constTarget> v(shape.begin(), shape.end(),
+                    strides.begin(), data_+1, andres::LastMajorOrder);
                 shape[0] = 3;
                 shape[1] = 2;
                 strides[0] = 2;
                 strides[1] = 4;
                 v.assign(shape.begin(), shape.end(), strides.begin(),
-                    data100_, marray::LastMajorOrder);
+                    data100_, andres::LastMajorOrder);
 
                 test(v.dimension() == shape.size() &&
                        v.size() == 6
@@ -2273,8 +2226,8 @@ void ViewTest::shapeStrideAssignTest()
                 std::vector<size_t> strides(2);
                 strides[0] = 1;
                 strides[1] = 3;
-                marray::View<int, constTarget> v(shape.begin(), shape.end(),
-                    strides.begin(), data_, marray::LastMajorOrder);
+                andres::View<int, constTarget> v(shape.begin(), shape.end(),
+                    strides.begin(), data_, andres::LastMajorOrder);
                 shape.resize(3);
                 shape[0] = 3;
                 shape[1] = 4;
@@ -2284,7 +2237,7 @@ void ViewTest::shapeStrideAssignTest()
                 strides[1] = 10;
                 strides[2] = 35;
                 v.assign(shape.begin(), shape.end(), strides.begin(),
-                    data100_, marray::LastMajorOrder);
+                    data100_, andres::LastMajorOrder);
                 
                 test(v.dimension() == shape.size() &&
                        v.size() == 24
@@ -2307,8 +2260,8 @@ void ViewTest::shapeStrideAssignTest()
                 std::vector<size_t> strides(2);
                 strides[0] = 1;
                 strides[1] = 3;
-                marray::View<int, constTarget> v(shape.begin(), shape.end(),
-                    strides.begin(), data_+2, marray::LastMajorOrder);
+                andres::View<int, constTarget> v(shape.begin(), shape.end(),
+                    strides.begin(), data_+2, andres::LastMajorOrder);
                 shape.resize(3);
                 shape[0] = 3;
                 shape[1] = 4;
@@ -2318,7 +2271,7 @@ void ViewTest::shapeStrideAssignTest()
                 strides[1] = 10;
                 strides[2] = 35;
                 v.assign(shape.begin(), shape.end(), strides.begin(), 
-                    data100_+30, marray::LastMajorOrder);
+                    data100_+30, andres::LastMajorOrder);
 
                 test(v.dimension() == shape.size() &&
                        v.size() == 24
@@ -2340,8 +2293,8 @@ void ViewTest::shapeStrideAssignTest()
                 std::vector<size_t> strides(2);
                 strides[0] = 1;
                 strides[1] = 3;
-                marray::View<int, constTarget> v(shape.begin(), shape.end(),
-                    strides.begin(), data_, marray::LastMajorOrder);
+                andres::View<int, constTarget> v(shape.begin(), shape.end(),
+                    strides.begin(), data_, andres::LastMajorOrder);
                 shape.resize(3);
                 shape[0] = 3;
                 shape[1] = 4;
@@ -2351,7 +2304,7 @@ void ViewTest::shapeStrideAssignTest()
                 strides[1] = 10;
                 strides[2] = 35;
                 v.assign(shape.begin(), shape.end(), strides.begin(), 
-                    data100_+30, marray::LastMajorOrder);
+                    data100_+30, andres::LastMajorOrder);
 
                 test(v.dimension() == shape.size() &&
                        v.size() == 24
@@ -2373,8 +2326,8 @@ void ViewTest::shapeStrideAssignTest()
                 std::vector<size_t> strides(2);
                 strides[0] = 1;
                 strides[1] = 3;
-                marray::View<int, constTarget> v(shape.begin(), shape.end(),
-                    strides.begin(), data_+2, marray::LastMajorOrder);
+                andres::View<int, constTarget> v(shape.begin(), shape.end(),
+                    strides.begin(), data_+2, andres::LastMajorOrder);
                 shape.resize(3);
                 shape[0] = 3;
                 shape[1] = 4;
@@ -2384,7 +2337,7 @@ void ViewTest::shapeStrideAssignTest()
                 strides[1] = 10;
                 strides[2] = 35;
                 v.assign(shape.begin(), shape.end(), strides.begin(),
-                    data100_, marray::LastMajorOrder);
+                    data100_, andres::LastMajorOrder);
 
                 test(v.dimension() == shape.size() &&
                        v.size() == 24
@@ -2413,14 +2366,14 @@ void ViewTest::shapeStrideAssignTest()
                 strides[0] = 1;
                 strides[1] = 3; 
                 strides[2] = 8; 
-                marray::View<int, constTarget> v(shape.begin(), shape.end(),
-                    strides.begin(), data100_, marray::LastMajorOrder);
+                andres::View<int, constTarget> v(shape.begin(), shape.end(),
+                    strides.begin(), data100_, andres::LastMajorOrder);
                 shape.resize(1);
                 shape[0] = 6; 
                 strides.resize(1);
                 strides[0] = 2;
                 v.assign(shape.begin(), shape.end(), strides.begin(),
-                    data100_, marray::LastMajorOrder);
+                    data100_, andres::LastMajorOrder);
 
                 test(v.dimension() == shape.size() &&
                        v.size() == 6
@@ -2441,14 +2394,14 @@ void ViewTest::shapeStrideAssignTest()
                 strides[0] = 1;
                 strides[1] = 3; 
                 strides[2] = 8;
-                marray::View<int, constTarget> v(shape.begin(), shape.end(),
-                    strides.begin(), data100_+5, marray::LastMajorOrder);
+                andres::View<int, constTarget> v(shape.begin(), shape.end(),
+                    strides.begin(), data100_+5, andres::LastMajorOrder);
                 shape.resize(1);
                 shape[0] = 6; 
                 strides.resize(1);
                 strides[0] = 2;
                 v.assign(shape.begin(), shape.end(), strides.begin(),
-                    data100_+1, marray::LastMajorOrder);
+                    data100_+1, andres::LastMajorOrder);
 
                 test(v.dimension() == shape.size() &&
                        v.size() == 6
@@ -2468,14 +2421,14 @@ void ViewTest::shapeStrideAssignTest()
                 strides[0] = 1;
                 strides[1] = 3; 
                 strides[2] = 8;
-                marray::View<int, constTarget> v(shape.begin(), shape.end(), 
-                    strides.begin(), data100_, marray::LastMajorOrder);
+                andres::View<int, constTarget> v(shape.begin(), shape.end(), 
+                    strides.begin(), data100_, andres::LastMajorOrder);
                 shape.resize(1);
                 shape[0] = 6;
                 strides.resize(1);
                 strides[0] = 2;
                 v.assign(shape.begin(), shape.end(), strides.begin(),
-                    data100_+1, marray::LastMajorOrder);
+                    data100_+1, andres::LastMajorOrder);
 
                 test(v.dimension() == shape.size() &&
                        v.size() == 6
@@ -2495,14 +2448,14 @@ void ViewTest::shapeStrideAssignTest()
                 strides[0] = 1;
                 strides[1] = 3; 
                 strides[2] = 8;
-                marray::View<int, constTarget> v(shape.begin(), shape.end(), 
-                    strides.begin(), data100_+5, marray::LastMajorOrder);
+                andres::View<int, constTarget> v(shape.begin(), shape.end(), 
+                    strides.begin(), data100_+5, andres::LastMajorOrder);
                 shape.resize(1);
                 shape[0] = 6; 
                 strides.resize(1);
                 strides[0] = 2;
                 v.assign(shape.begin(), shape.end(), strides.begin(),
-                    data100_, marray::LastMajorOrder);
+                    data100_, andres::LastMajorOrder);
 
                 test(v.dimension() == shape.size() &&
                        v.size() == 6
@@ -2526,8 +2479,8 @@ void ViewTest::shapeStrideAssignTest()
                 strides[0] = 1;
                 strides[1] = 4;
                 strides[2] = 2;
-                marray::View<int, constTarget> v(shape.begin(), shape.end(),
-                    strides.begin(), data100_, marray::LastMajorOrder);
+                andres::View<int, constTarget> v(shape.begin(), shape.end(),
+                    strides.begin(), data100_, andres::LastMajorOrder);
                 shape.resize(2);
                 shape[0] = 3;
                 shape[1] = 2;
@@ -2535,7 +2488,7 @@ void ViewTest::shapeStrideAssignTest()
                 strides[0] = 1; 
                 strides[1] = 3; 
                 v.assign(shape.begin(), shape.end(), strides.begin(),
-                    data_, marray::LastMajorOrder);
+                    data_, andres::LastMajorOrder);
 
                 test(v.dimension() == shape.size() &&
                        v.size() == 6
@@ -2558,8 +2511,8 @@ void ViewTest::shapeStrideAssignTest()
                 strides[0] = 1;
                 strides[1] = 4;
                 strides[2] = 2;
-                marray::View<int, constTarget> v(shape.begin(), shape.end(), 
-                    strides.begin(), data100_+10, marray::LastMajorOrder);
+                andres::View<int, constTarget> v(shape.begin(), shape.end(), 
+                    strides.begin(), data100_+10, andres::LastMajorOrder);
                 shape.resize(2);
                 shape[0] = 3;
                 shape[1] = 2;
@@ -2567,7 +2520,7 @@ void ViewTest::shapeStrideAssignTest()
                 strides[0] = 1; 
                 strides[1] = 3; 
                 v.assign(shape.begin(), shape.end(), strides.begin(),
-                    data_+1, marray::LastMajorOrder);
+                    data_+1, andres::LastMajorOrder);
 
                 test(v.dimension() == shape.size() &&
                        v.size() == 6
@@ -2589,8 +2542,8 @@ void ViewTest::shapeStrideAssignTest()
                 strides[0] = 1;
                 strides[1] = 4;
                 strides[2] = 2;
-                marray::View<int, constTarget> v(shape.begin(), shape.end(), 
-                    strides.begin(), data100_, marray::LastMajorOrder);
+                andres::View<int, constTarget> v(shape.begin(), shape.end(), 
+                    strides.begin(), data100_, andres::LastMajorOrder);
                 shape.resize(2);
                 shape[0] = 3;
                 shape[1] = 2;
@@ -2598,7 +2551,7 @@ void ViewTest::shapeStrideAssignTest()
                 strides[0] = 1; 
                 strides[1] = 3; 
                 v.assign(shape.begin(), shape.end(), strides.begin(),
-                    data_+1, marray::LastMajorOrder);
+                    data_+1, andres::LastMajorOrder);
 
                 test(v.dimension() == shape.size() &&
                        v.size() == 6
@@ -2620,8 +2573,8 @@ void ViewTest::shapeStrideAssignTest()
                 strides[0] = 1;
                 strides[1] = 4;
                 strides[2] = 2;
-                marray::View<int, constTarget> v(shape.begin(), shape.end(), 
-                    strides.begin(), data100_+10, marray::LastMajorOrder);
+                andres::View<int, constTarget> v(shape.begin(), shape.end(), 
+                    strides.begin(), data100_+10, andres::LastMajorOrder);
                 shape.resize(2);
                 shape[0] = 3;
                 shape[1] = 2;
@@ -2629,7 +2582,7 @@ void ViewTest::shapeStrideAssignTest()
                 strides[0] = 1; 
                 strides[1] = 3; 
                 v.assign(shape.begin(), shape.end(), strides.begin(),
-                    data_, marray::LastMajorOrder);
+                    data_, andres::LastMajorOrder);
 
                 test(v.dimension() == shape.size() &&
                        v.size() == 6
@@ -2657,13 +2610,13 @@ void ViewTest::shapeStrideAssignTest()
                 strides[0] = 1;
                 strides[1] = 3;
                 strides[2] = 7;
-                marray::View<int, constTarget> v(shape.begin(), shape.end(), 
-                    strides.begin(), data_, marray::LastMajorOrder);
+                andres::View<int, constTarget> v(shape.begin(), shape.end(), 
+                    strides.begin(), data_, andres::LastMajorOrder);
                 strides[0] = 2;
                 strides[1] = 10;
                 strides[2] = 35;
                 v.assign(shape.begin(), shape.end(), strides.begin(),
-                    data100_, marray::LastMajorOrder);
+                    data100_, andres::LastMajorOrder);
 
                 test(v.dimension() == shape.size() &&
                        v.size() == 24
@@ -2688,8 +2641,8 @@ void ViewTest::shapeStrideAssignTest()
                 strides[0] = 1;
                 strides[1] = 3;
                 strides[2] = 7;
-                marray::View<int, constTarget> v(shape.begin(), shape.end(),
-                    strides.begin(), data_, marray::LastMajorOrder);
+                andres::View<int, constTarget> v(shape.begin(), shape.end(),
+                    strides.begin(), data_, andres::LastMajorOrder);
                 shape[0] = 3;
                 shape[1] = 4;
                 shape[2] = 2;
@@ -2697,7 +2650,7 @@ void ViewTest::shapeStrideAssignTest()
                 strides[1] = 10;
                 strides[2] = 35;
                 v.assign(shape.begin(), shape.end(), strides.begin(),
-                    data100_, marray::LastMajorOrder);
+                    data100_, andres::LastMajorOrder);
 
                 test(v.dimension() == shape.size() &&
                        v.size() == 24
@@ -2722,13 +2675,13 @@ void ViewTest::shapeStrideAssignTest()
                 strides[0] = 1;
                 strides[1] = 3;
                 strides[2] = 7;
-                marray::View<int, constTarget> v(shape.begin(), shape.end(),
-                    strides.begin(), data_+1, marray::LastMajorOrder);
+                andres::View<int, constTarget> v(shape.begin(), shape.end(),
+                    strides.begin(), data_+1, andres::LastMajorOrder);
                 strides[0] = 2;
                 strides[1] = 10;
                 strides[2] = 35;
                 v.assign(shape.begin(), shape.end(), strides.begin(),
-                    data100_+30, marray::LastMajorOrder);
+                    data100_+30, andres::LastMajorOrder);
 
                 test(v.dimension() == shape.size() &&
                        v.size() == 24
@@ -2752,13 +2705,13 @@ void ViewTest::shapeStrideAssignTest()
                 strides[0] = 1;
                 strides[1] = 3;
                 strides[2] = 7;
-                marray::View<int, constTarget> v(shape.begin(), shape.end(), 
-                    strides.begin(), data_, marray::LastMajorOrder);
+                andres::View<int, constTarget> v(shape.begin(), shape.end(), 
+                    strides.begin(), data_, andres::LastMajorOrder);
                 strides[0] = 2;
                 strides[1] = 10;
                 strides[2] = 35;
                 v.assign(shape.begin(), shape.end(), strides.begin(),
-                    data100_+30, marray::LastMajorOrder);
+                    data100_+30, andres::LastMajorOrder);
 
                 test(v.dimension() == shape.size() &&
                        v.size() == 24
@@ -2782,13 +2735,13 @@ void ViewTest::shapeStrideAssignTest()
                 strides[0] = 1;
                 strides[1] = 3;
                 strides[2] = 7;
-                marray::View<int, constTarget> v(shape.begin(), shape.end(), 
-                    strides.begin(), data_+2, marray::LastMajorOrder);
+                andres::View<int, constTarget> v(shape.begin(), shape.end(), 
+                    strides.begin(), data_+2, andres::LastMajorOrder);
                 strides[0] = 2;
                 strides[1] = 10;
                 strides[2] = 35;
                 v.assign(shape.begin(), shape.end(), strides.begin(),
-                    data100_, marray::LastMajorOrder);
+                    data100_, andres::LastMajorOrder);
                 
                 test(v.dimension() == shape.size() &&
                        v.size() == 24
@@ -2813,8 +2766,8 @@ void ViewTest::shapeStrideAssignTest()
                 strides[0] = 1;
                 strides[1] = 3;
                 strides[2] = 7;
-                marray::View<int, constTarget> v(shape.begin(), shape.end(), 
-                    strides.begin(), data_+1, marray::LastMajorOrder);
+                andres::View<int, constTarget> v(shape.begin(), shape.end(), 
+                    strides.begin(), data_+1, andres::LastMajorOrder);
                 shape[0] = 3;
                 shape[1] = 4;
                 shape[2] = 2;
@@ -2822,7 +2775,7 @@ void ViewTest::shapeStrideAssignTest()
                 strides[1] = 10;
                 strides[2] = 35;
                 v.assign(shape.begin(), shape.end(), strides.begin(),
-                    data100_+30, marray::LastMajorOrder);
+                    data100_+30, andres::LastMajorOrder);
 
                 test(v.dimension() == shape.size() &&
                        v.size() == 24
@@ -2846,8 +2799,8 @@ void ViewTest::shapeStrideAssignTest()
                 strides[0] = 1;
                 strides[1] = 3;
                 strides[2] = 7;
-                marray::View<int, constTarget> v(shape.begin(), shape.end(), 
-                    strides.begin(), data_, marray::LastMajorOrder);
+                andres::View<int, constTarget> v(shape.begin(), shape.end(), 
+                    strides.begin(), data_, andres::LastMajorOrder);
                 shape[0] = 3;
                 shape[1] = 4;
                 shape[2] = 2;
@@ -2855,7 +2808,7 @@ void ViewTest::shapeStrideAssignTest()
                 strides[1] = 10;
                 strides[2] = 35;
                 v.assign(shape.begin(), shape.end(), strides.begin(),
-                    data100_+30, marray::LastMajorOrder);
+                    data100_+30, andres::LastMajorOrder);
 
                 test(v.dimension() == shape.size() &&
                        v.size() == 24
@@ -2879,8 +2832,8 @@ void ViewTest::shapeStrideAssignTest()
                 strides[0] = 1;
                 strides[1] = 3;
                 strides[2] = 7;
-                marray::View<int, constTarget> v(shape.begin(), shape.end(), 
-                    strides.begin(), data_+2, marray::LastMajorOrder);
+                andres::View<int, constTarget> v(shape.begin(), shape.end(), 
+                    strides.begin(), data_+2, andres::LastMajorOrder);
                 shape[0] = 3;
                 shape[1] = 4;
                 shape[2] = 2;
@@ -2888,7 +2841,7 @@ void ViewTest::shapeStrideAssignTest()
                 strides[1] = 10;
                 strides[2] = 35;
                 v.assign(shape.begin(), shape.end(), strides.begin(), 
-                    data100_, marray::LastMajorOrder);
+                    data100_, andres::LastMajorOrder);
                 
                 test(v.dimension() == shape.size() &&
                        v.size() == 24
@@ -2905,7 +2858,7 @@ void ViewTest::shapeStrideAssignTest()
     }
 }
 
-template<marray::CoordinateOrder internalFirstMajorOrder>
+template<andres::CoordinateOrder internalFirstMajorOrder>
 void ViewTest::assignmentOperatorTest()
 {
 
@@ -2916,7 +2869,7 @@ void ViewTest::assignmentOperatorTest()
         {
             int scalarv_ = 33;
             int scalarw_ = 54;
-            marray::View<int, false> v(&scalarv_), w(&scalarw_);
+            andres::View<int, false> v(&scalarv_), w(&scalarw_);
             v.operator=(w);
 
             test(v(0)==w(0));
@@ -2925,13 +2878,13 @@ void ViewTest::assignmentOperatorTest()
         {
             int datav[24];
             int dataw[24];
-            for(size_t j=0; j<24; ++j) {
+            for(int j=0; j<24; ++j) {
                 datav[j] = j;
                 dataw[j] = j*2;
             }
             std::vector<size_t> shape(1);
             shape[0] = 24;
-            marray::View<int, false> v(shape.begin(), shape.end(), datav, internalFirstMajorOrder),
+            andres::View<int, false> v(shape.begin(), shape.end(), datav, internalFirstMajorOrder),
                                      w(shape.begin(), shape.end(), dataw, internalFirstMajorOrder);
             v.operator=(w);
             
@@ -2942,14 +2895,14 @@ void ViewTest::assignmentOperatorTest()
         {
             int datav[24];
             int dataw[24];
-            for(size_t j=0; j<24; ++j) {
+            for(int j=0; j<24; ++j) {
                 datav[j] = j;
                 dataw[j] = j*2;
             }
             std::vector<size_t> shape(1);
             shape[0] = 24;
-            marray::View<int, false> v(shape.begin(), shape.end(), datav, marray::FirstMajorOrder),
-                                     w(shape.begin(), shape.end(), dataw, marray::LastMajorOrder);
+            andres::View<int, false> v(shape.begin(), shape.end(), datav, andres::FirstMajorOrder),
+                                     w(shape.begin(), shape.end(), dataw, andres::LastMajorOrder);
             v.operator=(w);
             
             for(size_t j=0; j<v.size(); ++j) {
@@ -2959,14 +2912,14 @@ void ViewTest::assignmentOperatorTest()
         {
             int datav[24];
             int dataw[24];
-            for(size_t j=0; j<24; ++j) {
+            for(int j=0; j<24; ++j) {
                 datav[j] = j;
                 dataw[j] = j*2;
             }
             std::vector<size_t> shape(1);
             shape[0] = 24;
-            marray::View<int, false> v(shape.begin(), shape.end(), datav, marray::LastMajorOrder),
-                                     w(shape.begin(), shape.end(), dataw, marray::FirstMajorOrder);
+            andres::View<int, false> v(shape.begin(), shape.end(), datav, andres::LastMajorOrder),
+                                     w(shape.begin(), shape.end(), dataw, andres::FirstMajorOrder);
             v.operator=(w);
             
             for(size_t j=0; j<v.size(); ++j) {
@@ -2977,7 +2930,7 @@ void ViewTest::assignmentOperatorTest()
         {
             int datav[24];
             int dataw[24];
-            for(size_t j=0; j<24; ++j) {
+            for(int j=0; j<24; ++j) {
                 datav[j] = j;
                 dataw[j] = j*2;
             }
@@ -2985,8 +2938,8 @@ void ViewTest::assignmentOperatorTest()
             shape[0] = 6;
             std::vector<size_t> strides(1);
             strides[0] = 4;
-            marray::View<int, false> v(shape.begin(), shape.end(), datav, marray::LastMajorOrder);
-            marray::View<int, false> w(shape.begin(), shape.end(), strides.begin(), dataw, marray::FirstMajorOrder);
+            andres::View<int, false> v(shape.begin(), shape.end(), datav, andres::LastMajorOrder);
+            andres::View<int, false> w(shape.begin(), shape.end(), strides.begin(), dataw, andres::FirstMajorOrder);
             v.operator=(w);
             
             for(size_t j=0; j<v.size(); ++j) {
@@ -2997,7 +2950,7 @@ void ViewTest::assignmentOperatorTest()
         {
             int datav[24];
             int dataw[24];
-            for(size_t j=0; j<24; ++j) {
+            for(int j=0; j<24; ++j) {
                 datav[j] = j;
                 dataw[j] = j*2;
             }
@@ -3005,8 +2958,8 @@ void ViewTest::assignmentOperatorTest()
             shape[0] = 6;
             std::vector<size_t> strides(1);
             strides[0] = 4;
-            marray::View<int, false> v(shape.begin(), shape.end(), strides.begin(), datav, marray::FirstMajorOrder);
-            marray::View<int, false> w(shape.begin(), shape.end(), dataw, marray::LastMajorOrder);
+            andres::View<int, false> v(shape.begin(), shape.end(), strides.begin(), datav, andres::FirstMajorOrder);
+            andres::View<int, false> w(shape.begin(), shape.end(), dataw, andres::LastMajorOrder);
             v.operator=(w);
             
             for(size_t j=0; j<v.size(); ++j) {
@@ -3017,7 +2970,7 @@ void ViewTest::assignmentOperatorTest()
         {
             int datav[24];
             int dataw[24];
-            for(size_t j=0; j<24; ++j) {
+            for(int j=0; j<24; ++j) {
                 datav[j] = j;
                 dataw[j] = j*2;
             }
@@ -3025,8 +2978,8 @@ void ViewTest::assignmentOperatorTest()
             shape[0] = 6;
             std::vector<size_t> strides(1);
             strides[0] = 4;
-            marray::View<int, false> v(shape.begin(), shape.end(), strides.begin(), datav, marray::LastMajorOrder);
-            marray::View<int, false> w(shape.begin(), shape.end(), strides.begin(), dataw, marray::FirstMajorOrder);
+            andres::View<int, false> v(shape.begin(), shape.end(), strides.begin(), datav, andres::LastMajorOrder);
+            andres::View<int, false> w(shape.begin(), shape.end(), strides.begin(), dataw, andres::FirstMajorOrder);
             v.operator=(w);
             
             for(size_t j=0; j<v.size(); ++j) {
@@ -3037,14 +2990,14 @@ void ViewTest::assignmentOperatorTest()
         {
             int datav[24];
             int dataw[24];
-            for(size_t j=0; j<24; ++j) {
+            for(int j=0; j<24; ++j) {
                 datav[j] = j;
                 dataw[j] = j*2;
             }
             std::vector<size_t> shape(2);
             shape[0] = 6; 
             shape[1] = 4;
-            marray::View<int, false> v(shape.begin(), shape.end(), datav, internalFirstMajorOrder),
+            andres::View<int, false> v(shape.begin(), shape.end(), datav, internalFirstMajorOrder),
                                      w(shape.begin(), shape.end(), dataw, internalFirstMajorOrder);
 
             v.operator=(w);
@@ -3061,15 +3014,15 @@ void ViewTest::assignmentOperatorTest()
         {
             int datav[24];
             int dataw[24];
-            for(size_t j=0; j<24; ++j) {
+            for(int j=0; j<24; ++j) {
                 datav[j] = j;
                 dataw[j] = j*2;
             }
             std::vector<size_t> shape(2);
             shape[0] = 6; 
             shape[1] = 4;
-            marray::View<int, false> v(shape.begin(), shape.end(), datav, marray::FirstMajorOrder),
-                                     w(shape.begin(), shape.end(), dataw, marray::LastMajorOrder);
+            andres::View<int, false> v(shape.begin(), shape.end(), datav, andres::FirstMajorOrder),
+                                     w(shape.begin(), shape.end(), dataw, andres::LastMajorOrder);
 
             v.operator=(w);
 
@@ -3085,15 +3038,15 @@ void ViewTest::assignmentOperatorTest()
         {
             int datav[24];
             int dataw[24];
-            for(size_t j=0; j<24; ++j) {
+            for(int j=0; j<24; ++j) {
                 datav[j] = j;
                 dataw[j] = j*2;
             }
             std::vector<size_t> shape(2);
             shape[0] = 6; 
             shape[1] = 4;
-            marray::View<int, false> v(shape.begin(), shape.end(), datav, marray::LastMajorOrder),
-                                     w(shape.begin(), shape.end(), dataw, marray::FirstMajorOrder);
+            andres::View<int, false> v(shape.begin(), shape.end(), datav, andres::LastMajorOrder),
+                                     w(shape.begin(), shape.end(), dataw, andres::FirstMajorOrder);
 
             v.operator=(w);
 
@@ -3110,7 +3063,7 @@ void ViewTest::assignmentOperatorTest()
         {
             int datav[24];
             int dataw[24];
-            for(size_t j=0; j<24; ++j) {
+            for(int j=0; j<24; ++j) {
                 datav[j] = j;
                 dataw[j] = j*2;
             }
@@ -3118,7 +3071,7 @@ void ViewTest::assignmentOperatorTest()
             shape[0] = 3;
             shape[1] = 2;
             shape[2] = 4; 
-            marray::View<int, false> v(shape.begin(), shape.end(), datav, internalFirstMajorOrder),
+            andres::View<int, false> v(shape.begin(), shape.end(), datav, internalFirstMajorOrder),
                                      w(shape.begin(), shape.end(), dataw, internalFirstMajorOrder);
 
             v.operator=(w);
@@ -3137,7 +3090,7 @@ void ViewTest::assignmentOperatorTest()
         {
             int datav[24];
             int dataw[24];
-            for(size_t j=0; j<24; ++j) {
+            for(int j=0; j<24; ++j) {
                 datav[j] = j;
                 dataw[j] = j*2;
             }
@@ -3145,8 +3098,8 @@ void ViewTest::assignmentOperatorTest()
             shape[0] = 3;
             shape[1] = 2;
             shape[2] = 4; 
-            marray::View<int, false> v(shape.begin(), shape.end(), datav, marray::FirstMajorOrder),
-                                     w(shape.begin(), shape.end(), dataw, marray::LastMajorOrder);
+            andres::View<int, false> v(shape.begin(), shape.end(), datav, andres::FirstMajorOrder),
+                                     w(shape.begin(), shape.end(), dataw, andres::LastMajorOrder);
 
             v.operator=(w);
 
@@ -3164,7 +3117,7 @@ void ViewTest::assignmentOperatorTest()
         {
             int datav[24];
             int dataw[24];
-            for(size_t j=0; j<24; ++j) {
+            for(int j=0; j<24; ++j) {
                 datav[j] = j;
                 dataw[j] = j*2;
             }
@@ -3172,8 +3125,8 @@ void ViewTest::assignmentOperatorTest()
             shape[0] = 3;
             shape[1] = 2;
             shape[2] = 4; 
-            marray::View<int, false> v(shape.begin(), shape.end(), datav, marray::LastMajorOrder),
-                                     w(shape.begin(), shape.end(), dataw, marray::FirstMajorOrder);
+            andres::View<int, false> v(shape.begin(), shape.end(), datav, andres::LastMajorOrder),
+                                     w(shape.begin(), shape.end(), dataw, andres::FirstMajorOrder);
 
             v.operator=(w);
 
@@ -3195,12 +3148,12 @@ void ViewTest::assignmentOperatorTest()
         // 'from' is 1D
         {
             int data[24];
-            for(size_t j=0; j<24; ++j) {
+            for(int j=0; j<24; ++j) {
                 data[j] = j;
             }
             std::vector<size_t> shape(1);
             shape[0] = 24; 
-            marray::View<int, false> v, w(shape.begin(), shape.end(), data, internalFirstMajorOrder);
+            andres::View<int, false> v, w(shape.begin(), shape.end(), data, internalFirstMajorOrder);
             v.operator=(w);
 
             test(v.dimension() == w.dimension() &&
@@ -3213,13 +3166,13 @@ void ViewTest::assignmentOperatorTest()
         // 'from' is 2D
         {
             int data[24];
-            for(size_t j=0; j<24; ++j) {
+            for(int j=0; j<24; ++j) {
                 data[j] = j;
             }
             std::vector<size_t> shape(2);
             shape[0] = 6; 
             shape[1] = 4;
-            marray::View<int, false> v, w(shape.begin(), shape.end(), data, internalFirstMajorOrder);
+            andres::View<int, false> v, w(shape.begin(), shape.end(), data, internalFirstMajorOrder);
             v.operator=(w);
 
             test(v.dimension() == w.dimension() &&
@@ -3237,14 +3190,14 @@ void ViewTest::assignmentOperatorTest()
         // 'from' is 3D
         {
             int data[24];
-            for(size_t j=0; j<24; ++j) {
+            for(int j=0; j<24; ++j) {
                 data[j] = j;
             }
             std::vector<size_t> shape(3);
             shape[0] = 3;
             shape[1] = 2;
             shape[2] = 4; 
-            marray::View<int, false> v, w(shape.begin(), shape.end(), data, internalFirstMajorOrder);
+            andres::View<int, false> v, w(shape.begin(), shape.end(), data, internalFirstMajorOrder);
             v.operator=(w);
 
             for(size_t j=0; j<v.size(); ++j) {
@@ -3268,14 +3221,14 @@ void ViewTest::assignmentOperatorTest()
             {
                 int datav[24];
                 int dataw[24];
-                for(size_t j=0; j<24; ++j) {
+                for(int j=0; j<24; ++j) {
                     datav[j] = j;
                     dataw[j] = j*2;
                 }
                 std::vector<size_t> shape(1);
                 shape[0] = 24;
-                marray::View<int, false> v(shape.begin(), shape.end(), datav, internalFirstMajorOrder);
-                marray::View<int, true> w(shape.begin(), shape.end(), dataw, internalFirstMajorOrder);
+                andres::View<int, false> v(shape.begin(), shape.end(), datav, internalFirstMajorOrder);
+                andres::View<int, true> w(shape.begin(), shape.end(), dataw, internalFirstMajorOrder);
                 v.operator=(w);
                 
                 for(size_t j=0; j<v.size(); ++j) {
@@ -3285,14 +3238,14 @@ void ViewTest::assignmentOperatorTest()
             {
                 int datav[24];
                 int dataw[24];
-                for(size_t j=0; j<24; ++j) {
+                for(int j=0; j<24; ++j) {
                     datav[j] = j;
                     dataw[j] = j*2;
                 }
                 std::vector<size_t> shape(1);
                 shape[0] = 24;
-                marray::View<int, false> v(shape.begin(), shape.end(), datav, marray::FirstMajorOrder);
-                marray::View<int, true> w(shape.begin(), shape.end(), dataw, marray::LastMajorOrder);
+                andres::View<int, false> v(shape.begin(), shape.end(), datav, andres::FirstMajorOrder);
+                andres::View<int, true> w(shape.begin(), shape.end(), dataw, andres::LastMajorOrder);
                 v.operator=(w);
                 
                 for(size_t j=0; j<v.size(); ++j) {
@@ -3302,14 +3255,14 @@ void ViewTest::assignmentOperatorTest()
             {
                 int datav[24];
                 int dataw[24];
-                for(size_t j=0; j<24; ++j) {
+                for(int j=0; j<24; ++j) {
                     datav[j] = j;
                     dataw[j] = j*2;
                 }
                 std::vector<size_t> shape(1);
                 shape[0] = 24;
-                marray::View<int, false> v(shape.begin(), shape.end(), datav, marray::LastMajorOrder);
-                marray::View<int, true> w(shape.begin(), shape.end(), dataw, marray::FirstMajorOrder);
+                andres::View<int, false> v(shape.begin(), shape.end(), datav, andres::LastMajorOrder);
+                andres::View<int, true> w(shape.begin(), shape.end(), dataw, andres::FirstMajorOrder);
                 v.operator=(w);
                 
                 for(size_t j=0; j<v.size(); ++j) {
@@ -3320,7 +3273,7 @@ void ViewTest::assignmentOperatorTest()
             {
                 int datav[24];
                 int dataw[24];
-                for(size_t j=0; j<24; ++j) {
+                for(int j=0; j<24; ++j) {
                     datav[j] = j;
                     dataw[j] = j*2;
                 }
@@ -3328,8 +3281,8 @@ void ViewTest::assignmentOperatorTest()
                 shape[0] = 6;
                 std::vector<size_t> strides(1);
                 strides[0] = 4;
-                marray::View<int, false> v(shape.begin(), shape.end(), datav, marray::LastMajorOrder);
-                marray::View<int, true> w(shape.begin(), shape.end(), strides.begin(), dataw, marray::FirstMajorOrder);
+                andres::View<int, false> v(shape.begin(), shape.end(), datav, andres::LastMajorOrder);
+                andres::View<int, true> w(shape.begin(), shape.end(), strides.begin(), dataw, andres::FirstMajorOrder);
                 v.operator=(w);
                 
                 for(size_t j=0; j<v.size(); ++j) {
@@ -3340,7 +3293,7 @@ void ViewTest::assignmentOperatorTest()
             {
                 int datav[24];
                 int dataw[24];
-                for(size_t j=0; j<24; ++j) {
+                for(int j=0; j<24; ++j) {
                     datav[j] = j;
                     dataw[j] = j*2;
                 }
@@ -3348,8 +3301,8 @@ void ViewTest::assignmentOperatorTest()
                 shape[0] = 6;
                 std::vector<size_t> strides(1);
                 strides[0] = 4;
-                marray::View<int, false> v(shape.begin(), shape.end(), strides.begin(), datav, marray::FirstMajorOrder);
-                marray::View<int, true> w(shape.begin(), shape.end(), dataw, marray::LastMajorOrder);
+                andres::View<int, false> v(shape.begin(), shape.end(), strides.begin(), datav, andres::FirstMajorOrder);
+                andres::View<int, true> w(shape.begin(), shape.end(), dataw, andres::LastMajorOrder);
                 v.operator=(w);
                 
                 for(size_t j=0; j<v.size(); ++j) {
@@ -3360,7 +3313,7 @@ void ViewTest::assignmentOperatorTest()
             {
                 int datav[24];
                 int dataw[24];
-                for(size_t j=0; j<24; ++j) {
+                for(int j=0; j<24; ++j) {
                     datav[j] = j;
                     dataw[j] = j*2;
                 }
@@ -3368,8 +3321,8 @@ void ViewTest::assignmentOperatorTest()
                 shape[0] = 6;
                 std::vector<size_t> strides(1);
                 strides[0] = 4;
-                marray::View<int, false> v(shape.begin(), shape.end(), strides.begin(), datav, marray::LastMajorOrder);
-                marray::View<int, true> w(shape.begin(), shape.end(), strides.begin(), dataw, marray::FirstMajorOrder);
+                andres::View<int, false> v(shape.begin(), shape.end(), strides.begin(), datav, andres::LastMajorOrder);
+                andres::View<int, true> w(shape.begin(), shape.end(), strides.begin(), dataw, andres::FirstMajorOrder);
                 v.operator=(w);
                 
                 for(size_t j=0; j<v.size(); ++j) {
@@ -3383,15 +3336,15 @@ void ViewTest::assignmentOperatorTest()
             {
                 int datav[24];
                 int dataw[24];
-                for(size_t j=0; j<24; ++j) {
+                for(int j=0; j<24; ++j) {
                     datav[j] = j;
                     dataw[j] = j*2;
                 }
                 std::vector<size_t> shape(2);
                 shape[0] = 6; 
                 shape[1] = 4;
-                marray::View<int, false> v(shape.begin(), shape.end(), datav, internalFirstMajorOrder);
-                marray::View<int, true> w(shape.begin(), shape.end(), dataw, internalFirstMajorOrder);
+                andres::View<int, false> v(shape.begin(), shape.end(), datav, internalFirstMajorOrder);
+                andres::View<int, true> w(shape.begin(), shape.end(), dataw, internalFirstMajorOrder);
                 v.operator=(w);
 
                 for(size_t j=0; j<v.size(); ++j) {
@@ -3406,15 +3359,15 @@ void ViewTest::assignmentOperatorTest()
             {
                 int datav[24];
                 int dataw[24];
-                for(size_t j=0; j<24; ++j) {
+                for(int j=0; j<24; ++j) {
                     datav[j] = j;
                     dataw[j] = j*2;
                 }
                 std::vector<size_t> shape(2);
                 shape[0] = 6; 
                 shape[1] = 4;
-                marray::View<int, false> v(shape.begin(), shape.end(), datav, marray::FirstMajorOrder);
-                marray::View<int, true> w(shape.begin(), shape.end(), dataw, marray::LastMajorOrder);
+                andres::View<int, false> v(shape.begin(), shape.end(), datav, andres::FirstMajorOrder);
+                andres::View<int, true> w(shape.begin(), shape.end(), dataw, andres::LastMajorOrder);
                 v.operator=(w);
 
                 for(size_t j=0; j<v.size(); ++j) {
@@ -3429,15 +3382,15 @@ void ViewTest::assignmentOperatorTest()
             {
                 int datav[24];
                 int dataw[24];
-                for(size_t j=0; j<24; ++j) {
+                for(int j=0; j<24; ++j) {
                     datav[j] = j;
                     dataw[j] = j*2;
                 }
                 std::vector<size_t> shape(2);
                 shape[0] = 6; 
                 shape[1] = 4;
-                marray::View<int, false> v(shape.begin(), shape.end(), datav, marray::LastMajorOrder);
-                marray::View<int, true> w(shape.begin(), shape.end(), dataw, marray::FirstMajorOrder);
+                andres::View<int, false> v(shape.begin(), shape.end(), datav, andres::LastMajorOrder);
+                andres::View<int, true> w(shape.begin(), shape.end(), dataw, andres::FirstMajorOrder);
                 v.operator=(w);
 
                 for(size_t j=0; j<v.size(); ++j) {
@@ -3456,7 +3409,7 @@ void ViewTest::assignmentOperatorTest()
             {
                 int datav[24];
                 int dataw[24];
-                for(size_t j=0; j<24; ++j) {
+                for(int j=0; j<24; ++j) {
                     datav[j] = j;
                     dataw[j] = j*2;
                 }
@@ -3464,8 +3417,8 @@ void ViewTest::assignmentOperatorTest()
                 shape[0] = 3;
                 shape[1] = 2;
                 shape[2] = 4; 
-                marray::View<int, false> v(shape.begin(), shape.end(), datav, internalFirstMajorOrder);
-                marray::View<int, true> w(shape.begin(), shape.end(), dataw, internalFirstMajorOrder);
+                andres::View<int, false> v(shape.begin(), shape.end(), datav, internalFirstMajorOrder);
+                andres::View<int, true> w(shape.begin(), shape.end(), dataw, internalFirstMajorOrder);
                 v.operator=(w);
 
                 for(size_t j=0; j<v.size(); ++j) {
@@ -3482,7 +3435,7 @@ void ViewTest::assignmentOperatorTest()
             {
                 int datav[24];
                 int dataw[24];
-                for(size_t j=0; j<24; ++j) {
+                for(int j=0; j<24; ++j) {
                     datav[j] = j;
                     dataw[j] = j*2;
                 }
@@ -3490,8 +3443,8 @@ void ViewTest::assignmentOperatorTest()
                 shape[0] = 3;
                 shape[1] = 2;
                 shape[2] = 4; 
-                marray::View<int, false> v(shape.begin(), shape.end(), datav, marray::FirstMajorOrder);
-                marray::View<int, true> w(shape.begin(), shape.end(), dataw, marray::LastMajorOrder);
+                andres::View<int, false> v(shape.begin(), shape.end(), datav, andres::FirstMajorOrder);
+                andres::View<int, true> w(shape.begin(), shape.end(), dataw, andres::LastMajorOrder);
                 v.operator=(w);
 
                 for(size_t j=0; j<v.size(); ++j) {
@@ -3508,7 +3461,7 @@ void ViewTest::assignmentOperatorTest()
             {
                 int datav[24];
                 int dataw[24];
-                for(size_t j=0; j<24; ++j) {
+                for(int j=0; j<24; ++j) {
                     datav[j] = j;
                     dataw[j] = j*2;
                 }
@@ -3516,8 +3469,8 @@ void ViewTest::assignmentOperatorTest()
                 shape[0] = 3;
                 shape[1] = 2;
                 shape[2] = 4; 
-                marray::View<int, false> v(shape.begin(), shape.end(), datav, marray::LastMajorOrder);
-                marray::View<int, true> w(shape.begin(), shape.end(), dataw, marray::FirstMajorOrder);
+                andres::View<int, false> v(shape.begin(), shape.end(), datav, andres::LastMajorOrder);
+                andres::View<int, true> w(shape.begin(), shape.end(), dataw, andres::FirstMajorOrder);
                 v.operator=(w);
 
                 for(size_t j=0; j<v.size(); ++j) {
@@ -3539,8 +3492,8 @@ void ViewTest::assignmentOperatorTest()
         // 'from' is scalar
         {
             int  scalar = 33;
-            marray::View<int, true> v;
-            marray::View<int, false> w(&scalar);
+            andres::View<int, true> v;
+            andres::View<int, false> w(&scalar);
             v.operator=(w);
 
             test(v.dimension() == w.dimension() &&
@@ -3551,13 +3504,13 @@ void ViewTest::assignmentOperatorTest()
         // 'from' is 1D
         {
             int data[24];
-            for(size_t j=0; j<24; ++j) {
+            for(int j=0; j<24; ++j) {
                 data[j] = j;
             }
             std::vector<size_t> shape(1);
             shape[0] = 24; 
-            marray::View<int, true> v; 
-            marray::View<int, false> w(shape.begin(), shape.end(), data, internalFirstMajorOrder);
+            andres::View<int, true> v; 
+            andres::View<int, false> w(shape.begin(), shape.end(), data, internalFirstMajorOrder);
             v.operator=(w);
 
             test(v.dimension() == w.dimension() &&
@@ -3570,14 +3523,14 @@ void ViewTest::assignmentOperatorTest()
         // 'from' is 2D
         {
             int data[24];
-            for(size_t j=0; j<24; ++j) {
+            for(int j=0; j<24; ++j) {
                 data[j] = j;
             }
             std::vector<size_t> shape(2);
             shape[0] = 6; 
             shape[1] = 4;
-            marray::View<int, true> v; 
-            marray::View<int, false> w(shape.begin(), shape.end(), data, internalFirstMajorOrder);
+            andres::View<int, true> v; 
+            andres::View<int, false> w(shape.begin(), shape.end(), data, internalFirstMajorOrder);
             v.operator=(w);
 
             test(v.dimension() == w.dimension() &&
@@ -3595,15 +3548,15 @@ void ViewTest::assignmentOperatorTest()
         // 'from' is 3D
         {
             int data[24];
-            for(size_t j=0; j<24; ++j) {
+            for(int j=0; j<24; ++j) {
                 data[j] = j;
             }
             std::vector<size_t> shape(3);
             shape[0] = 3;
             shape[1] = 2;
             shape[2] = 4; 
-            marray::View<int, true> v; 
-            marray::View<int, false> w(shape.begin(), shape.end(), data, internalFirstMajorOrder);
+            andres::View<int, true> v; 
+            andres::View<int, false> w(shape.begin(), shape.end(), data, internalFirstMajorOrder);
             v.operator=(w);
 
             for(size_t j=0; j<v.size(); ++j) {
@@ -3624,8 +3577,8 @@ void ViewTest::assignmentOperatorTest()
         // 'from' is scalar
         {
             int  scalar = 33;
-            marray::View<int, true> v;
-            marray::View<int, true> w(&scalar);
+            andres::View<int, true> v;
+            andres::View<int, true> w(&scalar);
             v.operator=(w);
 
             test(v.dimension() == w.dimension() &&
@@ -3636,13 +3589,13 @@ void ViewTest::assignmentOperatorTest()
         // 'from' is 1D
         {
             int data[24];
-            for(size_t j=0; j<24; ++j) {
+            for(int j=0; j<24; ++j) {
                 data[j] = j;
             }
             std::vector<size_t> shape(1);
             shape[0] = 24; 
-            marray::View<int, true> v; 
-            marray::View<int, true> w(shape.begin(), shape.end(), data, internalFirstMajorOrder);
+            andres::View<int, true> v; 
+            andres::View<int, true> w(shape.begin(), shape.end(), data, internalFirstMajorOrder);
             v.operator=(w);
 
             test(v.dimension() == w.dimension() &&
@@ -3655,14 +3608,14 @@ void ViewTest::assignmentOperatorTest()
         // 'from' is 2D
         {
             int data[24];
-            for(size_t j=0; j<24; ++j) {
+            for(int j=0; j<24; ++j) {
                 data[j] = j;
             }
             std::vector<size_t> shape(2);
             shape[0] = 6; 
             shape[1] = 4;
-            marray::View<int, true> v; 
-            marray::View<int, true> w(shape.begin(), shape.end(), data, internalFirstMajorOrder);
+            andres::View<int, true> v; 
+            andres::View<int, true> w(shape.begin(), shape.end(), data, internalFirstMajorOrder);
             v.operator=(w);
 
             test(v.dimension() == w.dimension() &&
@@ -3680,15 +3633,15 @@ void ViewTest::assignmentOperatorTest()
         // 'from' is 3D
         {
             int data[24];
-            for(size_t j=0; j<24; ++j) {
+            for(int j=0; j<24; ++j) {
                 data[j] = j;
             }
             std::vector<size_t> shape(3);
             shape[0] = 3;
             shape[1] = 2;
             shape[2] = 4; 
-            marray::View<int, true> v; 
-            marray::View<int, true> w(shape.begin(), shape.end(), data, internalFirstMajorOrder);
+            andres::View<int, true> v; 
+            andres::View<int, true> w(shape.begin(), shape.end(), data, internalFirstMajorOrder);
             v.operator=(w);
 
             test(v.dimension() == w.dimension() &&
@@ -3715,8 +3668,8 @@ void ViewTest::assignmentOperatorTest()
             {
                 int scalarv = 56;
                 int  scalarw = 33;
-                marray::View<int, true> v(&scalarv);
-                marray::View<int, false> w(&scalarw);
+                andres::View<int, true> v(&scalarv);
+                andres::View<int, false> w(&scalarw);
                 v.operator=(w);
 
                 test(&v(0)==&w(0));
@@ -3725,13 +3678,13 @@ void ViewTest::assignmentOperatorTest()
             {
                 int scalar = 53;
                 int data[24];
-                for(size_t j=0; j<24; ++j) {
+                for(int j=0; j<24; ++j) {
                     data[j] = j;
                 }
                 std::vector<size_t> shape(1);
                 shape[0] = 24;
-                marray::View<int, true> v(&scalar);
-                marray::View<int, false> w(shape.begin(), shape.end(), data, internalFirstMajorOrder);
+                andres::View<int, true> v(&scalar);
+                andres::View<int, false> w(shape.begin(), shape.end(), data, internalFirstMajorOrder);
                 v.operator=(w);
                 
                 for(size_t j=0; j<v.size(); ++j) {
@@ -3744,14 +3697,14 @@ void ViewTest::assignmentOperatorTest()
 
                 int scalar = 53;
                 int data[24];
-                for(size_t j=0; j<24; ++j) {
+                for(int j=0; j<24; ++j) {
                     data[j] = j;
                 }
                 std::vector<size_t> shape(2); 
                 shape[0] = 6;
                 shape[1] = 4;
-                marray::View<int, true> v(&scalar);
-                marray::View<int, false> w(shape.begin(), shape.end(), data, internalFirstMajorOrder);
+                andres::View<int, true> v(&scalar);
+                andres::View<int, false> w(shape.begin(), shape.end(), data, internalFirstMajorOrder);
                 v.operator=(w);
 
                 test(v.dimension() == w.dimension() &&
@@ -3770,15 +3723,15 @@ void ViewTest::assignmentOperatorTest()
             {
                 int scalar = 53;
                 int data[24];
-                for(size_t j=0; j<24; ++j) {
+                for(int j=0; j<24; ++j) {
                     data[j] = j;
                 }
                 std::vector<size_t> shape(3);
                 shape[0] = 2;
                 shape[1] = 3; 
                 shape[2] = 4;
-                marray::View<int, true> v(&scalar);
-                marray::View<int, false> w(shape.begin(), shape.end(), data, internalFirstMajorOrder);
+                andres::View<int, true> v(&scalar);
+                andres::View<int, false> w(shape.begin(), shape.end(), data, internalFirstMajorOrder);
                 v.operator=(w);
 
                 test(v.dimension() == w.dimension() &&
@@ -3802,13 +3755,13 @@ void ViewTest::assignmentOperatorTest()
             {
                 int scalar = 53;
                 int data[24];
-                for(size_t j=0; j<24; ++j) {
+                for(int j=0; j<24; ++j) {
                     data[j] = j;
                 }
                 std::vector<size_t> shape(1);
                 shape[0] = 24;
-                marray::View<int, true> v(shape.begin(), shape.end(), data, internalFirstMajorOrder);
-                marray::View<int, false> w(&scalar);
+                andres::View<int, true> v(shape.begin(), shape.end(), data, internalFirstMajorOrder);
+                andres::View<int, false> w(&scalar);
                 v.operator=(w);
                 
                 test(v.dimension() == w.dimension() &&
@@ -3820,14 +3773,14 @@ void ViewTest::assignmentOperatorTest()
             {
                 int datav[24];
                 int dataw[24];
-                for(size_t j=0; j<24; ++j) {
+                for(int j=0; j<24; ++j) {
                     datav[j] = j;
                     dataw[j] = j*2;
                 }
                 std::vector<size_t> shape(1);
                 shape[0] = 24;
-                marray::View<int, true> v(shape.begin(), shape.end(), datav, internalFirstMajorOrder);
-                marray::View<int, false> w(shape.begin(), shape.end(), dataw, internalFirstMajorOrder);
+                andres::View<int, true> v(shape.begin(), shape.end(), datav, internalFirstMajorOrder);
+                andres::View<int, false> w(shape.begin(), shape.end(), dataw, internalFirstMajorOrder);
                 v.operator=(w);
                 
                 for(size_t j=0; j<v.size(); ++j) {
@@ -3838,14 +3791,14 @@ void ViewTest::assignmentOperatorTest()
             {
                 int datav[24];
                 int dataw[24];
-                for(size_t j=0; j<24; ++j) {
+                for(int j=0; j<24; ++j) {
                     datav[j] = j;
                     dataw[j] = j*2;
                 }
                 std::vector<size_t> shape(1);
                 shape[0] = 24;
-                marray::View<int, true> v(shape.begin(), shape.end(), datav, marray::FirstMajorOrder);
-                marray::View<int, false> w(shape.begin(), shape.end(), dataw, marray::LastMajorOrder);
+                andres::View<int, true> v(shape.begin(), shape.end(), datav, andres::FirstMajorOrder);
+                andres::View<int, false> w(shape.begin(), shape.end(), dataw, andres::LastMajorOrder);
                 v.operator=(w);
                 
                 for(size_t j=0; j<v.size(); ++j) {
@@ -3856,14 +3809,14 @@ void ViewTest::assignmentOperatorTest()
             {
                 int datav[24];
                 int dataw[24];
-                for(size_t j=0; j<24; ++j) {
+                for(int j=0; j<24; ++j) {
                     datav[j] = j;
                     dataw[j] = j*2;
                 }
                 std::vector<size_t> shape(1);
                 shape[0] = 24;
-                marray::View<int, true> v(shape.begin(), shape.end(), datav, marray::LastMajorOrder);
-                marray::View<int, false> w(shape.begin(), shape.end(), dataw, marray::FirstMajorOrder);
+                andres::View<int, true> v(shape.begin(), shape.end(), datav, andres::LastMajorOrder);
+                andres::View<int, false> w(shape.begin(), shape.end(), dataw, andres::FirstMajorOrder);
                 v.operator=(w);
                 
                 for(size_t j=0; j<v.size(); ++j) {
@@ -3875,7 +3828,7 @@ void ViewTest::assignmentOperatorTest()
             {
                 int datav[24];
                 int dataw[24];
-                for(size_t j=0; j<24; ++j) {
+                for(int j=0; j<24; ++j) {
                     datav[j] = j;
                     dataw[j] = j*2;
                 }
@@ -3883,8 +3836,8 @@ void ViewTest::assignmentOperatorTest()
                 shapev[0] = 24;
                 shapew[0] = 6;
                 shapew[1] = 4;
-                marray::View<int, true> v(shapev.begin(), shapev.end(), datav, internalFirstMajorOrder);
-                marray::View<int, false> w(shapew.begin(), shapew.end(), dataw, internalFirstMajorOrder);
+                andres::View<int, true> v(shapev.begin(), shapev.end(), datav, internalFirstMajorOrder);
+                andres::View<int, false> w(shapew.begin(), shapew.end(), dataw, internalFirstMajorOrder);
                 v.operator=(w);
 
                 test(v.dimension() == w.dimension() &&
@@ -3902,7 +3855,7 @@ void ViewTest::assignmentOperatorTest()
             {
                 int datav[24];
                 int dataw[24];
-                for(size_t j=0; j<24; ++j) {
+                for(int j=0; j<24; ++j) {
                     datav[j] = j;
                     dataw[j] = j*2;
                 }
@@ -3910,8 +3863,8 @@ void ViewTest::assignmentOperatorTest()
                 shapev[0] = 24;
                 shapew[0] = 6;
                 shapew[1] = 4;
-                marray::View<int, true> v(shapev.begin(), shapev.end(), datav, marray::FirstMajorOrder);
-                marray::View<int, false> w(shapew.begin(), shapew.end(), dataw, marray::LastMajorOrder);
+                andres::View<int, true> v(shapev.begin(), shapev.end(), datav, andres::FirstMajorOrder);
+                andres::View<int, false> w(shapew.begin(), shapew.end(), dataw, andres::LastMajorOrder);
                 v.operator=(w);
 
                 test(v.dimension() == w.dimension() &&
@@ -3929,7 +3882,7 @@ void ViewTest::assignmentOperatorTest()
             {
                 int datav[24];
                 int dataw[24];
-                for(size_t j=0; j<24; ++j) {
+                for(int j=0; j<24; ++j) {
                     datav[j] = j;
                     dataw[j] = j*2;
                 }
@@ -3937,8 +3890,8 @@ void ViewTest::assignmentOperatorTest()
                 shapev[0] = 24;
                 shapew[0] = 6;
                 shapew[1] = 4;
-                marray::View<int, true> v(shapev.begin(), shapev.end(), datav, marray::LastMajorOrder);
-                marray::View<int, false> w(shapew.begin(), shapew.end(), dataw, marray::FirstMajorOrder);
+                andres::View<int, true> v(shapev.begin(), shapev.end(), datav, andres::LastMajorOrder);
+                andres::View<int, false> w(shapew.begin(), shapew.end(), dataw, andres::FirstMajorOrder);
                 v.operator=(w);
 
                 test(v.dimension() == w.dimension() &&
@@ -3957,7 +3910,7 @@ void ViewTest::assignmentOperatorTest()
             {
                 int datav[24];
                 int dataw[24];
-                for(size_t j=0; j<24; ++j) {
+                for(int j=0; j<24; ++j) {
                     datav[j] = j;
                     dataw[j] = j*2;
                 }
@@ -3966,8 +3919,8 @@ void ViewTest::assignmentOperatorTest()
                 shapew[0] = 2;
                 shapew[1] = 3; 
                 shapew[2] = 4;
-                marray::View<int, true> v(shapev.begin(), shapev.end(), datav, internalFirstMajorOrder);
-                marray::View<int, false> w(shapew.begin(), shapew.end(), dataw, internalFirstMajorOrder);
+                andres::View<int, true> v(shapev.begin(), shapev.end(), datav, internalFirstMajorOrder);
+                andres::View<int, false> w(shapew.begin(), shapew.end(), dataw, internalFirstMajorOrder);
                 v.operator=(w);
 
                 test(v.dimension() == w.dimension() &&
@@ -3987,7 +3940,7 @@ void ViewTest::assignmentOperatorTest()
             {
                 int datav[24];
                 int dataw[24];
-                for(size_t j=0; j<24; ++j) {
+                for(int j=0; j<24; ++j) {
                     datav[j] = j;
                     dataw[j] = j*2;
                 }
@@ -3996,8 +3949,8 @@ void ViewTest::assignmentOperatorTest()
                 shapew[0] = 2;
                 shapew[1] = 3; 
                 shapew[2] = 4;
-                marray::View<int, true> v(shapev.begin(), shapev.end(), datav, marray::FirstMajorOrder);
-                marray::View<int, false> w(shapew.begin(), shapew.end(), dataw, marray::LastMajorOrder);
+                andres::View<int, true> v(shapev.begin(), shapev.end(), datav, andres::FirstMajorOrder);
+                andres::View<int, false> w(shapew.begin(), shapew.end(), dataw, andres::LastMajorOrder);
                 v.operator=(w);
 
                 test(v.dimension() == w.dimension() &&
@@ -4017,7 +3970,7 @@ void ViewTest::assignmentOperatorTest()
             {
                 int datav[24];
                 int dataw[24];
-                for(size_t j=0; j<24; ++j) {
+                for(int j=0; j<24; ++j) {
                     datav[j] = j;
                     dataw[j] = j*2;
                 }
@@ -4026,8 +3979,8 @@ void ViewTest::assignmentOperatorTest()
                 shapew[0] = 2;
                 shapew[1] = 3; 
                 shapew[2] = 4;
-                marray::View<int, true> v(shapev.begin(), shapev.end(), datav, marray::LastMajorOrder);
-                marray::View<int, false> w(shapew.begin(), shapew.end(), dataw, marray::FirstMajorOrder);
+                andres::View<int, true> v(shapev.begin(), shapev.end(), datav, andres::LastMajorOrder);
+                andres::View<int, false> w(shapew.begin(), shapew.end(), dataw, andres::FirstMajorOrder);
                 v.operator=(w);
 
                 test(v.dimension() == w.dimension() &&
@@ -4051,14 +4004,14 @@ void ViewTest::assignmentOperatorTest()
             {
                 int scalar = 53;
                 int data[24];
-                for(size_t j=0; j<24; ++j) {
+                for(int j=0; j<24; ++j) {
                     data[j] = j;
                 }
                 std::vector<size_t> shape(2);
                 shape[0] = 6;
                 shape[1] = 4;
-                marray::View<int, true> v(shape.begin(), shape.end(), data, internalFirstMajorOrder);
-                marray::View<int, false> w(&scalar);
+                andres::View<int, true> v(shape.begin(), shape.end(), data, internalFirstMajorOrder);
+                andres::View<int, false> w(&scalar);
                 v.operator=(w);
 
                 test(v.dimension() == w.dimension() &&
@@ -4069,7 +4022,7 @@ void ViewTest::assignmentOperatorTest()
             {
                 int datav[24];
                 int dataw[24];
-                for(size_t j=0; j<24; ++j) {
+                for(int j=0; j<24; ++j) {
                     datav[j] = j;
                     dataw[j] = j*2;
                 }
@@ -4077,8 +4030,8 @@ void ViewTest::assignmentOperatorTest()
                 shapev[0] = 6;
                 shapev[1] = 4;
                 shapew[0] = 24;
-                marray::View<int, true> v(shapev.begin(), shapev.end(), datav, internalFirstMajorOrder);
-                marray::View<int, false> w(shapew.begin(), shapew.end(), dataw, internalFirstMajorOrder);
+                andres::View<int, true> v(shapev.begin(), shapev.end(), datav, internalFirstMajorOrder);
+                andres::View<int, false> w(shapew.begin(), shapew.end(), dataw, internalFirstMajorOrder);
                 v.operator=(w);
 
                 test(v.dimension() == w.dimension() &&
@@ -4091,7 +4044,7 @@ void ViewTest::assignmentOperatorTest()
             {
                 int datav[24];
                 int dataw[24];
-                for(size_t j=0; j<24; ++j) {
+                for(int j=0; j<24; ++j) {
                     datav[j] = j;
                     dataw[j] = j*2;
                 }
@@ -4099,8 +4052,8 @@ void ViewTest::assignmentOperatorTest()
                 shapev[0] = 6;
                 shapev[1] = 4;
                 shapew[0] = 24;
-                marray::View<int, true> v(shapev.begin(), shapev.end(), datav, marray::FirstMajorOrder);
-                marray::View<int, false> w(shapew.begin(), shapew.end(), dataw, marray::LastMajorOrder);
+                andres::View<int, true> v(shapev.begin(), shapev.end(), datav, andres::FirstMajorOrder);
+                andres::View<int, false> w(shapew.begin(), shapew.end(), dataw, andres::LastMajorOrder);
                 v.operator=(w);
 
                 test(v.dimension() == w.dimension() &&
@@ -4113,7 +4066,7 @@ void ViewTest::assignmentOperatorTest()
             {
                 int datav[24];
                 int dataw[24];
-                for(size_t j=0; j<24; ++j) {
+                for(int j=0; j<24; ++j) {
                     datav[j] = j;
                     dataw[j] = j*2;
                 }
@@ -4121,8 +4074,8 @@ void ViewTest::assignmentOperatorTest()
                 shapev[0] = 6;
                 shapev[1] = 4;
                 shapew[0] = 24;
-                marray::View<int, true> v(shapev.begin(), shapev.end(), datav, marray::LastMajorOrder);
-                marray::View<int, false> w(shapew.begin(), shapew.end(), dataw, marray::FirstMajorOrder);
+                andres::View<int, true> v(shapev.begin(), shapev.end(), datav, andres::LastMajorOrder);
+                andres::View<int, false> w(shapew.begin(), shapew.end(), dataw, andres::FirstMajorOrder);
                 v.operator=(w);
 
                 test(v.dimension() == w.dimension() &&
@@ -4136,15 +4089,15 @@ void ViewTest::assignmentOperatorTest()
             {
                 int datav[24];
                 int dataw[24];
-                for(size_t j=0; j<24; ++j) {
+                for(int j=0; j<24; ++j) {
                     datav[j] = j;
                     dataw[j] = j*2;
                 }
                 std::vector<size_t> shape(2);
                 shape[0] = 6; 
                 shape[1] = 4;
-                marray::View<int, true> v(shape.begin(), shape.end(), datav, internalFirstMajorOrder);
-                marray::View<int, false> w(shape.begin(), shape.end(), dataw, internalFirstMajorOrder);
+                andres::View<int, true> v(shape.begin(), shape.end(), datav, internalFirstMajorOrder);
+                andres::View<int, false> w(shape.begin(), shape.end(), dataw, internalFirstMajorOrder);
                 v.operator=(w);
 
                 for(size_t j=0; j<v.size(); ++j) {
@@ -4159,15 +4112,15 @@ void ViewTest::assignmentOperatorTest()
             {
                 int datav[24];
                 int dataw[24];
-                for(size_t j=0; j<24; ++j) {
+                for(int j=0; j<24; ++j) {
                     datav[j] = j;
                     dataw[j] = j*2;
                 }
                 std::vector<size_t> shape(2);
                 shape[0] = 6; 
                 shape[1] = 4;
-                marray::View<int, true> v(shape.begin(), shape.end(), datav, marray::FirstMajorOrder);
-                marray::View<int, false> w(shape.begin(), shape.end(), dataw, marray::LastMajorOrder);
+                andres::View<int, true> v(shape.begin(), shape.end(), datav, andres::FirstMajorOrder);
+                andres::View<int, false> w(shape.begin(), shape.end(), dataw, andres::LastMajorOrder);
                 v.operator=(w);
 
                 for(size_t j=0; j<v.size(); ++j) {
@@ -4182,15 +4135,15 @@ void ViewTest::assignmentOperatorTest()
             {
                 int datav[24];
                 int dataw[24];
-                for(size_t j=0; j<24; ++j) {
+                for(int j=0; j<24; ++j) {
                     datav[j] = j;
                     dataw[j] = j*2;
                 }
                 std::vector<size_t> shape(2);
                 shape[0] = 6; 
                 shape[1] = 4;
-                marray::View<int, true> v(shape.begin(), shape.end(), datav, marray::LastMajorOrder);
-                marray::View<int, false> w(shape.begin(), shape.end(), dataw, marray::FirstMajorOrder);
+                andres::View<int, true> v(shape.begin(), shape.end(), datav, andres::LastMajorOrder);
+                andres::View<int, false> w(shape.begin(), shape.end(), dataw, andres::FirstMajorOrder);
                 v.operator=(w);
 
                 for(size_t j=0; j<v.size(); ++j) {
@@ -4206,7 +4159,7 @@ void ViewTest::assignmentOperatorTest()
             {
                 int datav[24];
                 int dataw[24];
-                for(size_t j=0; j<24; ++j) {
+                for(int j=0; j<24; ++j) {
                     datav[j] = j;
                     dataw[j] = j*2;
                 }
@@ -4215,8 +4168,8 @@ void ViewTest::assignmentOperatorTest()
                 shapev[1] = 4;
                 shapew[0] = 4;
                 shapew[1] = 6;
-                marray::View<int, true> v(shapev.begin(), shapev.end(), datav, internalFirstMajorOrder);
-                marray::View<int, false> w(shapew.begin(), shapew.end(), dataw, internalFirstMajorOrder);
+                andres::View<int, true> v(shapev.begin(), shapev.end(), datav, internalFirstMajorOrder);
+                andres::View<int, false> w(shapew.begin(), shapew.end(), dataw, internalFirstMajorOrder);
                 v.operator=(w);
 
                 for(size_t j=0; j<v.size(); ++j) {
@@ -4231,7 +4184,7 @@ void ViewTest::assignmentOperatorTest()
             {
                 int datav[24];
                 int dataw[24];
-                for(size_t j=0; j<24; ++j) {
+                for(int j=0; j<24; ++j) {
                     datav[j] = j;
                     dataw[j] = j*2;
                 }
@@ -4240,8 +4193,8 @@ void ViewTest::assignmentOperatorTest()
                 shapev[1] = 4;
                 shapew[0] = 4;
                 shapew[1] = 6;
-                marray::View<int, true> v(shapev.begin(), shapev.end(), datav, marray::FirstMajorOrder);
-                marray::View<int, false> w(shapew.begin(), shapew.end(), dataw, marray::LastMajorOrder);
+                andres::View<int, true> v(shapev.begin(), shapev.end(), datav, andres::FirstMajorOrder);
+                andres::View<int, false> w(shapew.begin(), shapew.end(), dataw, andres::LastMajorOrder);
                 v.operator=(w);
 
                 for(size_t j=0; j<v.size(); ++j) {
@@ -4256,7 +4209,7 @@ void ViewTest::assignmentOperatorTest()
             {
                 int datav[24];
                 int dataw[24];
-                for(size_t j=0; j<24; ++j) {
+                for(int j=0; j<24; ++j) {
                     datav[j] = j;
                     dataw[j] = j*2;
                 }
@@ -4265,8 +4218,8 @@ void ViewTest::assignmentOperatorTest()
                 shapev[1] = 4;
                 shapew[0] = 4;
                 shapew[1] = 6;
-                marray::View<int, true> v(shapev.begin(), shapev.end(), datav, marray::LastMajorOrder);
-                marray::View<int, false> w(shapew.begin(), shapew.end(), dataw, marray::FirstMajorOrder);
+                andres::View<int, true> v(shapev.begin(), shapev.end(), datav, andres::LastMajorOrder);
+                andres::View<int, false> w(shapew.begin(), shapew.end(), dataw, andres::FirstMajorOrder);
                 v.operator=(w);
 
                 for(size_t j=0; j<v.size(); ++j) {
@@ -4282,7 +4235,7 @@ void ViewTest::assignmentOperatorTest()
             {
                 int datav[24];
                 int dataw[24];
-                for(size_t j=0; j<24; ++j) {
+                for(int j=0; j<24; ++j) {
                     datav[j] = j;
                     dataw[j] = j*2;
                 }
@@ -4292,8 +4245,8 @@ void ViewTest::assignmentOperatorTest()
                 shapew[0] = 2;
                 shapew[1] = 3; 
                 shapew[2] = 4;
-                marray::View<int, true> v(shapev.begin(), shapev.end(), datav, internalFirstMajorOrder);
-                marray::View<int, false> w(shapew.begin(), shapew.end(), dataw, internalFirstMajorOrder);
+                andres::View<int, true> v(shapev.begin(), shapev.end(), datav, internalFirstMajorOrder);
+                andres::View<int, false> w(shapew.begin(), shapew.end(), dataw, internalFirstMajorOrder);
                 v.operator=(w);
 
                 test(v.dimension() == w.dimension() &&
@@ -4313,7 +4266,7 @@ void ViewTest::assignmentOperatorTest()
             {
                 int datav[24];
                 int dataw[24];
-                for(size_t j=0; j<24; ++j) {
+                for(int j=0; j<24; ++j) {
                     datav[j] = j;
                     dataw[j] = j*2;
                 }
@@ -4323,8 +4276,8 @@ void ViewTest::assignmentOperatorTest()
                 shapew[0] = 2;
                 shapew[1] = 3; 
                 shapew[2] = 4;
-                marray::View<int, true> v(shapev.begin(), shapev.end(), datav, marray::FirstMajorOrder);
-                marray::View<int, false> w(shapew.begin(), shapew.end(), dataw, marray::LastMajorOrder);
+                andres::View<int, true> v(shapev.begin(), shapev.end(), datav, andres::FirstMajorOrder);
+                andres::View<int, false> w(shapew.begin(), shapew.end(), dataw, andres::LastMajorOrder);
                 v.operator=(w);
 
                 test(v.dimension() == w.dimension() &&
@@ -4344,7 +4297,7 @@ void ViewTest::assignmentOperatorTest()
             {
                 int datav[24];
                 int dataw[24];
-                for(size_t j=0; j<24; ++j) {
+                for(int j=0; j<24; ++j) {
                     datav[j] = j;
                     dataw[j] = j*2;
                 }
@@ -4354,8 +4307,8 @@ void ViewTest::assignmentOperatorTest()
                 shapew[0] = 2;
                 shapew[1] = 3; 
                 shapew[2] = 4;
-                marray::View<int, true> v(shapev.begin(), shapev.end(), datav, marray::LastMajorOrder);
-                marray::View<int, false> w(shapew.begin(), shapew.end(), dataw, marray::FirstMajorOrder);
+                andres::View<int, true> v(shapev.begin(), shapev.end(), datav, andres::LastMajorOrder);
+                andres::View<int, false> w(shapew.begin(), shapew.end(), dataw, andres::FirstMajorOrder);
                 v.operator=(w);
 
                 test(v.dimension() == w.dimension() &&
@@ -4379,7 +4332,7 @@ void ViewTest::assignmentOperatorTest()
             {
                 int datav[24];
                 int dataw[24];
-                for(size_t j=0; j<24; ++j) {
+                for(int j=0; j<24; ++j) {
                     datav[j] = j;
                     dataw[j] = j*2;
                 }
@@ -4388,8 +4341,8 @@ void ViewTest::assignmentOperatorTest()
                 shapev[1] = 3; 
                 shapev[2] = 4; 
                 shapew[0] = 24;
-                marray::View<int, true> v(shapev.begin(), shapev.end(), datav, internalFirstMajorOrder);
-                marray::View<int, false> w(shapew.begin(), shapew.end(), dataw, internalFirstMajorOrder);
+                andres::View<int, true> v(shapev.begin(), shapev.end(), datav, internalFirstMajorOrder);
+                andres::View<int, false> w(shapew.begin(), shapew.end(), dataw, internalFirstMajorOrder);
                 v.operator=(w);
 
                 test(v.dimension() == w.dimension() &&
@@ -4402,7 +4355,7 @@ void ViewTest::assignmentOperatorTest()
             {
                 int datav[24];
                 int dataw[24];
-                for(size_t j=0; j<24; ++j) {
+                for(int j=0; j<24; ++j) {
                     datav[j] = j;
                     dataw[j] = j*2;
                 }
@@ -4411,8 +4364,8 @@ void ViewTest::assignmentOperatorTest()
                 shapev[1] = 3; 
                 shapev[2] = 4; 
                 shapew[0] = 24;
-                marray::View<int, true> v(shapev.begin(), shapev.end(), datav, marray::FirstMajorOrder);
-                marray::View<int, false> w(shapew.begin(), shapew.end(), dataw, marray::LastMajorOrder);
+                andres::View<int, true> v(shapev.begin(), shapev.end(), datav, andres::FirstMajorOrder);
+                andres::View<int, false> w(shapew.begin(), shapew.end(), dataw, andres::LastMajorOrder);
                 v.operator=(w);
 
                 test(v.dimension() == w.dimension() &&
@@ -4425,7 +4378,7 @@ void ViewTest::assignmentOperatorTest()
             {
                 int datav[24];
                 int dataw[24];
-                for(size_t j=0; j<24; ++j) {
+                for(int j=0; j<24; ++j) {
                     datav[j] = j;
                     dataw[j] = j*2;
                 }
@@ -4434,8 +4387,8 @@ void ViewTest::assignmentOperatorTest()
                 shapev[1] = 3; 
                 shapev[2] = 4; 
                 shapew[0] = 24;
-                marray::View<int, true> v(shapev.begin(), shapev.end(), datav, marray::LastMajorOrder);
-                marray::View<int, false> w(shapew.begin(), shapew.end(), dataw, marray::FirstMajorOrder);
+                andres::View<int, true> v(shapev.begin(), shapev.end(), datav, andres::LastMajorOrder);
+                andres::View<int, false> w(shapew.begin(), shapew.end(), dataw, andres::FirstMajorOrder);
                 v.operator=(w);
 
                 test(v.dimension() == w.dimension() &&
@@ -4449,7 +4402,7 @@ void ViewTest::assignmentOperatorTest()
             {
                 int datav[24];
                 int dataw[24];
-                for(size_t j=0; j<24; ++j) {
+                for(int j=0; j<24; ++j) {
                     datav[j] = j;
                     dataw[j] = j*2;
                 }
@@ -4459,8 +4412,8 @@ void ViewTest::assignmentOperatorTest()
                 shapev[2] = 4; 
                 shapew[0] = 6;
                 shapew[1] = 4;
-                marray::View<int, true> v(shapev.begin(), shapev.end(), datav, internalFirstMajorOrder);
-                marray::View<int, false> w(shapew.begin(), shapew.end(), dataw, internalFirstMajorOrder);
+                andres::View<int, true> v(shapev.begin(), shapev.end(), datav, internalFirstMajorOrder);
+                andres::View<int, false> w(shapew.begin(), shapew.end(), dataw, internalFirstMajorOrder);
                 v.operator=(w);
 
                 test(v.dimension() == w.dimension() &&
@@ -4478,7 +4431,7 @@ void ViewTest::assignmentOperatorTest()
             {
                 int datav[24];
                 int dataw[24];
-                for(size_t j=0; j<24; ++j) {
+                for(int j=0; j<24; ++j) {
                     datav[j] = j;
                     dataw[j] = j*2;
                 }
@@ -4488,8 +4441,8 @@ void ViewTest::assignmentOperatorTest()
                 shapev[2] = 4; 
                 shapew[0] = 6;
                 shapew[1] = 4;
-                marray::View<int, true> v(shapev.begin(), shapev.end(), datav, marray::FirstMajorOrder);
-                marray::View<int, false> w(shapew.begin(), shapew.end(), dataw, marray::LastMajorOrder);
+                andres::View<int, true> v(shapev.begin(), shapev.end(), datav, andres::FirstMajorOrder);
+                andres::View<int, false> w(shapew.begin(), shapew.end(), dataw, andres::LastMajorOrder);
                 v.operator=(w);
 
                 test(v.dimension() == w.dimension() &&
@@ -4507,7 +4460,7 @@ void ViewTest::assignmentOperatorTest()
             {
                 int datav[24];
                 int dataw[24];
-                for(size_t j=0; j<24; ++j) {
+                for(int j=0; j<24; ++j) {
                     datav[j] = j;
                     dataw[j] = j*2;
                 }
@@ -4517,8 +4470,8 @@ void ViewTest::assignmentOperatorTest()
                 shapev[2] = 4; 
                 shapew[0] = 6;
                 shapew[1] = 4;
-                marray::View<int, true> v(shapev.begin(), shapev.end(), datav, marray::LastMajorOrder);
-                marray::View<int, false> w(shapew.begin(), shapew.end(), dataw, marray::FirstMajorOrder);
+                andres::View<int, true> v(shapev.begin(), shapev.end(), datav, andres::LastMajorOrder);
+                andres::View<int, false> w(shapew.begin(), shapew.end(), dataw, andres::FirstMajorOrder);
                 v.operator=(w);
 
                 test(v.dimension() == w.dimension() &&
@@ -4537,7 +4490,7 @@ void ViewTest::assignmentOperatorTest()
             {
                 int datav[24];
                 int dataw[24];
-                for(size_t j=0; j<24; ++j) {
+                for(int j=0; j<24; ++j) {
                     datav[j] = j;
                     dataw[j] = j*2;
                 }
@@ -4545,8 +4498,8 @@ void ViewTest::assignmentOperatorTest()
                 shape[0] = 3;
                 shape[1] = 2;
                 shape[2] = 4; 
-                marray::View<int, true> v(shape.begin(), shape.end(), datav, internalFirstMajorOrder);
-                marray::View<int, false> w(shape.begin(), shape.end(), dataw, internalFirstMajorOrder);
+                andres::View<int, true> v(shape.begin(), shape.end(), datav, internalFirstMajorOrder);
+                andres::View<int, false> w(shape.begin(), shape.end(), dataw, internalFirstMajorOrder);
                 v.operator=(w);
 
                 for(size_t j=0; j<v.size(); ++j) {
@@ -4563,7 +4516,7 @@ void ViewTest::assignmentOperatorTest()
             {
                 int datav[24];
                 int dataw[24];
-                for(size_t j=0; j<24; ++j) {
+                for(int j=0; j<24; ++j) {
                     datav[j] = j;
                     dataw[j] = j*2;
                 }
@@ -4571,8 +4524,8 @@ void ViewTest::assignmentOperatorTest()
                 shape[0] = 3;
                 shape[1] = 2;
                 shape[2] = 4; 
-                marray::View<int, true> v(shape.begin(), shape.end(), datav, marray::FirstMajorOrder);
-                marray::View<int, false> w(shape.begin(), shape.end(), dataw, marray::LastMajorOrder);
+                andres::View<int, true> v(shape.begin(), shape.end(), datav, andres::FirstMajorOrder);
+                andres::View<int, false> w(shape.begin(), shape.end(), dataw, andres::LastMajorOrder);
                 v.operator=(w);
 
                 for(size_t j=0; j<v.size(); ++j) {
@@ -4589,7 +4542,7 @@ void ViewTest::assignmentOperatorTest()
             {
                 int datav[24];
                 int dataw[24];
-                for(size_t j=0; j<24; ++j) {
+                for(int j=0; j<24; ++j) {
                     datav[j] = j;
                     dataw[j] = j*2;
                 }
@@ -4597,8 +4550,8 @@ void ViewTest::assignmentOperatorTest()
                 shape[0] = 3;
                 shape[1] = 2;
                 shape[2] = 4; 
-                marray::View<int, true> v(shape.begin(), shape.end(), datav, marray::LastMajorOrder);
-                marray::View<int, false> w(shape.begin(), shape.end(), dataw, marray::FirstMajorOrder);
+                andres::View<int, true> v(shape.begin(), shape.end(), datav, andres::LastMajorOrder);
+                andres::View<int, false> w(shape.begin(), shape.end(), dataw, andres::FirstMajorOrder);
                 v.operator=(w);
 
                 for(size_t j=0; j<v.size(); ++j) {
@@ -4616,7 +4569,7 @@ void ViewTest::assignmentOperatorTest()
             {
                 int datav[24];
                 int dataw[24];
-                for(size_t j=0; j<24; ++j) {
+                for(int j=0; j<24; ++j) {
                     datav[j] = j;
                     dataw[j] = j*2;
                 }
@@ -4627,8 +4580,8 @@ void ViewTest::assignmentOperatorTest()
                 shapew[0] = 2;
                 shapew[1] = 4;
                 shapew[2] = 2;
-                marray::View<int, true> v(shapev.begin(), shapev.end(), datav, internalFirstMajorOrder);
-                marray::View<int, false> w(shapew.begin(), shapew.end(), dataw, internalFirstMajorOrder);
+                andres::View<int, true> v(shapev.begin(), shapev.end(), datav, internalFirstMajorOrder);
+                andres::View<int, false> w(shapew.begin(), shapew.end(), dataw, internalFirstMajorOrder);
                 v.operator=(w);
 
                 for(size_t j=0; j<v.size(); ++j) {
@@ -4645,7 +4598,7 @@ void ViewTest::assignmentOperatorTest()
             {
                 int datav[24];
                 int dataw[24];
-                for(size_t j=0; j<24; ++j) {
+                for(int j=0; j<24; ++j) {
                     datav[j] = j;
                     dataw[j] = j*2;
                 }
@@ -4657,8 +4610,8 @@ void ViewTest::assignmentOperatorTest()
 
                 shapew[1] = 4;
                 shapew[2] = 2;
-                marray::View<int, true> v(shapev.begin(), shapev.end(), datav, marray::FirstMajorOrder);
-                marray::View<int, false> w(shapew.begin(), shapew.end(), dataw, marray::LastMajorOrder);
+                andres::View<int, true> v(shapev.begin(), shapev.end(), datav, andres::FirstMajorOrder);
+                andres::View<int, false> w(shapew.begin(), shapew.end(), dataw, andres::LastMajorOrder);
                 v.operator=(w);
 
                 for(size_t j=0; j<v.size(); ++j) {
@@ -4675,7 +4628,7 @@ void ViewTest::assignmentOperatorTest()
             {
                 int datav[24];
                 int dataw[24];
-                for(size_t j=0; j<24; ++j) {
+                for(int j=0; j<24; ++j) {
                     datav[j] = j;
                     dataw[j] = j*2;
                 }
@@ -4686,8 +4639,8 @@ void ViewTest::assignmentOperatorTest()
                 shapew[0] = 2;
                 shapew[1] = 4;
                 shapew[2] = 2;
-                marray::View<int, true> v(shapev.begin(), shapev.end(), datav, marray::LastMajorOrder);
-                marray::View<int, false> w(shapew.begin(), shapew.end(), dataw, marray::FirstMajorOrder);
+                andres::View<int, true> v(shapev.begin(), shapev.end(), datav, andres::LastMajorOrder);
+                andres::View<int, false> w(shapew.begin(), shapew.end(), dataw, andres::FirstMajorOrder);
                 v.operator=(w);
 
                 for(size_t j=0; j<v.size(); ++j) {
@@ -4712,7 +4665,7 @@ void ViewTest::assignmentOperatorTest()
             {
                 int scalarv = 3;
                 int scalarw = 76;
-                marray::View<int, true> v(&scalarv), w(&scalarw);
+                andres::View<int, true> v(&scalarv), w(&scalarw);
                 v.operator=(w);
                 
                 test(&v(0) == &w(0));
@@ -4721,12 +4674,12 @@ void ViewTest::assignmentOperatorTest()
             {
                 int scalar = 53;
                 int data[24];
-                for(size_t j=0; j<24; ++j) {
+                for(int j=0; j<24; ++j) {
                     data[j] = j;
                 }
                 std::vector<size_t> shape(1);
                 shape[0] = 24;
-                marray::View<int, true> v(&scalar), 
+                andres::View<int, true> v(&scalar), 
                                         w(shape.begin(), shape.end(), data, internalFirstMajorOrder);
                 v.operator=(w);
 
@@ -4741,13 +4694,13 @@ void ViewTest::assignmentOperatorTest()
             {
                 int scalar = 53;
                 int data[24];
-                for(size_t j=0; j<24; ++j) {
+                for(int j=0; j<24; ++j) {
                     data[j] = j;
                 }
                 std::vector<size_t> shape(2); 
                 shape[0] = 6;
                 shape[1] = 4;
-                marray::View<int, true> v(&scalar), w(shape.begin(), shape.end(), data, internalFirstMajorOrder);
+                andres::View<int, true> v(&scalar), w(shape.begin(), shape.end(), data, internalFirstMajorOrder);
                 v.operator=(w);
 
                 test(v.dimension() == w.dimension() &&
@@ -4766,14 +4719,14 @@ void ViewTest::assignmentOperatorTest()
             {
                 int scalar = 53;
                 int data[24];
-                for(size_t j=0; j<24; ++j) {
+                for(int j=0; j<24; ++j) {
                     data[j] = j;
                 }
                 std::vector<size_t> shape(3);
                 shape[0] = 2;
                 shape[1] = 3; 
                 shape[2] = 4;
-                marray::View<int, true> v(&scalar), w(shape.begin(), shape.end(), data, internalFirstMajorOrder);
+                andres::View<int, true> v(&scalar), w(shape.begin(), shape.end(), data, internalFirstMajorOrder);
                 v.operator=(w);
 
                 test(v.dimension() == w.dimension() &&
@@ -4797,13 +4750,13 @@ void ViewTest::assignmentOperatorTest()
             {
                 int scalar = 53;
                 int data[24];
-                for(size_t j=0; j<24; ++j) {
+                for(int j=0; j<24; ++j) {
                     data[j] = j;
                 }
                 std::vector<size_t> shape(1);
                 shape[0] = 24;
-                marray::View<int, true> v(shape.begin(), shape.end(), data, internalFirstMajorOrder);
-                marray::View<int, true> w(&scalar);
+                andres::View<int, true> v(shape.begin(), shape.end(), data, internalFirstMajorOrder);
+                andres::View<int, true> w(&scalar);
                 v.operator=(w);
                 
                 test(v.dimension() == w.dimension() &&
@@ -4814,14 +4767,14 @@ void ViewTest::assignmentOperatorTest()
             {
                 int datav[24];
                 int dataw[24];
-                for(size_t j=0; j<24; ++j) {
+                for(int j=0; j<24; ++j) {
                     datav[j] = j;
                     dataw[j] = j*2;
                 }
                 std::vector<size_t> shape(1);
                 shape[0] = 24;
-                marray::View<int, true> v(shape.begin(), shape.end(), datav, internalFirstMajorOrder);
-                marray::View<int, true> w(shape.begin(), shape.end(), dataw, internalFirstMajorOrder);
+                andres::View<int, true> v(shape.begin(), shape.end(), datav, internalFirstMajorOrder);
+                andres::View<int, true> w(shape.begin(), shape.end(), dataw, internalFirstMajorOrder);
                 v.operator=(w);
                 
                 for(size_t j=0; j<v.size(); ++j) {
@@ -4831,14 +4784,14 @@ void ViewTest::assignmentOperatorTest()
             {
                 int datav[24];
                 int dataw[24];
-                for(size_t j=0; j<24; ++j) {
+                for(int j=0; j<24; ++j) {
                     datav[j] = j;
                     dataw[j] = j*2;
                 }
                 std::vector<size_t> shape(1);
                 shape[0] = 24;
-                marray::View<int, true> v(shape.begin(), shape.end(), datav, marray::FirstMajorOrder);
-                marray::View<int, true> w(shape.begin(), shape.end(), dataw, marray::LastMajorOrder);
+                andres::View<int, true> v(shape.begin(), shape.end(), datav, andres::FirstMajorOrder);
+                andres::View<int, true> w(shape.begin(), shape.end(), dataw, andres::LastMajorOrder);
                 v.operator=(w);
                 
                 for(size_t j=0; j<v.size(); ++j) {
@@ -4848,14 +4801,14 @@ void ViewTest::assignmentOperatorTest()
             {
                 int datav[24];
                 int dataw[24];
-                for(size_t j=0; j<24; ++j) {
+                for(int j=0; j<24; ++j) {
                     datav[j] = j;
                     dataw[j] = j*2;
                 }
                 std::vector<size_t> shape(1);
                 shape[0] = 24;
-                marray::View<int, true> v(shape.begin(), shape.end(), datav, marray::LastMajorOrder);
-                marray::View<int, true> w(shape.begin(), shape.end(), dataw, marray::FirstMajorOrder);
+                andres::View<int, true> v(shape.begin(), shape.end(), datav, andres::LastMajorOrder);
+                andres::View<int, true> w(shape.begin(), shape.end(), dataw, andres::FirstMajorOrder);
                 v.operator=(w);
                 
                 for(size_t j=0; j<v.size(); ++j) {
@@ -4866,7 +4819,7 @@ void ViewTest::assignmentOperatorTest()
             {
                 int datav[24];
                 int dataw[24];
-                for(size_t j=0; j<24; ++j) {
+                for(int j=0; j<24; ++j) {
                     datav[j] = j;
                     dataw[j] = j*2;
                 }
@@ -4874,8 +4827,8 @@ void ViewTest::assignmentOperatorTest()
                 shapev[0] = 24;
                 shapew[0] = 6;
                 shapew[1] = 4;
-                marray::View<int, true> v(shapev.begin(), shapev.end(), datav, internalFirstMajorOrder);
-                marray::View<int, true> w(shapew.begin(), shapew.end(), dataw, internalFirstMajorOrder);
+                andres::View<int, true> v(shapev.begin(), shapev.end(), datav, internalFirstMajorOrder);
+                andres::View<int, true> w(shapew.begin(), shapew.end(), dataw, internalFirstMajorOrder);
                 v.operator=(w);
 
                 test(v.dimension() == w.dimension() &&
@@ -4893,7 +4846,7 @@ void ViewTest::assignmentOperatorTest()
             {
                 int datav[24];
                 int dataw[24];
-                for(size_t j=0; j<24; ++j) {
+                for(int j=0; j<24; ++j) {
                     datav[j] = j;
                     dataw[j] = j*2;
                 }
@@ -4901,8 +4854,8 @@ void ViewTest::assignmentOperatorTest()
                 shapev[0] = 24;
                 shapew[0] = 6;
                 shapew[1] = 4;
-                marray::View<int, true> v(shapev.begin(), shapev.end(), datav, marray::FirstMajorOrder);
-                marray::View<int, true> w(shapew.begin(), shapew.end(), dataw, marray::LastMajorOrder);
+                andres::View<int, true> v(shapev.begin(), shapev.end(), datav, andres::FirstMajorOrder);
+                andres::View<int, true> w(shapew.begin(), shapew.end(), dataw, andres::LastMajorOrder);
                 v.operator=(w);
 
                 test(v.dimension() == w.dimension() &&
@@ -4920,7 +4873,7 @@ void ViewTest::assignmentOperatorTest()
             {
                 int datav[24];
                 int dataw[24];
-                for(size_t j=0; j<24; ++j) {
+                for(int j=0; j<24; ++j) {
                     datav[j] = j;
                     dataw[j] = j*2;
                 }
@@ -4928,8 +4881,8 @@ void ViewTest::assignmentOperatorTest()
                 shapev[0] = 24;
                 shapew[0] = 6;
                 shapew[1] = 4;
-                marray::View<int, true> v(shapev.begin(), shapev.end(), datav, marray::LastMajorOrder);
-                marray::View<int, true> w(shapew.begin(), shapew.end(), dataw, marray::FirstMajorOrder);
+                andres::View<int, true> v(shapev.begin(), shapev.end(), datav, andres::LastMajorOrder);
+                andres::View<int, true> w(shapew.begin(), shapew.end(), dataw, andres::FirstMajorOrder);
                 v.operator=(w);
 
                 test(v.dimension() == w.dimension() &&
@@ -4948,7 +4901,7 @@ void ViewTest::assignmentOperatorTest()
             {
                 int datav[24];
                 int dataw[24];
-                for(size_t j=0; j<24; ++j) {
+                for(int j=0; j<24; ++j) {
                     datav[j] = j;
                     dataw[j] = j*2;
                 }
@@ -4957,8 +4910,8 @@ void ViewTest::assignmentOperatorTest()
                 shapew[0] = 2;
                 shapew[1] = 3; 
                 shapew[2] = 4;
-                marray::View<int, true> v(shapev.begin(), shapev.end(), datav, internalFirstMajorOrder);
-                marray::View<int, true> w(shapew.begin(), shapew.end(), dataw, internalFirstMajorOrder);
+                andres::View<int, true> v(shapev.begin(), shapev.end(), datav, internalFirstMajorOrder);
+                andres::View<int, true> w(shapew.begin(), shapew.end(), dataw, internalFirstMajorOrder);
                 v.operator=(w);
 
                 test(v.dimension() == w.dimension() &&
@@ -4980,7 +4933,7 @@ void ViewTest::assignmentOperatorTest()
                 int datav[24];
 
                 int dataw[24];
-                for(size_t j=0; j<24; ++j) {
+                for(int j=0; j<24; ++j) {
                     datav[j] = j;
                     dataw[j] = j*2;
                 }
@@ -4989,8 +4942,8 @@ void ViewTest::assignmentOperatorTest()
                 shapew[0] = 2;
                 shapew[1] = 3; 
                 shapew[2] = 4;
-                marray::View<int, true> v(shapev.begin(), shapev.end(), datav, marray::FirstMajorOrder);
-                marray::View<int, true> w(shapew.begin(), shapew.end(), dataw, marray::LastMajorOrder);
+                andres::View<int, true> v(shapev.begin(), shapev.end(), datav, andres::FirstMajorOrder);
+                andres::View<int, true> w(shapew.begin(), shapew.end(), dataw, andres::LastMajorOrder);
                 v.operator=(w);
 
                 test(v.dimension() == w.dimension() &&
@@ -5010,7 +4963,7 @@ void ViewTest::assignmentOperatorTest()
             {
                 int datav[24];
                 int dataw[24];
-                for(size_t j=0; j<24; ++j) {
+                for(int j=0; j<24; ++j) {
                     datav[j] = j;
                     dataw[j] = j*2;
                 }
@@ -5019,8 +4972,8 @@ void ViewTest::assignmentOperatorTest()
                 shapew[0] = 2;
                 shapew[1] = 3; 
                 shapew[2] = 4;
-                marray::View<int, true> v(shapev.begin(), shapev.end(), datav, marray::LastMajorOrder);
-                marray::View<int, true> w(shapew.begin(), shapew.end(), dataw, marray::FirstMajorOrder);
+                andres::View<int, true> v(shapev.begin(), shapev.end(), datav, andres::LastMajorOrder);
+                andres::View<int, true> w(shapew.begin(), shapew.end(), dataw, andres::FirstMajorOrder);
                 v.operator=(w);
 
                 test(v.dimension() == w.dimension() &&
@@ -5044,14 +4997,14 @@ void ViewTest::assignmentOperatorTest()
             {
                 int scalar = 53;
                 int data[24];
-                for(size_t j=0; j<24; ++j) {
+                for(int j=0; j<24; ++j) {
                     data[j] = j;
                 }
                 std::vector<size_t> shape(2);
                 shape[0] = 6;
                 shape[1] = 4;
-                marray::View<int, true> v(shape.begin(), shape.end(), data, internalFirstMajorOrder);
-                marray::View<int, true> w(&scalar);
+                andres::View<int, true> v(shape.begin(), shape.end(), data, internalFirstMajorOrder);
+                andres::View<int, true> w(&scalar);
                 v.operator=(w);
 
                 test(v.dimension() == w.dimension() &&
@@ -5062,7 +5015,7 @@ void ViewTest::assignmentOperatorTest()
             {
                 int datav[24];
                 int dataw[24];
-                for(size_t j=0; j<24; ++j) {
+                for(int j=0; j<24; ++j) {
                     datav[j] = j;
                     dataw[j] = j*2;
                 }
@@ -5070,8 +5023,8 @@ void ViewTest::assignmentOperatorTest()
                 shapev[0] = 6;
                 shapev[1] = 4;
                 shapew[0] = 24;
-                marray::View<int, true> v(shapev.begin(), shapev.end(), datav, internalFirstMajorOrder);
-                marray::View<int, true> w(shapew.begin(), shapew.end(), dataw, internalFirstMajorOrder);
+                andres::View<int, true> v(shapev.begin(), shapev.end(), datav, internalFirstMajorOrder);
+                andres::View<int, true> w(shapew.begin(), shapew.end(), dataw, internalFirstMajorOrder);
                 v.operator=(w);
 
                 test(v.dimension() == w.dimension() &&
@@ -5084,7 +5037,7 @@ void ViewTest::assignmentOperatorTest()
             {
                 int datav[24];
                 int dataw[24];
-                for(size_t j=0; j<24; ++j) {
+                for(int j=0; j<24; ++j) {
                     datav[j] = j;
                     dataw[j] = j*2;
                 }
@@ -5092,8 +5045,8 @@ void ViewTest::assignmentOperatorTest()
                 shapev[0] = 6;
                 shapev[1] = 4;
                 shapew[0] = 24;
-                marray::View<int, true> v(shapev.begin(), shapev.end(), datav, marray::FirstMajorOrder);
-                marray::View<int, true> w(shapew.begin(), shapew.end(), dataw, marray::LastMajorOrder);
+                andres::View<int, true> v(shapev.begin(), shapev.end(), datav, andres::FirstMajorOrder);
+                andres::View<int, true> w(shapew.begin(), shapew.end(), dataw, andres::LastMajorOrder);
                 v.operator=(w);
 
                 test(v.dimension() == w.dimension() &&
@@ -5106,7 +5059,7 @@ void ViewTest::assignmentOperatorTest()
             {
                 int datav[24];
                 int dataw[24];
-                for(size_t j=0; j<24; ++j) {
+                for(int j=0; j<24; ++j) {
                     datav[j] = j;
                     dataw[j] = j*2;
                 }
@@ -5114,8 +5067,8 @@ void ViewTest::assignmentOperatorTest()
                 shapev[0] = 6;
                 shapev[1] = 4;
                 shapew[0] = 24;
-                marray::View<int, true> v(shapev.begin(), shapev.end(), datav, marray::LastMajorOrder);
-                marray::View<int, true> w(shapew.begin(), shapew.end(), dataw, marray::FirstMajorOrder);
+                andres::View<int, true> v(shapev.begin(), shapev.end(), datav, andres::LastMajorOrder);
+                andres::View<int, true> w(shapew.begin(), shapew.end(), dataw, andres::FirstMajorOrder);
                 v.operator=(w);
 
                 test(v.dimension() == w.dimension() &&
@@ -5129,15 +5082,15 @@ void ViewTest::assignmentOperatorTest()
             {
                 int datav[24];
                 int dataw[24];
-                for(size_t j=0; j<24; ++j) {
+                for(int j=0; j<24; ++j) {
                     datav[j] = j;
                     dataw[j] = j*2;
                 }
                 std::vector<size_t> shape(2);
                 shape[0] = 6; 
                 shape[1] = 4;
-                marray::View<int, true> v(shape.begin(), shape.end(), datav, internalFirstMajorOrder);
-                marray::View<int, true> w(shape.begin(), shape.end(), dataw, internalFirstMajorOrder);
+                andres::View<int, true> v(shape.begin(), shape.end(), datav, internalFirstMajorOrder);
+                andres::View<int, true> w(shape.begin(), shape.end(), dataw, internalFirstMajorOrder);
                 v.operator=(w);
 
                 for(size_t j=0; j<v.size(); ++j) {
@@ -5152,15 +5105,15 @@ void ViewTest::assignmentOperatorTest()
             {
                 int datav[24];
                 int dataw[24];
-                for(size_t j=0; j<24; ++j) {
+                for(int j=0; j<24; ++j) {
                     datav[j] = j;
                     dataw[j] = j*2;
                 }
                 std::vector<size_t> shape(2);
                 shape[0] = 6; 
                 shape[1] = 4;
-                marray::View<int, true> v(shape.begin(), shape.end(), datav, marray::FirstMajorOrder);
-                marray::View<int, true> w(shape.begin(), shape.end(), dataw, marray::LastMajorOrder);
+                andres::View<int, true> v(shape.begin(), shape.end(), datav, andres::FirstMajorOrder);
+                andres::View<int, true> w(shape.begin(), shape.end(), dataw, andres::LastMajorOrder);
                 v.operator=(w);
 
                 for(size_t j=0; j<v.size(); ++j) {
@@ -5175,15 +5128,15 @@ void ViewTest::assignmentOperatorTest()
             {
                 int datav[24];
                 int dataw[24];
-                for(size_t j=0; j<24; ++j) {
+                for(int j=0; j<24; ++j) {
                     datav[j] = j;
                     dataw[j] = j*2;
                 }
                 std::vector<size_t> shape(2);
                 shape[0] = 6; 
                 shape[1] = 4;
-                marray::View<int, true> v(shape.begin(), shape.end(), datav, marray::LastMajorOrder);
-                marray::View<int, true> w(shape.begin(), shape.end(), dataw, marray::FirstMajorOrder);
+                andres::View<int, true> v(shape.begin(), shape.end(), datav, andres::LastMajorOrder);
+                andres::View<int, true> w(shape.begin(), shape.end(), dataw, andres::FirstMajorOrder);
                 v.operator=(w);
 
                 for(size_t j=0; j<v.size(); ++j) {
@@ -5199,7 +5152,7 @@ void ViewTest::assignmentOperatorTest()
             {
                 int datav[24];
                 int dataw[24];
-                for(size_t j=0; j<24; ++j) {
+                for(int j=0; j<24; ++j) {
                     datav[j] = j;
                     dataw[j] = j*2;
                 }
@@ -5208,8 +5161,8 @@ void ViewTest::assignmentOperatorTest()
                 shapev[1] = 4;
                 shapew[0] = 4; 
                 shapew[1] = 6;
-                marray::View<int, true> v(shapev.begin(), shapev.end(), datav, internalFirstMajorOrder);
-                marray::View<int, true> w(shapew.begin(), shapew.end(), dataw, internalFirstMajorOrder);
+                andres::View<int, true> v(shapev.begin(), shapev.end(), datav, internalFirstMajorOrder);
+                andres::View<int, true> w(shapew.begin(), shapew.end(), dataw, internalFirstMajorOrder);
                 v.operator=(w);
 
                 for(size_t j=0; j<v.size(); ++j) {
@@ -5224,7 +5177,7 @@ void ViewTest::assignmentOperatorTest()
             {
                 int datav[24];
                 int dataw[24];
-                for(size_t j=0; j<24; ++j) {
+                for(int j=0; j<24; ++j) {
                     datav[j] = j;
                     dataw[j] = j*2;
                 }
@@ -5233,8 +5186,8 @@ void ViewTest::assignmentOperatorTest()
                 shapev[1] = 4;
                 shapew[0] = 4; 
                 shapew[1] = 6;
-                marray::View<int, true> v(shapev.begin(), shapev.end(), datav, marray::FirstMajorOrder);
-                marray::View<int, true> w(shapew.begin(), shapew.end(), dataw, marray::LastMajorOrder);
+                andres::View<int, true> v(shapev.begin(), shapev.end(), datav, andres::FirstMajorOrder);
+                andres::View<int, true> w(shapew.begin(), shapew.end(), dataw, andres::LastMajorOrder);
                 v.operator=(w);
 
                 for(size_t j=0; j<v.size(); ++j) {
@@ -5249,7 +5202,7 @@ void ViewTest::assignmentOperatorTest()
             {
                 int datav[24];
                 int dataw[24];
-                for(size_t j=0; j<24; ++j) {
+                for(int j=0; j<24; ++j) {
                     datav[j] = j;
                     dataw[j] = j*2;
                 }
@@ -5258,8 +5211,8 @@ void ViewTest::assignmentOperatorTest()
                 shapev[1] = 4;
                 shapew[0] = 4; 
                 shapew[1] = 6;
-                marray::View<int, true> v(shapev.begin(), shapev.end(), datav, marray::LastMajorOrder);
-                marray::View<int, true> w(shapew.begin(), shapew.end(), dataw, marray::FirstMajorOrder);
+                andres::View<int, true> v(shapev.begin(), shapev.end(), datav, andres::LastMajorOrder);
+                andres::View<int, true> w(shapew.begin(), shapew.end(), dataw, andres::FirstMajorOrder);
                 v.operator=(w);
 
                 for(size_t j=0; j<v.size(); ++j) {
@@ -5275,7 +5228,7 @@ void ViewTest::assignmentOperatorTest()
             {
                 int datav[24];
                 int dataw[24];
-                for(size_t j=0; j<24; ++j) {
+                for(int j=0; j<24; ++j) {
                     datav[j] = j;
                     dataw[j] = j*2;
                 }
@@ -5285,8 +5238,8 @@ void ViewTest::assignmentOperatorTest()
                 shapew[0] = 2;
                 shapew[1] = 3; 
                 shapew[2] = 4;
-                marray::View<int, true> v(shapev.begin(), shapev.end(), datav, internalFirstMajorOrder);
-                marray::View<int, true> w(shapew.begin(), shapew.end(), dataw, internalFirstMajorOrder);
+                andres::View<int, true> v(shapev.begin(), shapev.end(), datav, internalFirstMajorOrder);
+                andres::View<int, true> w(shapew.begin(), shapew.end(), dataw, internalFirstMajorOrder);
                 v.operator=(w);
 
                 test(v.dimension() == w.dimension() &&
@@ -5306,7 +5259,7 @@ void ViewTest::assignmentOperatorTest()
             {
                 int datav[24];
                 int dataw[24];
-                for(size_t j=0; j<24; ++j) {
+                for(int j=0; j<24; ++j) {
                     datav[j] = j;
                     dataw[j] = j*2;
                 }
@@ -5316,8 +5269,8 @@ void ViewTest::assignmentOperatorTest()
                 shapew[0] = 2;
                 shapew[1] = 3; 
                 shapew[2] = 4;
-                marray::View<int, true> v(shapev.begin(), shapev.end(), datav, marray::FirstMajorOrder);
-                marray::View<int, true> w(shapew.begin(), shapew.end(), dataw, marray::LastMajorOrder);
+                andres::View<int, true> v(shapev.begin(), shapev.end(), datav, andres::FirstMajorOrder);
+                andres::View<int, true> w(shapew.begin(), shapew.end(), dataw, andres::LastMajorOrder);
                 v.operator=(w);
 
                 test(v.dimension() == w.dimension() &&
@@ -5337,7 +5290,7 @@ void ViewTest::assignmentOperatorTest()
             {
                 int datav[24];
                 int dataw[24];
-                for(size_t j=0; j<24; ++j) {
+                for(int j=0; j<24; ++j) {
                     datav[j] = j;
                     dataw[j] = j*2;
                 }
@@ -5347,8 +5300,8 @@ void ViewTest::assignmentOperatorTest()
                 shapew[0] = 2;
                 shapew[1] = 3; 
                 shapew[2] = 4;
-                marray::View<int, true> v(shapev.begin(), shapev.end(), datav, marray::LastMajorOrder);
-                marray::View<int, true> w(shapew.begin(), shapew.end(), dataw, marray::FirstMajorOrder);
+                andres::View<int, true> v(shapev.begin(), shapev.end(), datav, andres::LastMajorOrder);
+                andres::View<int, true> w(shapew.begin(), shapew.end(), dataw, andres::FirstMajorOrder);
                 v.operator=(w);
 
                 test(v.dimension() == w.dimension() &&
@@ -5372,15 +5325,15 @@ void ViewTest::assignmentOperatorTest()
             {
                 int scalar = 53;
                 int data[24];
-                for(size_t j=0; j<24; ++j) {
+                for(int j=0; j<24; ++j) {
                     data[j] = j;
                 }
                 std::vector<size_t> shape(3);
                 shape[0] = 2;
                 shape[1] = 3; 
                 shape[2] = 4; 
-                marray::View<int, true> v(shape.begin(), shape.end(), data, internalFirstMajorOrder);
-                marray::View<int, true> w(&scalar);
+                andres::View<int, true> v(shape.begin(), shape.end(), data, internalFirstMajorOrder);
+                andres::View<int, true> w(&scalar);
                 v.operator=(w);
 
                 test(v.dimension() == w.dimension() &&
@@ -5391,7 +5344,7 @@ void ViewTest::assignmentOperatorTest()
             {
                 int datav[24];
                 int dataw[24];
-                for(size_t j=0; j<24; ++j) {
+                for(int j=0; j<24; ++j) {
                     datav[j] = j;
                     dataw[j] = j*2;
                 }
@@ -5400,8 +5353,8 @@ void ViewTest::assignmentOperatorTest()
                 shapev[1] = 3; 
                 shapev[2] = 4; 
                 shapew[0] = 24;
-                marray::View<int, true> v(shapev.begin(), shapev.end(), datav, internalFirstMajorOrder);
-                marray::View<int, true> w(shapew.begin(), shapew.end(), dataw, internalFirstMajorOrder);
+                andres::View<int, true> v(shapev.begin(), shapev.end(), datav, internalFirstMajorOrder);
+                andres::View<int, true> w(shapew.begin(), shapew.end(), dataw, internalFirstMajorOrder);
                 v.operator=(w);
 
                 test(v.dimension() == w.dimension() &&
@@ -5414,7 +5367,7 @@ void ViewTest::assignmentOperatorTest()
             {
                 int datav[24];
                 int dataw[24];
-                for(size_t j=0; j<24; ++j) {
+                for(int j=0; j<24; ++j) {
                     datav[j] = j;
                     dataw[j] = j*2;
                 }
@@ -5423,8 +5376,8 @@ void ViewTest::assignmentOperatorTest()
                 shapev[1] = 3; 
                 shapev[2] = 4; 
                 shapew[0] = 24;
-                marray::View<int, true> v(shapev.begin(), shapev.end(), datav, marray::FirstMajorOrder);
-                marray::View<int, true> w(shapew.begin(), shapew.end(), dataw, marray::LastMajorOrder);
+                andres::View<int, true> v(shapev.begin(), shapev.end(), datav, andres::FirstMajorOrder);
+                andres::View<int, true> w(shapew.begin(), shapew.end(), dataw, andres::LastMajorOrder);
                 v.operator=(w);
 
                 test(v.dimension() == w.dimension() &&
@@ -5437,7 +5390,7 @@ void ViewTest::assignmentOperatorTest()
             {
                 int datav[24];
                 int dataw[24];
-                for(size_t j=0; j<24; ++j) {
+                for(int j=0; j<24; ++j) {
                     datav[j] = j;
                     dataw[j] = j*2;
                 }
@@ -5446,8 +5399,8 @@ void ViewTest::assignmentOperatorTest()
                 shapev[1] = 3; 
                 shapev[2] = 4; 
                 shapew[0] = 24;
-                marray::View<int, true> v(shapev.begin(), shapev.end(), datav, marray::LastMajorOrder);
-                marray::View<int, true> w(shapew.begin(), shapew.end(), dataw, marray::FirstMajorOrder);
+                andres::View<int, true> v(shapev.begin(), shapev.end(), datav, andres::LastMajorOrder);
+                andres::View<int, true> w(shapew.begin(), shapew.end(), dataw, andres::FirstMajorOrder);
                 v.operator=(w);
 
                 test(v.dimension() == w.dimension() &&
@@ -5461,7 +5414,7 @@ void ViewTest::assignmentOperatorTest()
             {
                 int datav[24];
                 int dataw[24];
-                for(size_t j=0; j<24; ++j) {
+                for(int j=0; j<24; ++j) {
                     datav[j] = j;
                     dataw[j] = j*2;
                 }
@@ -5471,8 +5424,8 @@ void ViewTest::assignmentOperatorTest()
                 shapev[2] = 4; 
                 shapew[0] = 6;
                 shapew[1] = 4;
-                marray::View<int, true> v(shapev.begin(), shapev.end(), datav, internalFirstMajorOrder);
-                marray::View<int, true> w(shapew.begin(), shapew.end(), dataw, internalFirstMajorOrder);
+                andres::View<int, true> v(shapev.begin(), shapev.end(), datav, internalFirstMajorOrder);
+                andres::View<int, true> w(shapew.begin(), shapew.end(), dataw, internalFirstMajorOrder);
                 v.operator=(w);
 
                 test(v.dimension() == w.dimension() &&
@@ -5490,7 +5443,7 @@ void ViewTest::assignmentOperatorTest()
             {
                 int datav[24];
                 int dataw[24];
-                for(size_t j=0; j<24; ++j) {
+                for(int j=0; j<24; ++j) {
                     datav[j] = j;
                     dataw[j] = j*2;
                 }
@@ -5500,8 +5453,8 @@ void ViewTest::assignmentOperatorTest()
                 shapev[2] = 4; 
                 shapew[0] = 6;
                 shapew[1] = 4;
-                marray::View<int, true> v(shapev.begin(), shapev.end(), datav, marray::FirstMajorOrder);
-                marray::View<int, true> w(shapew.begin(), shapew.end(), dataw, marray::LastMajorOrder);
+                andres::View<int, true> v(shapev.begin(), shapev.end(), datav, andres::FirstMajorOrder);
+                andres::View<int, true> w(shapew.begin(), shapew.end(), dataw, andres::LastMajorOrder);
                 v.operator=(w);
 
                 test(v.dimension() == w.dimension() &&
@@ -5519,7 +5472,7 @@ void ViewTest::assignmentOperatorTest()
             {
                 int datav[24];
                 int dataw[24];
-                for(size_t j=0; j<24; ++j) {
+                for(int j=0; j<24; ++j) {
                     datav[j] = j;
                     dataw[j] = j*2;
                 }
@@ -5529,8 +5482,8 @@ void ViewTest::assignmentOperatorTest()
                 shapev[2] = 4; 
                 shapew[0] = 6;
                 shapew[1] = 4;
-                marray::View<int, true> v(shapev.begin(), shapev.end(), datav, marray::LastMajorOrder);
-                marray::View<int, true> w(shapew.begin(), shapew.end(), dataw, marray::FirstMajorOrder);
+                andres::View<int, true> v(shapev.begin(), shapev.end(), datav, andres::LastMajorOrder);
+                andres::View<int, true> w(shapew.begin(), shapew.end(), dataw, andres::FirstMajorOrder);
                 v.operator=(w);
 
                 test(v.dimension() == w.dimension() &&
@@ -5549,7 +5502,7 @@ void ViewTest::assignmentOperatorTest()
             {
                 int datav[24];
                 int dataw[24];
-                for(size_t j=0; j<24; ++j) {
+                for(int j=0; j<24; ++j) {
                     datav[j] = j;
                     dataw[j] = j*2;
                 }
@@ -5557,8 +5510,8 @@ void ViewTest::assignmentOperatorTest()
                 shape[0] = 3;
                 shape[1] = 2;
                 shape[2] = 4; 
-                marray::View<int, true> v(shape.begin(), shape.end(), datav, internalFirstMajorOrder);
-                marray::View<int, true> w(shape.begin(), shape.end(), dataw, internalFirstMajorOrder);
+                andres::View<int, true> v(shape.begin(), shape.end(), datav, internalFirstMajorOrder);
+                andres::View<int, true> w(shape.begin(), shape.end(), dataw, internalFirstMajorOrder);
                 v.operator=(w);
 
                 for(size_t j=0; j<v.size(); ++j) {
@@ -5575,7 +5528,7 @@ void ViewTest::assignmentOperatorTest()
             {
                 int datav[24];
                 int dataw[24];
-                for(size_t j=0; j<24; ++j) {
+                for(int j=0; j<24; ++j) {
                     datav[j] = j;
                     dataw[j] = j*2;
                 }
@@ -5583,8 +5536,8 @@ void ViewTest::assignmentOperatorTest()
                 shape[0] = 3;
                 shape[1] = 2;
                 shape[2] = 4; 
-                marray::View<int, true> v(shape.begin(), shape.end(), datav, marray::FirstMajorOrder);
-                marray::View<int, true> w(shape.begin(), shape.end(), dataw, marray::LastMajorOrder);
+                andres::View<int, true> v(shape.begin(), shape.end(), datav, andres::FirstMajorOrder);
+                andres::View<int, true> w(shape.begin(), shape.end(), dataw, andres::LastMajorOrder);
                 v.operator=(w);
 
                 for(size_t j=0; j<v.size(); ++j) {
@@ -5601,7 +5554,7 @@ void ViewTest::assignmentOperatorTest()
             {
                 int datav[24];
                 int dataw[24];
-                for(size_t j=0; j<24; ++j) {
+                for(int j=0; j<24; ++j) {
                     datav[j] = j;
                     dataw[j] = j*2;
                 }
@@ -5609,8 +5562,8 @@ void ViewTest::assignmentOperatorTest()
                 shape[0] = 3;
                 shape[1] = 2;
                 shape[2] = 4; 
-                marray::View<int, true> v(shape.begin(), shape.end(), datav, marray::LastMajorOrder);
-                marray::View<int, true> w(shape.begin(), shape.end(), dataw, marray::FirstMajorOrder);
+                andres::View<int, true> v(shape.begin(), shape.end(), datav, andres::LastMajorOrder);
+                andres::View<int, true> w(shape.begin(), shape.end(), dataw, andres::FirstMajorOrder);
                 v.operator=(w);
 
                 for(size_t j=0; j<v.size(); ++j) {
@@ -5628,7 +5581,7 @@ void ViewTest::assignmentOperatorTest()
             {
                 int datav[24];
                 int dataw[24];
-                for(size_t j=0; j<24; ++j) {
+                for(int j=0; j<24; ++j) {
                     datav[j] = j;
                     dataw[j] = j*2;
                 }
@@ -5639,8 +5592,8 @@ void ViewTest::assignmentOperatorTest()
                 shapew[0] = 2;
                 shapew[1] = 4;
                 shapew[2] = 3;
-                marray::View<int, true> v(shapev.begin(), shapev.end(), datav, internalFirstMajorOrder);
-                marray::View<int, true> w(shapew.begin(), shapew.end(), dataw, internalFirstMajorOrder);
+                andres::View<int, true> v(shapev.begin(), shapev.end(), datav, internalFirstMajorOrder);
+                andres::View<int, true> w(shapew.begin(), shapew.end(), dataw, internalFirstMajorOrder);
                 v.operator=(w);
 
                 for(size_t j=0; j<v.size(); ++j) {
@@ -5657,7 +5610,7 @@ void ViewTest::assignmentOperatorTest()
             {
                 int datav[24];
                 int dataw[24];
-                for(size_t j=0; j<24; ++j) {
+                for(int j=0; j<24; ++j) {
                     datav[j] = j;
                     dataw[j] = j*2;
                 }
@@ -5668,8 +5621,8 @@ void ViewTest::assignmentOperatorTest()
                 shapew[0] = 2;
                 shapew[1] = 4;
                 shapew[2] = 3;
-                marray::View<int, true> v(shapev.begin(), shapev.end(), datav, marray::FirstMajorOrder);
-                marray::View<int, true> w(shapew.begin(), shapew.end(), dataw, marray::LastMajorOrder);
+                andres::View<int, true> v(shapev.begin(), shapev.end(), datav, andres::FirstMajorOrder);
+                andres::View<int, true> w(shapew.begin(), shapew.end(), dataw, andres::LastMajorOrder);
                 v.operator=(w);
 
                 for(size_t j=0; j<v.size(); ++j) {
@@ -5686,7 +5639,7 @@ void ViewTest::assignmentOperatorTest()
             {
                 int datav[24];
                 int dataw[24];
-                for(size_t j=0; j<24; ++j) {
+                for(int j=0; j<24; ++j) {
                     datav[j] = j;
                     dataw[j] = j*2;
                 }
@@ -5697,8 +5650,8 @@ void ViewTest::assignmentOperatorTest()
                 shapew[0] = 2;
                 shapew[1] = 4;
                 shapew[2] = 3;
-                marray::View<int, true> v(shapev.begin(), shapev.end(), datav, marray::LastMajorOrder);
-                marray::View<int, true> w(shapew.begin(), shapew.end(), dataw, marray::FirstMajorOrder);
+                andres::View<int, true> v(shapev.begin(), shapev.end(), datav, andres::LastMajorOrder);
+                andres::View<int, true> w(shapew.begin(), shapew.end(), dataw, andres::FirstMajorOrder);
                 v.operator=(w);
 
                 for(size_t j=0; j<v.size(); ++j) {
@@ -5718,14 +5671,14 @@ void ViewTest::assignmentOperatorTest()
     {
         { // unstrided view 
             int data[24];
-            for(size_t j=0; j<24; ++j) {
+            for(int j=0; j<24; ++j) {
                 data[j] = 3;
             }
             std::vector<size_t> shape(3);
             shape[0] = 3;
             shape[1] = 2;
             shape[2] = 4;
-            marray::View<int, false> v(shape.begin(), shape.end(), data, marray::LastMajorOrder);
+            andres::View<int, false> v(shape.begin(), shape.end(), data, andres::LastMajorOrder);
 
             v = 4;
 
@@ -5744,8 +5697,8 @@ void ViewTest::assignmentOperatorTest()
             std::vector<size_t> strides(2);
             strides[0] = 2;
             strides[1] = 8;
-            marray::View<int, false> v(shape.begin(), shape.end(), 
-                strides.begin(), data, marray::LastMajorOrder);
+            andres::View<int, false> v(shape.begin(), shape.end(), 
+                strides.begin(), data, andres::LastMajorOrder);
 
             v = 4;
 
@@ -5773,7 +5726,7 @@ template<bool constTarget>
 void ViewTest::queryTest(){
     // scalar
     {
-        marray::View<int, constTarget> v(&scalar_);
+        andres::View<int, constTarget> v(&scalar_);
         test(v.dimension()== 0 &&
                v.size()== 1);
     }
@@ -5781,7 +5734,7 @@ void ViewTest::queryTest(){
     {
         std::vector<size_t> shape(1);
         shape[0] = 24;
-        marray::View<int, constTarget> v(shape.begin(), shape.end(), data_);
+        andres::View<int, constTarget> v(shape.begin(), shape.end(), data_);
 
         test(v.dimension()==1 && 
                v.size()==24 &&
@@ -5792,7 +5745,7 @@ void ViewTest::queryTest(){
         std::vector<size_t> shape(2);
         shape[0] = 4;
         shape[1] = 6; 
-        marray::View<int, constTarget> v(shape.begin(), shape.end(), data_);
+        andres::View<int, constTarget> v(shape.begin(), shape.end(), data_);
 
         test(v.dimension()== 2 &&
                v.size()== 24 &&
@@ -5805,7 +5758,7 @@ void ViewTest::queryTest(){
         shape[0] = 3;
         shape[1] = 4;
         shape[2] = 2;
-        marray::View<int, constTarget> v(shape.begin(), shape.end(), data_);
+        andres::View<int, constTarget> v(shape.begin(), shape.end(), data_);
 
         test(v.dimension()== 3 &&
                v.size()== 24 && 
@@ -5824,7 +5777,7 @@ void ViewTest::elementAccessTest(){
             std::vector<size_t> shape(2);
             shape[0] = 6;
             shape[1] = 4;
-            marray::View<int, constTarget> v(shape.begin(), shape.end(), data_);
+            andres::View<int, constTarget> v(shape.begin(), shape.end(), data_);
             std::vector<size_t> w(2);
         
             for(size_t x=0; x<6; ++x) {
@@ -5841,7 +5794,7 @@ void ViewTest::elementAccessTest(){
             shape[0] = 3;
             shape[1] = 4;
             shape[2] = 2; 
-            marray::View<int, constTarget> v(shape.begin(), shape.end(), data_);
+            andres::View<int, constTarget> v(shape.begin(), shape.end(), data_);
             std::vector<size_t> w(3);
         
             for(size_t x=0; x<3; ++x) {
@@ -5859,13 +5812,13 @@ void ViewTest::elementAccessTest(){
     // scalar
     {
         {
-            marray::View<int, constTarget> v(&scalar_);
+            andres::View<int, constTarget> v(&scalar_);
             
             test(v(0) == 42);
         }
         // const
         {
-            marray::View<int, constTarget> const v(&scalar_);
+            andres::View<int, constTarget> const v(&scalar_);
             
             test(v(0) == 42);
         }
@@ -5875,7 +5828,7 @@ void ViewTest::elementAccessTest(){
         {
             std::vector<size_t> shape(1);
             shape[0] = 24;
-            marray::View<int, constTarget> v(shape.begin(), shape.end(), data_);
+            andres::View<int, constTarget> v(shape.begin(), shape.end(), data_);
 
             for(size_t j=0; j<24; ++j) {
                 test(v(j) == data_[j]); 
@@ -5885,7 +5838,7 @@ void ViewTest::elementAccessTest(){
         {
             std::vector<size_t> shape(1);
             shape[0] = 24;
-            marray::View<int, constTarget> const v(shape.begin(), shape.end(), data_);
+            andres::View<int, constTarget> const v(shape.begin(), shape.end(), data_);
 
             for(size_t j=0; j<24; ++j) {
                 test(v(j) == data_[j]); 
@@ -5898,7 +5851,7 @@ void ViewTest::elementAccessTest(){
             std::vector<size_t> shape(2);
             shape[0] = 4;
             shape[1] = 6;
-            marray::View<int, constTarget> v(shape.begin(), shape.end(), data_);
+            andres::View<int, constTarget> v(shape.begin(), shape.end(), data_);
 
             int i = 0;
             for(int y = 0; y < 6; ++y){
@@ -5913,7 +5866,7 @@ void ViewTest::elementAccessTest(){
             std::vector<size_t> shape(2);
             shape[0] = 4;
             shape[1] = 6;
-            marray::View<int, constTarget> const v(shape.begin(), shape.end(), data_);
+            andres::View<int, constTarget> const v(shape.begin(), shape.end(), data_);
 
             int i = 0;
             for(int y = 0; y < 6; ++y){
@@ -5931,7 +5884,7 @@ void ViewTest::elementAccessTest(){
             shape[0] = 3;
             shape[1] = 4;
             shape[2] = 2; 
-            marray::View<int, constTarget> v(shape.begin(), shape.end(), data_);
+            andres::View<int, constTarget> v(shape.begin(), shape.end(), data_);
 
             int i = 0;
             for(int z = 0; z < 2; ++z){
@@ -5949,7 +5902,7 @@ void ViewTest::elementAccessTest(){
             shape[0] = 3;
             shape[1] = 4;
             shape[2] = 2; 
-            marray::View<int, constTarget> const v(shape.begin(), shape.end(), data_);
+            andres::View<int, constTarget> const v(shape.begin(), shape.end(), data_);
 
             int i = 0;
             for(int z = 0; z < 2; ++z){
@@ -5970,7 +5923,7 @@ void ViewTest::elementAccessTest(){
             shape[1] = 4;
             shape[2] = 2;
             shape[3] = 2;
-            marray::View<int, constTarget> v(shape.begin(), shape.end(), data100_);
+            andres::View<int, constTarget> v(shape.begin(), shape.end(), data100_);
 
             int i = 0;
             for(int z = 0; z < 2; ++z){
@@ -5991,7 +5944,7 @@ void ViewTest::elementAccessTest(){
             shape[1] = 4;
             shape[2] = 2;
             shape[3] = 2;
-            marray::View<int, constTarget> const v(shape.begin(), shape.end(), data100_);
+            andres::View<int, constTarget> const v(shape.begin(), shape.end(), data100_);
 
             int i = 0;
             for(int z = 0; z < 2; ++z){
@@ -6016,11 +5969,11 @@ void ViewTest::subViewsTest(){
         {
             std::vector<size_t> shape(1);
             shape[0] = 24; 
-            marray::View<int, constTarget> v(shape.begin(), shape.end(), data_);
+            andres::View<int, constTarget> v(shape.begin(), shape.end(), data_);
             std::vector<size_t> base(1);
             base[0] = 4;
             shape[0] = 1;
-            marray::View<int, constTarget> s;
+            andres::View<int, constTarget> s;
             v.view(base.begin(), shape.begin(),  s);
 
             test(s.size() == 1 && s.dimension()==1
@@ -6030,11 +5983,11 @@ void ViewTest::subViewsTest(){
         {
             std::vector<size_t> shape(1);
             shape[0] = 24; 
-            marray::View<int, constTarget> v(shape.begin(), shape.end(), data_, marray::FirstMajorOrder);
+            andres::View<int, constTarget> v(shape.begin(), shape.end(), data_, andres::FirstMajorOrder);
             std::vector<size_t> base(1);
             base[0] = 4;
             shape[0] = 1;
-            marray::View<int, constTarget> s;
+            andres::View<int, constTarget> s;
             v.view(base.begin(), shape.begin(),  s);
 
             test(s.size() == 1 && s.dimension()==1
@@ -6046,11 +5999,11 @@ void ViewTest::subViewsTest(){
         {
             std::vector<size_t> shape(1);
             shape[0] = 24; 
-            marray::View<int, constTarget> v(shape.begin(), shape.end(), data_);
+            andres::View<int, constTarget> v(shape.begin(), shape.end(), data_);
             std::vector<size_t> base(1);
             base[0] = 4;
             shape[0] = 3;
-            marray::View<int, constTarget> s;
+            andres::View<int, constTarget> s;
             v.view(base.begin(), shape.begin(),  s);
 
             test(s.size() == 3 && s.dimension()==1
@@ -6060,11 +6013,11 @@ void ViewTest::subViewsTest(){
         {
             std::vector<size_t> shape(1);
             shape[0] = 24; 
-            marray::View<int, constTarget> v(shape.begin(), shape.end(), data_, marray::FirstMajorOrder);
+            andres::View<int, constTarget> v(shape.begin(), shape.end(), data_, andres::FirstMajorOrder);
             std::vector<size_t> base(1);
             base[0] = 4;
             shape[0] = 3;
-            marray::View<int, constTarget> s;
+            andres::View<int, constTarget> s;
             v.view(base.begin(), shape.begin(),  s);
 
             test(s.size() == 3 && s.dimension()==1
@@ -6079,13 +6032,13 @@ void ViewTest::subViewsTest(){
             std::vector<size_t> shape(2);
             shape[0] = 6; 
             shape[1] = 4; 
-            marray::View<int, constTarget> v(shape.begin(), shape.end(), data_);
+            andres::View<int, constTarget> v(shape.begin(), shape.end(), data_);
             std::vector<size_t> base(2);
             base[0] =2;
             base[1] =2;
             shape[0] = 1; 
             shape[1] = 1;
-            marray::View<int, constTarget> s;
+            andres::View<int, constTarget> s;
             v.view(base.begin(), shape.begin(), s);
 
             test(s.size() == 1 && s.dimension()==2
@@ -6096,13 +6049,13 @@ void ViewTest::subViewsTest(){
             std::vector<size_t> shape(2);
             shape[0] = 6; 
             shape[1] = 4; 
-            marray::View<int, constTarget> v(shape.begin(), shape.end(), data_, marray::FirstMajorOrder);
+            andres::View<int, constTarget> v(shape.begin(), shape.end(), data_, andres::FirstMajorOrder);
             std::vector<size_t> base(2);
             base[0] =2;
             base[1] =2;
             shape[0] = 1; 
             shape[1] = 1;
-            marray::View<int, constTarget> s;
+            andres::View<int, constTarget> s;
             v.view(base.begin(), shape.begin(), s);
 
             test(s.size() == 1 && s.dimension()==2
@@ -6114,13 +6067,13 @@ void ViewTest::subViewsTest(){
             std::vector<size_t> shape(2);
             shape[0] = 6; 
             shape[1] = 4; 
-            marray::View<int, constTarget> v(shape.begin(), shape.end(), data_);
+            andres::View<int, constTarget> v(shape.begin(), shape.end(), data_);
             std::vector<size_t> base(2);
             base[0] =0;
             base[1] =0;
             shape[0] = 1; 
             shape[1] = 4;
-            marray::View<int, constTarget> s;
+            andres::View<int, constTarget> s;
             v.view(base.begin(), shape.begin(), s);
 
             test(s.size() == 4 && s.dimension()==2
@@ -6131,13 +6084,13 @@ void ViewTest::subViewsTest(){
             std::vector<size_t> shape(2);
             shape[0] = 6; 
             shape[1] = 4; 
-            marray::View<int, constTarget> v(shape.begin(), shape.end(), data_, marray::FirstMajorOrder);
+            andres::View<int, constTarget> v(shape.begin(), shape.end(), data_, andres::FirstMajorOrder);
             std::vector<size_t> base(2);
             base[0] =0;
             base[1] =0;
             shape[0] = 1; 
             shape[1] = 4;
-            marray::View<int, constTarget> s;
+            andres::View<int, constTarget> s;
             v.view(base.begin(), shape.begin(), s);
 
             test(s.size() == 4 && s.dimension()==2
@@ -6150,13 +6103,13 @@ void ViewTest::subViewsTest(){
             std::vector<size_t> shape(2);
             shape[0] = 6;
             shape[1] = 4; 
-            marray::View<int, constTarget> v(shape.begin(), shape.end(), data_);
+            andres::View<int, constTarget> v(shape.begin(), shape.end(), data_);
             std::vector<size_t> base(2);
             base[0] = 2;
             base[1] = 1;
             shape[0] = 3;
             shape[1] = 2; 
-            marray::View<int, constTarget> s;
+            andres::View<int, constTarget> s;
             v.view(base.begin(), shape.begin(), s);
 
             test(s.size() == 6 && s.dimension()==2
@@ -6173,13 +6126,13 @@ void ViewTest::subViewsTest(){
             std::vector<size_t> shape(2);
             shape[0] = 6;
             shape[1] = 4; 
-            marray::View<int, constTarget> v(shape.begin(), shape.end(), data_, marray::FirstMajorOrder);
+            andres::View<int, constTarget> v(shape.begin(), shape.end(), data_, andres::FirstMajorOrder);
             std::vector<size_t> base(2);
             base[0] = 2;
             base[1] = 1;
             shape[0] = 3;
             shape[1] = 2; 
-            marray::View<int, constTarget> s;
+            andres::View<int, constTarget> s;
             v.view(base.begin(), shape.begin(), s);
 
             test(s.size() == 6 && s.dimension()==2
@@ -6200,7 +6153,7 @@ void ViewTest::subViewsTest(){
             shape[0] = 3;
             shape[1] = 4;
             shape[2] = 2; 
-            marray::View<int, constTarget> v(shape.begin(), shape.end(), data_);
+            andres::View<int, constTarget> v(shape.begin(), shape.end(), data_);
             std::vector<size_t> base(3);
             base[0] = 1;
             base[1] = 1;
@@ -6208,7 +6161,7 @@ void ViewTest::subViewsTest(){
             shape[0] = 1;
             shape[1] = 1;
             shape[2] = 1; 
-            marray::View<int, constTarget> s;
+            andres::View<int, constTarget> s;
             v.view(base.begin(), shape.begin(), s);
 
             test(s.size() == 1 && s.dimension()==3
@@ -6220,7 +6173,7 @@ void ViewTest::subViewsTest(){
             shape[0] = 3;
             shape[1] = 4;
             shape[2] = 2; 
-            marray::View<int, constTarget> v(shape.begin(), shape.end(), data_, marray::FirstMajorOrder);
+            andres::View<int, constTarget> v(shape.begin(), shape.end(), data_, andres::FirstMajorOrder);
             std::vector<size_t> base(3);
             base[0] = 1;
             base[1] = 1;
@@ -6228,7 +6181,7 @@ void ViewTest::subViewsTest(){
             shape[0] = 1;
             shape[1] = 1;
             shape[2] = 1; 
-            marray::View<int, constTarget> s;
+            andres::View<int, constTarget> s;
             v.view(base.begin(), shape.begin(), s);
 
             test(s.size() == 1 && s.dimension()==3
@@ -6241,7 +6194,7 @@ void ViewTest::subViewsTest(){
             shape[0] = 3;
             shape[1] = 4;
             shape[2] = 2; 
-            marray::View<int, constTarget> v(shape.begin(), shape.end(), data_);
+            andres::View<int, constTarget> v(shape.begin(), shape.end(), data_);
             std::vector<size_t> base(3);
             base[0] = 1;
             base[1] = 1;
@@ -6249,7 +6202,7 @@ void ViewTest::subViewsTest(){
             shape[0] = 1;
             shape[1] = 3;
             shape[2] = 1; 
-            marray::View<int, constTarget> s;
+            andres::View<int, constTarget> s;
             v.view(base.begin(), shape.begin(), s);
 
             test(s.size() == 3 && s.dimension()==3
@@ -6261,7 +6214,7 @@ void ViewTest::subViewsTest(){
             shape[0] = 3;
             shape[1] = 4;
             shape[2] = 2; 
-            marray::View<int, constTarget> v(shape.begin(), shape.end(), data_, marray::FirstMajorOrder);
+            andres::View<int, constTarget> v(shape.begin(), shape.end(), data_, andres::FirstMajorOrder);
             std::vector<size_t> base(3);
             base[0] = 1;
             base[1] = 1;
@@ -6269,7 +6222,7 @@ void ViewTest::subViewsTest(){
             shape[0] = 1;
             shape[1] = 3;
             shape[2] = 1; 
-            marray::View<int, constTarget> s;
+            andres::View<int, constTarget> s;
             v.view(base.begin(), shape.begin(), s);
 
             test(s.size() == 3 && s.dimension()==3
@@ -6283,7 +6236,7 @@ void ViewTest::subViewsTest(){
             shape[0] = 3;
             shape[1] = 4;
             shape[2] = 2; 
-            marray::View<int, constTarget> v(shape.begin(), shape.end(), data_);
+            andres::View<int, constTarget> v(shape.begin(), shape.end(), data_);
             std::vector<size_t> base(3);
             base[0] = 1;
             base[1] = 1;
@@ -6291,7 +6244,7 @@ void ViewTest::subViewsTest(){
             shape[0] = 2;
             shape[1] = 3;
             shape[2] = 1; 
-            marray::View<int, constTarget> s;
+            andres::View<int, constTarget> s;
             v.view(base.begin(), shape.begin(), s);
 
             test(s.size() == 6 && s.dimension()==3
@@ -6310,7 +6263,7 @@ void ViewTest::subViewsTest(){
             shape[0] = 3;
             shape[1] = 4;
             shape[2] = 2; 
-            marray::View<int, constTarget> v(shape.begin(), shape.end(), data_, marray::FirstMajorOrder);
+            andres::View<int, constTarget> v(shape.begin(), shape.end(), data_, andres::FirstMajorOrder);
             std::vector<size_t> base(3);
             base[0] = 1;
             base[1] = 1;
@@ -6318,7 +6271,7 @@ void ViewTest::subViewsTest(){
             shape[0] = 2;
             shape[1] = 3;
             shape[2] = 1; 
-            marray::View<int, constTarget> s;
+            andres::View<int, constTarget> s;
             v.view(base.begin(), shape.begin(), s);
 
             test(s.size() == 6 && s.dimension()==3
@@ -6338,7 +6291,7 @@ void ViewTest::subViewsTest(){
             shape[0] = 3;
             shape[1] = 4; 
             shape[2] = 2; 
-            marray::View<int, constTarget> v(shape.begin(), shape.end(), data_);
+            andres::View<int, constTarget> v(shape.begin(), shape.end(), data_);
             std::vector<size_t> base(3);
             base[0] = 1;
             base[1] = 1;
@@ -6346,7 +6299,7 @@ void ViewTest::subViewsTest(){
             shape[0] =2;
             shape[1] =2;
             shape[2] =2;
-            marray::View<int, constTarget> s;
+            andres::View<int, constTarget> s;
             v.view(base.begin(), shape.begin(), s);
 
             test(s.size() == 8 && s.dimension()==3
@@ -6365,7 +6318,7 @@ void ViewTest::subViewsTest(){
             shape[0] = 3;
             shape[1] = 4; 
             shape[2] = 2; 
-            marray::View<int, constTarget> v(shape.begin(), shape.end(), data_, marray::FirstMajorOrder);
+            andres::View<int, constTarget> v(shape.begin(), shape.end(), data_, andres::FirstMajorOrder);
             std::vector<size_t> base(3);
             base[0] = 1;
             base[1] = 1;
@@ -6373,7 +6326,7 @@ void ViewTest::subViewsTest(){
             shape[0] =2;
             shape[1] =2;
             shape[2] =2;
-            marray::View<int, constTarget> s;
+            andres::View<int, constTarget> s;
             v.view(base.begin(), shape.begin(), s);
 
             test(s.size() == 8 && s.dimension()==3
@@ -6396,11 +6349,11 @@ void ViewTest::subConstViewsTest(){
         {
             std::vector<size_t> shape(1);
             shape[0] = 24; 
-            marray::View<int, true> v(shape.begin(), shape.end(), data_);
+            andres::View<int, true> v(shape.begin(), shape.end(), data_);
             std::vector<size_t> base(1);
             base[0] = 4;
             shape[0] = 1;
-            marray::View<int, true> s;
+            andres::View<int, true> s;
             v.constView(base.begin(), shape.begin(),  s);
 
             test(s.size() == 1 && s.dimension()==1
@@ -6410,11 +6363,11 @@ void ViewTest::subConstViewsTest(){
         {
             std::vector<size_t> shape(1);
             shape[0] = 24; 
-            marray::View<int, true> v(shape.begin(), shape.end(), data_, marray::FirstMajorOrder);
+            andres::View<int, true> v(shape.begin(), shape.end(), data_, andres::FirstMajorOrder);
             std::vector<size_t> base(1);
             base[0] = 4;
             shape[0] = 1;
-            marray::View<int, true> s;
+            andres::View<int, true> s;
             v.constView(base.begin(), shape.begin(),  s);
 
             test(s.size() == 1 && s.dimension()==1
@@ -6426,11 +6379,11 @@ void ViewTest::subConstViewsTest(){
         {
             std::vector<size_t> shape(1);
             shape[0] = 24; 
-            marray::View<int, true> v(shape.begin(), shape.end(), data_);
+            andres::View<int, true> v(shape.begin(), shape.end(), data_);
             std::vector<size_t> base(1);
             base[0] = 4;
             shape[0] = 3;
-            marray::View<int, true> s;
+            andres::View<int, true> s;
             v.constView(base.begin(), shape.begin(),  s);
 
             test(s.size() == 3 && s.dimension()==1
@@ -6440,11 +6393,11 @@ void ViewTest::subConstViewsTest(){
         {
             std::vector<size_t> shape(1);
             shape[0] = 24; 
-            marray::View<int, true> v(shape.begin(), shape.end(), data_, marray::FirstMajorOrder);
+            andres::View<int, true> v(shape.begin(), shape.end(), data_, andres::FirstMajorOrder);
             std::vector<size_t> base(1);
             base[0] = 4;
             shape[0] = 3;
-            marray::View<int, true> s;
+            andres::View<int, true> s;
             v.constView(base.begin(), shape.begin(),  s);
 
             test(s.size() == 3 && s.dimension()==1
@@ -6459,13 +6412,13 @@ void ViewTest::subConstViewsTest(){
             std::vector<size_t> shape(2);
             shape[0] = 6; 
             shape[1] = 4; 
-            marray::View<int, true> v(shape.begin(), shape.end(), data_);
+            andres::View<int, true> v(shape.begin(), shape.end(), data_);
             std::vector<size_t> base(2);
             base[0] =2;
             base[1] =2;
             shape[0] = 1; 
             shape[1] = 1;
-            marray::View<int, true> s;
+            andres::View<int, true> s;
             v.constView(base.begin(), shape.begin(), s);
 
             test(s.size() == 1 && s.dimension()==2
@@ -6476,13 +6429,13 @@ void ViewTest::subConstViewsTest(){
             std::vector<size_t> shape(2);
             shape[0] = 6; 
             shape[1] = 4; 
-            marray::View<int, true> v(shape.begin(), shape.end(), data_, marray::FirstMajorOrder);
+            andres::View<int, true> v(shape.begin(), shape.end(), data_, andres::FirstMajorOrder);
             std::vector<size_t> base(2);
             base[0] =2;
             base[1] =2;
             shape[0] = 1; 
             shape[1] = 1;
-            marray::View<int, true> s;
+            andres::View<int, true> s;
             v.constView(base.begin(), shape.begin(), s);
 
             test(s.size() == 1 && s.dimension()==2
@@ -6494,13 +6447,13 @@ void ViewTest::subConstViewsTest(){
             std::vector<size_t> shape(2);
             shape[0] = 6; 
             shape[1] = 4; 
-            marray::View<int, true> v(shape.begin(), shape.end(), data_);
+            andres::View<int, true> v(shape.begin(), shape.end(), data_);
             std::vector<size_t> base(2);
             base[0] =0;
             base[1] =0;
             shape[0] = 1; 
             shape[1] = 4;
-            marray::View<int, true> s;
+            andres::View<int, true> s;
             v.constView(base.begin(), shape.begin(), s);
 
             test(s.size() == 4 && s.dimension()==2
@@ -6511,13 +6464,13 @@ void ViewTest::subConstViewsTest(){
             std::vector<size_t> shape(2);
             shape[0] = 6; 
             shape[1] = 4; 
-            marray::View<int, true> v(shape.begin(), shape.end(), data_, marray::FirstMajorOrder);
+            andres::View<int, true> v(shape.begin(), shape.end(), data_, andres::FirstMajorOrder);
             std::vector<size_t> base(2);
             base[0] =0;
             base[1] =0;
             shape[0] = 1; 
             shape[1] = 4;
-            marray::View<int, true> s;
+            andres::View<int, true> s;
             v.constView(base.begin(), shape.begin(), s);
 
             test(s.size() == 4 && s.dimension()==2
@@ -6530,13 +6483,13 @@ void ViewTest::subConstViewsTest(){
             std::vector<size_t> shape(2);
             shape[0] = 6;
             shape[1] = 4; 
-            marray::View<int, true> v(shape.begin(), shape.end(), data_);
+            andres::View<int, true> v(shape.begin(), shape.end(), data_);
             std::vector<size_t> base(2);
             base[0] = 2;
             base[1] = 1;
             shape[0] = 3;
             shape[1] = 2; 
-            marray::View<int, true> s;
+            andres::View<int, true> s;
             v.constView(base.begin(), shape.begin(), s);
 
             test(s.size() == 6 && s.dimension()==2
@@ -6553,13 +6506,13 @@ void ViewTest::subConstViewsTest(){
             std::vector<size_t> shape(2);
             shape[0] = 6;
             shape[1] = 4; 
-            marray::View<int, true> v(shape.begin(), shape.end(), data_, marray::FirstMajorOrder);
+            andres::View<int, true> v(shape.begin(), shape.end(), data_, andres::FirstMajorOrder);
             std::vector<size_t> base(2);
             base[0] = 2;
             base[1] = 1;
             shape[0] = 3;
             shape[1] = 2; 
-            marray::View<int, true> s;
+            andres::View<int, true> s;
             v.constView(base.begin(), shape.begin(), s);
 
             test(s.size() == 6 && s.dimension()==2
@@ -6580,7 +6533,7 @@ void ViewTest::subConstViewsTest(){
             shape[0] = 3;
             shape[1] = 4;
             shape[2] = 2; 
-            marray::View<int, true> v(shape.begin(), shape.end(), data_);
+            andres::View<int, true> v(shape.begin(), shape.end(), data_);
             std::vector<size_t> base(3);
             base[0] = 1;
             base[1] = 1;
@@ -6588,7 +6541,7 @@ void ViewTest::subConstViewsTest(){
             shape[0] = 1;
             shape[1] = 1;
             shape[2] = 1; 
-            marray::View<int, true> s;
+            andres::View<int, true> s;
             v.constView(base.begin(), shape.begin(), s);
 
             test(s.size() == 1 && s.dimension()==3
@@ -6600,7 +6553,7 @@ void ViewTest::subConstViewsTest(){
             shape[0] = 3;
             shape[1] = 4;
             shape[2] = 2; 
-            marray::View<int, true> v(shape.begin(), shape.end(), data_, marray::FirstMajorOrder);
+            andres::View<int, true> v(shape.begin(), shape.end(), data_, andres::FirstMajorOrder);
             std::vector<size_t> base(3);
             base[0] = 1;
             base[1] = 1;
@@ -6608,7 +6561,7 @@ void ViewTest::subConstViewsTest(){
             shape[0] = 1;
             shape[1] = 1;
             shape[2] = 1; 
-            marray::View<int, true> s;
+            andres::View<int, true> s;
             v.constView(base.begin(), shape.begin(), s);
 
             test(s.size() == 1 && s.dimension()==3
@@ -6621,7 +6574,7 @@ void ViewTest::subConstViewsTest(){
             shape[0] = 3;
             shape[1] = 4;
             shape[2] = 2; 
-            marray::View<int, true> v(shape.begin(), shape.end(), data_);
+            andres::View<int, true> v(shape.begin(), shape.end(), data_);
             std::vector<size_t> base(3);
             base[0] = 1;
             base[1] = 1;
@@ -6629,7 +6582,7 @@ void ViewTest::subConstViewsTest(){
             shape[0] = 1;
             shape[1] = 3;
             shape[2] = 1; 
-            marray::View<int, true> s;
+            andres::View<int, true> s;
             v.constView(base.begin(), shape.begin(), s);
 
             test(s.size() == 3 && s.dimension()==3
@@ -6641,7 +6594,7 @@ void ViewTest::subConstViewsTest(){
             shape[0] = 3;
             shape[1] = 4;
             shape[2] = 2; 
-            marray::View<int, true> v(shape.begin(), shape.end(), data_, marray::FirstMajorOrder);
+            andres::View<int, true> v(shape.begin(), shape.end(), data_, andres::FirstMajorOrder);
             std::vector<size_t> base(3);
             base[0] = 1;
             base[1] = 1;
@@ -6649,7 +6602,7 @@ void ViewTest::subConstViewsTest(){
             shape[0] = 1;
             shape[1] = 3;
             shape[2] = 1; 
-            marray::View<int, true> s;
+            andres::View<int, true> s;
             v.constView(base.begin(), shape.begin(), s);
 
             test(s.size() == 3 && s.dimension()==3
@@ -6663,7 +6616,7 @@ void ViewTest::subConstViewsTest(){
             shape[0] = 3;
             shape[1] = 4;
             shape[2] = 2; 
-            marray::View<int, true> v(shape.begin(), shape.end(), data_);
+            andres::View<int, true> v(shape.begin(), shape.end(), data_);
             std::vector<size_t> base(3);
             base[0] = 1;
             base[1] = 1;
@@ -6671,7 +6624,7 @@ void ViewTest::subConstViewsTest(){
             shape[0] = 2;
             shape[1] = 3;
             shape[2] = 1; 
-            marray::View<int, true> s;
+            andres::View<int, true> s;
             v.constView(base.begin(), shape.begin(), s);
 
             test(s.size() == 6 && s.dimension()==3
@@ -6690,7 +6643,7 @@ void ViewTest::subConstViewsTest(){
             shape[0] = 3;
             shape[1] = 4;
             shape[2] = 2; 
-            marray::View<int, true> v(shape.begin(), shape.end(), data_, marray::FirstMajorOrder);
+            andres::View<int, true> v(shape.begin(), shape.end(), data_, andres::FirstMajorOrder);
             std::vector<size_t> base(3);
             base[0] = 1;
             base[1] = 1;
@@ -6698,7 +6651,7 @@ void ViewTest::subConstViewsTest(){
             shape[0] = 2;
             shape[1] = 3;
             shape[2] = 1; 
-            marray::View<int, true> s;
+            andres::View<int, true> s;
             v.constView(base.begin(), shape.begin(), s);
 
             test(s.size() == 6 && s.dimension()==3
@@ -6718,7 +6671,7 @@ void ViewTest::subConstViewsTest(){
             shape[0] = 3;
             shape[1] = 4; 
             shape[2] = 2; 
-            marray::View<int, true> v(shape.begin(), shape.end(), data_);
+            andres::View<int, true> v(shape.begin(), shape.end(), data_);
             std::vector<size_t> base(3);
             base[0] = 1;
             base[1] = 1;
@@ -6726,7 +6679,7 @@ void ViewTest::subConstViewsTest(){
             shape[0] =2;
             shape[1] =2;
             shape[2] =2;
-            marray::View<int, true> s;
+            andres::View<int, true> s;
             v.constView(base.begin(), shape.begin(), s);
 
             test(s.size() == 8 && s.dimension()==3
@@ -6745,7 +6698,7 @@ void ViewTest::subConstViewsTest(){
             shape[0] = 3;
             shape[1] = 4; 
             shape[2] = 2; 
-            marray::View<int, true> v(shape.begin(), shape.end(), data_, marray::FirstMajorOrder);
+            andres::View<int, true> v(shape.begin(), shape.end(), data_, andres::FirstMajorOrder);
             std::vector<size_t> base(3);
             base[0] = 1;
             base[1] = 1;
@@ -6753,7 +6706,7 @@ void ViewTest::subConstViewsTest(){
             shape[0] =2;
             shape[1] =2;
             shape[2] =2;
-            marray::View<int, true> s;
+            andres::View<int, true> s;
             v.constView(base.begin(), shape.begin(), s);
 
             test(s.size() == 8 && s.dimension()==3
@@ -6776,8 +6729,8 @@ void ViewTest::iteratorAccessTest(){
         {
             std::vector<size_t> shape(1);
             shape[0] = 24;
-            marray::View<int, constTarget> v(shape.begin(), shape.end(), data_);
-            typename marray::View<int, constTarget>::iterator it;
+            andres::View<int, constTarget> v(shape.begin(), shape.end(), data_);
+            typename andres::View<int, constTarget>::iterator it;
             it = v.begin();
             for(int i = 0; i < 24; ++i){
                 test(*it == data_[i]);
@@ -6790,8 +6743,8 @@ void ViewTest::iteratorAccessTest(){
         {
             std::vector<size_t> shape(1);
             shape[0] = 24;
-            marray::View<int, constTarget> v(shape.begin(), shape.end(), data_);
-            typename marray::View<int, constTarget>::reverse_iterator it;
+            andres::View<int, constTarget> v(shape.begin(), shape.end(), data_);
+            typename andres::View<int, constTarget>::reverse_iterator it;
             it = v.rbegin();
             for(int i = 23; i >= 0; --i){
                 test(*it == data_[i]);
@@ -6804,8 +6757,8 @@ void ViewTest::iteratorAccessTest(){
         {
             std::vector<size_t> shape(1);
             shape[0] = 24;
-            marray::View<int, constTarget> v(shape.begin(), shape.end(), data_);
-            typename marray::View<int, constTarget>::const_iterator it;
+            andres::View<int, constTarget> v(shape.begin(), shape.end(), data_);
+            typename andres::View<int, constTarget>::const_iterator it;
             it = v.begin();
             for(int i = 0; i < 24; ++i){
                 test(*it == data_[i]);
@@ -6821,8 +6774,8 @@ void ViewTest::iteratorAccessTest(){
             std::vector<size_t> shape(2);
             shape[0] = 6;
             shape[1] = 4;
-            marray::View<int, constTarget> v(shape.begin(), shape.end(), data_);
-            typename marray::View<int, constTarget>::iterator it;
+            andres::View<int, constTarget> v(shape.begin(), shape.end(), data_);
+            typename andres::View<int, constTarget>::iterator it;
             it = v.begin();
             for(int i = 0; i < 24; ++i){
                 test(*it == data_[i]);
@@ -6836,8 +6789,8 @@ void ViewTest::iteratorAccessTest(){
             std::vector<size_t> shape(2);
             shape[0] = 6;
             shape[1] = 4; 
-            marray::View<int, constTarget> v(shape.begin(), shape.end(), data_);
-            typename marray::View<int, constTarget>::reverse_iterator it;
+            andres::View<int, constTarget> v(shape.begin(), shape.end(), data_);
+            typename andres::View<int, constTarget>::reverse_iterator it;
             it = v.rbegin();
             for(int i = 23; i >= 0; --i){
                 test(*it == data_[i]);
@@ -6851,8 +6804,8 @@ void ViewTest::iteratorAccessTest(){
             std::vector<size_t> shape(2);
             shape[0] = 6;
             shape[1] = 4;
-            marray::View<int, constTarget> v(shape.begin(), shape.end(), data_);
-            typename marray::View<int, constTarget>::const_iterator it;
+            andres::View<int, constTarget> v(shape.begin(), shape.end(), data_);
+            typename andres::View<int, constTarget>::const_iterator it;
             it = v.begin();
             for(int i = 0; i < 24; ++i){
                 test(*it == data_[i]);
@@ -6869,8 +6822,8 @@ void ViewTest::iteratorAccessTest(){
             shape[0] = 3;
             shape[1] = 4;
             shape[2] = 2;
-            marray::View<int, constTarget> v(shape.begin(), shape.end(), data_);
-            typename marray::View<int, constTarget>::iterator it;
+            andres::View<int, constTarget> v(shape.begin(), shape.end(), data_);
+            typename andres::View<int, constTarget>::iterator it;
             it = v.begin();
             for(int i = 0; i < 24; ++i){
                 test(*it == data_[i]);
@@ -6885,8 +6838,8 @@ void ViewTest::iteratorAccessTest(){
             shape[0] = 3;
             shape[1] = 4;
             shape[2] = 2;
-            marray::View<int, constTarget> v(shape.begin(), shape.end(), data_);
-            typename marray::View<int, constTarget>::reverse_iterator it;
+            andres::View<int, constTarget> v(shape.begin(), shape.end(), data_);
+            typename andres::View<int, constTarget>::reverse_iterator it;
             it = v.rbegin();
             for(int i = 23; i >= 0; --i){
                 test(*it == data_[i]);
@@ -6901,8 +6854,8 @@ void ViewTest::iteratorAccessTest(){
             shape[0] = 3;
             shape[1] = 4;
             shape[2] = 2;
-            marray::View<int, constTarget> v(shape.begin(), shape.end(), data_);
-            typename marray::View<int, constTarget>::const_iterator it;
+            andres::View<int, constTarget> v(shape.begin(), shape.end(), data_);
+            typename andres::View<int, constTarget>::const_iterator it;
             it = v.begin();
             for(int i = 0; i < 24; ++i){
                 test(*it == data_[i]);
@@ -6921,8 +6874,8 @@ void ViewTest::coordinateBindingTest() {
         {
             std::vector<size_t> shape(1);
             shape[0] = 24;
-            marray::View<int, constTarget> v(shape.begin(), shape.end(), data_);
-            marray::View<int, constTarget> w = v.boundView(0,7);
+            andres::View<int, constTarget> v(shape.begin(), shape.end(), data_);
+            andres::View<int, constTarget> w = v.boundView(0,7);
             test(w.dimension()==0 && w.size()==1);
             test(w(0)==7);
         }
@@ -6934,8 +6887,8 @@ void ViewTest::coordinateBindingTest() {
             std::vector<size_t> shape(2); 
             shape[0] = 6;
             shape[1] = 4; 
-            marray::View<int, constTarget> v(shape.begin(), shape.end(), data_);
-            marray::View<int, constTarget> w = v.boundView(0,3);
+            andres::View<int, constTarget> v(shape.begin(), shape.end(), data_);
+            andres::View<int, constTarget> w = v.boundView(0,3);
             test(w.dimension()==1 && w.size()==4);
             test(w(0)==3 && w(1)==9 && w(2)==15 && w(3)==21);
         }
@@ -6943,8 +6896,8 @@ void ViewTest::coordinateBindingTest() {
             std::vector<size_t> shape(2); 
             shape[0] = 6;
             shape[1] = 4; 
-            marray::View<int, constTarget> v(shape.begin(), shape.end(), data_, marray::FirstMajorOrder);
-            marray::View<int, constTarget> w = v.boundView(0,3);
+            andres::View<int, constTarget> v(shape.begin(), shape.end(), data_, andres::FirstMajorOrder);
+            andres::View<int, constTarget> w = v.boundView(0,3);
             
             test(w.dimension()==1 && w.size()==4);
             test(w(0)==12 && w(1)==13 && w(2)==14 && w(3)==15);
@@ -6954,8 +6907,8 @@ void ViewTest::coordinateBindingTest() {
             std::vector<size_t> shape(2); 
             shape[0] = 6;
             shape[1] = 4; 
-            marray::View<int, constTarget> v(shape.begin(), shape.end(), data_);
-            marray::View<int, constTarget> w = v.boundView(1,2);
+            andres::View<int, constTarget> v(shape.begin(), shape.end(), data_);
+            andres::View<int, constTarget> w = v.boundView(1,2);
             
             test(w.dimension()==1 && w.size()==6);
             int i = 12; 
@@ -6969,8 +6922,8 @@ void ViewTest::coordinateBindingTest() {
             std::vector<size_t> shape(2); 
             shape[0] = 6;
             shape[1] = 4; 
-            marray::View<int, constTarget> v(shape.begin(), shape.end(), data_, marray::FirstMajorOrder);
-            marray::View<int, constTarget> w = v.boundView(1,2);
+            andres::View<int, constTarget> v(shape.begin(), shape.end(), data_, andres::FirstMajorOrder);
+            andres::View<int, constTarget> w = v.boundView(1,2);
             
             test(w.dimension()==1 && w.size()==6);
             for(int x = 0; x < 6; ++x){
@@ -6987,8 +6940,8 @@ void ViewTest::coordinateBindingTest() {
             shape[0] = 3;
             shape[1] = 4;
             shape[2] = 2;
-            marray::View<int, constTarget> v(shape.begin(), shape.end(), data_);
-            marray::View<int, constTarget> w = v.boundView(0,2);
+            andres::View<int, constTarget> v(shape.begin(), shape.end(), data_);
+            andres::View<int, constTarget> w = v.boundView(0,2);
         
             test(w.size()==8 && w.dimension()==2);
             int index = 0; 
@@ -7004,8 +6957,8 @@ void ViewTest::coordinateBindingTest() {
             shape[0] = 3;
             shape[1] = 4;
             shape[2] = 2;
-            marray::View<int, constTarget> v(shape.begin(), shape.end(), data_, marray::FirstMajorOrder);
-            marray::View<int, constTarget> w = v.boundView(0,2);
+            andres::View<int, constTarget> v(shape.begin(), shape.end(), data_, andres::FirstMajorOrder);
+            andres::View<int, constTarget> w = v.boundView(0,2);
             
             test(w.size()==8 && w.dimension()==2);
             int index = 0; 
@@ -7022,8 +6975,8 @@ void ViewTest::coordinateBindingTest() {
             shape[0] = 3;
             shape[1] = 4;
             shape[2] = 2;
-            marray::View<int, constTarget> v(shape.begin(), shape.end(), data_);
-            marray::View<int, constTarget> w = v.boundView(1,2);
+            andres::View<int, constTarget> v(shape.begin(), shape.end(), data_);
+            andres::View<int, constTarget> w = v.boundView(1,2);
             
             test(w.size()==6 && w.dimension()==2);
             int index = 0; 
@@ -7039,8 +6992,8 @@ void ViewTest::coordinateBindingTest() {
             shape[0] = 3;
             shape[1] = 4;
             shape[2] = 2;
-            marray::View<int, constTarget> v(shape.begin(), shape.end(), data_, marray::FirstMajorOrder);
-            marray::View<int, constTarget> w = v.boundView(1,2);
+            andres::View<int, constTarget> v(shape.begin(), shape.end(), data_, andres::FirstMajorOrder);
+            andres::View<int, constTarget> w = v.boundView(1,2);
 
             test(w.size()==6 && w.dimension()==2);
             int index = 0; 
@@ -7058,7 +7011,7 @@ void ViewTest::coordinateBindingTest() {
             std::vector<size_t> shape(2); 
             shape[0] = 1;
             shape[1] = 1;
-            marray::View<int, constTarget> v(shape.begin(), shape.end(), data_);
+            andres::View<int, constTarget> v(shape.begin(), shape.end(), data_);
             v.squeeze();
             
             test(v.size()==1 && v.dimension()==0);
@@ -7069,7 +7022,7 @@ void ViewTest::coordinateBindingTest() {
             std::vector<size_t> shape(2); 
             shape[0] = 24;
             shape[1] = 1;
-            marray::View<int, constTarget> v(shape.begin(), shape.end(), data_);
+            andres::View<int, constTarget> v(shape.begin(), shape.end(), data_);
             v.squeeze();
 
             test(v.size()== 24 && v.dimension()==1);
@@ -7082,7 +7035,7 @@ void ViewTest::coordinateBindingTest() {
             shape[0] = 1;
             shape[1] = 1;
             shape[2] = 1;
-            marray::View<int, constTarget> v(shape.begin(), shape.end(), data_);
+            andres::View<int, constTarget> v(shape.begin(), shape.end(), data_);
             v.squeeze();
 
             test(v.size()==1 && v.dimension()==0);
@@ -7094,7 +7047,7 @@ void ViewTest::coordinateBindingTest() {
             shape[0] = 1;
             shape[1] = 24;
             shape[2] = 1;
-            marray::View<int, constTarget> v(shape.begin(), shape.end(), data_);
+            andres::View<int, constTarget> v(shape.begin(), shape.end(), data_);
             v.squeeze();
 
             test(v.size()==24 && v.dimension()==1
@@ -7108,7 +7061,7 @@ void ViewTest::coordinateBindingTest() {
             shape[0] = 1;
             shape[1] = 3;
             shape[2] = 2;
-            marray::View<int, constTarget> v(shape.begin(), shape.end(), data_);
+            andres::View<int, constTarget> v(shape.begin(), shape.end(), data_);
             v.squeeze();
 
             test(v.size()==6 && v.dimension()==2
@@ -7130,7 +7083,7 @@ void ViewTest::coordinateBindingTest() {
             shape[3] = 1;
             shape[4] = 3;
             shape[5] = 2;
-            marray::View<int, constTarget> v(shape.begin(), shape.end(), data_);
+            andres::View<int, constTarget> v(shape.begin(), shape.end(), data_);
             v.squeeze();
 
             test(v.size()==12 && v.dimension()==3
@@ -7156,10 +7109,10 @@ void ViewTest::transposeTest()
         std::vector<size_t> shape(2);
         shape[0] = 6; 
         shape[1] = 4;
-        marray::View<int, constTarget> v(shape.begin(), shape.end(), data_);
-        marray::View<int, constTarget> w1(shape.begin(), shape.end(), data_);
-        marray::View<int, constTarget> w2(shape.begin(), shape.end(), data_);
-        marray::View<int, constTarget> w3(shape.begin(), shape.end(), data_);
+        andres::View<int, constTarget> v(shape.begin(), shape.end(), data_);
+        andres::View<int, constTarget> w1(shape.begin(), shape.end(), data_);
+        andres::View<int, constTarget> w2(shape.begin(), shape.end(), data_);
+        andres::View<int, constTarget> w3(shape.begin(), shape.end(), data_);
         w1.transpose(0,1);
         w2.transpose(0,0);
         w3.transpose(1,1);
@@ -7176,10 +7129,10 @@ void ViewTest::transposeTest()
         std::vector<size_t> shape(2);
         shape[0] = 6; 
         shape[1] = 4;
-        marray::View<int, constTarget> v(shape.begin(), shape.end(), data_, marray::FirstMajorOrder);
-        marray::View<int, constTarget> w1(shape.begin(), shape.end(), data_, marray::FirstMajorOrder);
-        marray::View<int, constTarget> w2(shape.begin(), shape.end(), data_, marray::FirstMajorOrder);
-        marray::View<int, constTarget> w3(shape.begin(), shape.end(), data_, marray::FirstMajorOrder);
+        andres::View<int, constTarget> v(shape.begin(), shape.end(), data_, andres::FirstMajorOrder);
+        andres::View<int, constTarget> w1(shape.begin(), shape.end(), data_, andres::FirstMajorOrder);
+        andres::View<int, constTarget> w2(shape.begin(), shape.end(), data_, andres::FirstMajorOrder);
+        andres::View<int, constTarget> w3(shape.begin(), shape.end(), data_, andres::FirstMajorOrder);
         w1.transpose(0,1);
         w2.transpose(0,0);
         w3.transpose(1,1);
@@ -7200,8 +7153,8 @@ void ViewTest::transposeTest()
             shape[0] = 3;
             shape[1] = 4;
             shape[2] = 2;
-            marray::View<int, constTarget> v(shape.begin(), shape.end(), data_);
-            marray::View<int, constTarget> w(shape.begin(), shape.end(), data_);
+            andres::View<int, constTarget> v(shape.begin(), shape.end(), data_);
+            andres::View<int, constTarget> w(shape.begin(), shape.end(), data_);
             w.transpose(0,1);
 
             for(size_t x=0; x<3; ++x) {
@@ -7217,8 +7170,8 @@ void ViewTest::transposeTest()
             shape[0] = 3;
             shape[1] = 4;
             shape[2] = 2;
-            marray::View<int, constTarget> v(shape.begin(), shape.end(), data_, marray::FirstMajorOrder);
-            marray::View<int, constTarget> w(shape.begin(), shape.end(), data_, marray::FirstMajorOrder);
+            andres::View<int, constTarget> v(shape.begin(), shape.end(), data_, andres::FirstMajorOrder);
+            andres::View<int, constTarget> w(shape.begin(), shape.end(), data_, andres::FirstMajorOrder);
             w.transpose(0,1);
 
             for(size_t x=0; x<3; ++x) {
@@ -7235,8 +7188,8 @@ void ViewTest::transposeTest()
             shape[0] = 3;
             shape[1] = 4;
             shape[2] = 2;
-            marray::View<int, constTarget> v(shape.begin(), shape.end(), data_);
-            marray::View<int, constTarget> w(shape.begin(), shape.end(), data_);
+            andres::View<int, constTarget> v(shape.begin(), shape.end(), data_);
+            andres::View<int, constTarget> w(shape.begin(), shape.end(), data_);
             w.transpose(0,2);
 
             for(size_t x=0; x<3; ++x) {
@@ -7253,8 +7206,8 @@ void ViewTest::transposeTest()
             shape[0] = 3;
             shape[1] = 4;
             shape[2] = 2;
-            marray::View<int, constTarget> v(shape.begin(), shape.end(), data_, marray::FirstMajorOrder);
-            marray::View<int, constTarget> w(shape.begin(), shape.end(), data_, marray::FirstMajorOrder);
+            andres::View<int, constTarget> v(shape.begin(), shape.end(), data_, andres::FirstMajorOrder);
+            andres::View<int, constTarget> w(shape.begin(), shape.end(), data_, andres::FirstMajorOrder);
             w.transpose(0,2);
 
             for(size_t x=0; x<3; ++x) {
@@ -7271,8 +7224,8 @@ void ViewTest::transposeTest()
             shape[0] = 3;
             shape[1] = 4;
             shape[2] = 2;
-            marray::View<int, constTarget> v(shape.begin(), shape.end(), data_);
-            marray::View<int, constTarget> w(shape.begin(), shape.end(), data_);
+            andres::View<int, constTarget> v(shape.begin(), shape.end(), data_);
+            andres::View<int, constTarget> w(shape.begin(), shape.end(), data_);
             w.transpose(1,2);
 
             for(size_t x=0; x<3; ++x) {
@@ -7288,8 +7241,8 @@ void ViewTest::transposeTest()
             shape[0] = 3;
             shape[1] = 4;
             shape[2] = 2;
-            marray::View<int, constTarget> v(shape.begin(), shape.end(), data_, marray::FirstMajorOrder);
-            marray::View<int, constTarget> w(shape.begin(), shape.end(), data_, marray::FirstMajorOrder);
+            andres::View<int, constTarget> v(shape.begin(), shape.end(), data_, andres::FirstMajorOrder);
+            andres::View<int, constTarget> w(shape.begin(), shape.end(), data_, andres::FirstMajorOrder);
             w.transpose(1,2);
 
             for(size_t x=0; x<3; ++x) {
@@ -7310,9 +7263,9 @@ void ViewTest::permuteTest() {
         std::vector<size_t> shape(2);
         shape[0] = 6; 
         shape[1] = 4;
-        marray::View<int, constTarget> v(shape.begin(), shape.end(), data_);
-        marray::View<int, constTarget> w1(shape.begin(), shape.end(), data_);
-        marray::View<int, constTarget> w2(shape.begin(), shape.end(), data_);
+        andres::View<int, constTarget> v(shape.begin(), shape.end(), data_);
+        andres::View<int, constTarget> w1(shape.begin(), shape.end(), data_);
+        andres::View<int, constTarget> w2(shape.begin(), shape.end(), data_);
         std::vector<size_t> permutation(2);
         permutation[0] = 1;
         permutation[1] = 0;
@@ -7332,9 +7285,9 @@ void ViewTest::permuteTest() {
         std::vector<size_t> shape(2);
         shape[0] = 6; 
         shape[1] = 4;
-        marray::View<int, constTarget> v(shape.begin(), shape.end(), data_, marray::FirstMajorOrder);
-        marray::View<int, constTarget> w1(shape.begin(), shape.end(), data_, marray::FirstMajorOrder);
-        marray::View<int, constTarget> w2(shape.begin(), shape.end(), data_, marray::FirstMajorOrder);
+        andres::View<int, constTarget> v(shape.begin(), shape.end(), data_, andres::FirstMajorOrder);
+        andres::View<int, constTarget> w1(shape.begin(), shape.end(), data_, andres::FirstMajorOrder);
+        andres::View<int, constTarget> w2(shape.begin(), shape.end(), data_, andres::FirstMajorOrder);
         std::vector<size_t> permutation(2);
         permutation[0] = 1;
         permutation[1] = 0;
@@ -7356,12 +7309,12 @@ void ViewTest::permuteTest() {
         shape[0] = 3;
         shape[1] = 4;
         shape[2] = 2;
-        marray::View<int, constTarget> v(shape.begin(), shape.end(), data_);
-        marray::View<int, constTarget> w1(shape.begin(), shape.end(), data_);
-        marray::View<int, constTarget> w2(shape.begin(), shape.end(), data_);
-        marray::View<int, constTarget> w3(shape.begin(), shape.end(), data_);
-        marray::View<int, constTarget> w4(shape.begin(), shape.end(), data_);
-        marray::View<int, constTarget> w5(shape.begin(), shape.end(), data_);
+        andres::View<int, constTarget> v(shape.begin(), shape.end(), data_);
+        andres::View<int, constTarget> w1(shape.begin(), shape.end(), data_);
+        andres::View<int, constTarget> w2(shape.begin(), shape.end(), data_);
+        andres::View<int, constTarget> w3(shape.begin(), shape.end(), data_);
+        andres::View<int, constTarget> w4(shape.begin(), shape.end(), data_);
+        andres::View<int, constTarget> w5(shape.begin(), shape.end(), data_);
         std::vector<size_t> permutation(3);
         permutation[0] = 0;
         permutation[1] = 1; 
@@ -7401,12 +7354,12 @@ void ViewTest::permuteTest() {
         shape[0] = 3;
         shape[1] = 4;
         shape[2] = 2;
-        marray::View<int, constTarget> v(shape.begin(), shape.end(), data_, marray::FirstMajorOrder);
-        marray::View<int, constTarget> w1(shape.begin(), shape.end(), data_, marray::FirstMajorOrder);
-        marray::View<int, constTarget> w2(shape.begin(), shape.end(), data_, marray::FirstMajorOrder);
-        marray::View<int, constTarget> w3(shape.begin(), shape.end(), data_, marray::FirstMajorOrder);
-        marray::View<int, constTarget> w4(shape.begin(), shape.end(), data_, marray::FirstMajorOrder);
-        marray::View<int, constTarget> w5(shape.begin(), shape.end(), data_, marray::FirstMajorOrder);
+        andres::View<int, constTarget> v(shape.begin(), shape.end(), data_, andres::FirstMajorOrder);
+        andres::View<int, constTarget> w1(shape.begin(), shape.end(), data_, andres::FirstMajorOrder);
+        andres::View<int, constTarget> w2(shape.begin(), shape.end(), data_, andres::FirstMajorOrder);
+        andres::View<int, constTarget> w3(shape.begin(), shape.end(), data_, andres::FirstMajorOrder);
+        andres::View<int, constTarget> w4(shape.begin(), shape.end(), data_, andres::FirstMajorOrder);
+        andres::View<int, constTarget> w5(shape.begin(), shape.end(), data_, andres::FirstMajorOrder);
         std::vector<size_t> permutation(3);
         permutation[0] = 0;
         permutation[1] = 1; 
@@ -7443,20 +7396,20 @@ void ViewTest::permuteTest() {
     }
 }
 
-template<bool constTarget, marray::CoordinateOrder internalFirstMajorOrder>
+template<bool constTarget, andres::CoordinateOrder internalFirstMajorOrder>
 void ViewTest::shiftOperatorTest() {
     // 2D
     {
         std::vector<size_t> shape(2);
         shape[0] = 6; 
         shape[1] = 4;
-        marray::View<int, constTarget> v(shape.begin(), shape.end(), data_, internalFirstMajorOrder);
-        marray::View<int, constTarget> w1(shape.begin(), shape.end(), data_, internalFirstMajorOrder);
-        marray::View<int, constTarget> w2(shape.begin(), shape.end(), data_, internalFirstMajorOrder);
-        marray::View<int, constTarget> w3(shape.begin(), shape.end(), data_, internalFirstMajorOrder);
-        marray::View<int, constTarget> w4(shape.begin(), shape.end(), data_, internalFirstMajorOrder);
-        marray::View<int, constTarget> w5(shape.begin(), shape.end(), data_, internalFirstMajorOrder);
-        marray::View<int, constTarget> w6(shape.begin(), shape.end(), data_, internalFirstMajorOrder);
+        andres::View<int, constTarget> v(shape.begin(), shape.end(), data_, internalFirstMajorOrder);
+        andres::View<int, constTarget> w1(shape.begin(), shape.end(), data_, internalFirstMajorOrder);
+        andres::View<int, constTarget> w2(shape.begin(), shape.end(), data_, internalFirstMajorOrder);
+        andres::View<int, constTarget> w3(shape.begin(), shape.end(), data_, internalFirstMajorOrder);
+        andres::View<int, constTarget> w4(shape.begin(), shape.end(), data_, internalFirstMajorOrder);
+        andres::View<int, constTarget> w5(shape.begin(), shape.end(), data_, internalFirstMajorOrder);
+        andres::View<int, constTarget> w6(shape.begin(), shape.end(), data_, internalFirstMajorOrder);
         w1.shift(1);
         w2.shift(2);
         w3.shift(3);
@@ -7481,15 +7434,15 @@ void ViewTest::shiftOperatorTest() {
         shape[0] = 3; 
         shape[1] = 4;
         shape[2] = 2;
-        marray::View<int, constTarget> v(shape.begin(), shape.end(), data_, internalFirstMajorOrder);
-        marray::View<int, constTarget> w1(shape.begin(), shape.end(), data_, internalFirstMajorOrder);
-        marray::View<int, constTarget> w2(shape.begin(), shape.end(), data_, internalFirstMajorOrder);
-        marray::View<int, constTarget> w3(shape.begin(), shape.end(), data_, internalFirstMajorOrder);
-        marray::View<int, constTarget> w4(shape.begin(), shape.end(), data_, internalFirstMajorOrder);
-        marray::View<int, constTarget> w5(shape.begin(), shape.end(), data_, internalFirstMajorOrder);
-        marray::View<int, constTarget> w6(shape.begin(), shape.end(), data_, internalFirstMajorOrder);
-        marray::View<int, constTarget> w7(shape.begin(), shape.end(), data_, internalFirstMajorOrder);
-        marray::View<int, constTarget> w8(shape.begin(), shape.end(), data_, internalFirstMajorOrder);
+        andres::View<int, constTarget> v(shape.begin(), shape.end(), data_, internalFirstMajorOrder);
+        andres::View<int, constTarget> w1(shape.begin(), shape.end(), data_, internalFirstMajorOrder);
+        andres::View<int, constTarget> w2(shape.begin(), shape.end(), data_, internalFirstMajorOrder);
+        andres::View<int, constTarget> w3(shape.begin(), shape.end(), data_, internalFirstMajorOrder);
+        andres::View<int, constTarget> w4(shape.begin(), shape.end(), data_, internalFirstMajorOrder);
+        andres::View<int, constTarget> w5(shape.begin(), shape.end(), data_, internalFirstMajorOrder);
+        andres::View<int, constTarget> w6(shape.begin(), shape.end(), data_, internalFirstMajorOrder);
+        andres::View<int, constTarget> w7(shape.begin(), shape.end(), data_, internalFirstMajorOrder);
+        andres::View<int, constTarget> w8(shape.begin(), shape.end(), data_, internalFirstMajorOrder);
         w1.shift(1);
         w2.shift(2);
         w3.shift(3);
@@ -7525,31 +7478,31 @@ void ViewTest::arithmeticOperatorsTest(){
             // a variable
             {   
                 int datav_[24];
-                for(size_t j=0; j<24; ++j) {
+                for(int j=0; j<24; ++j) {
                     datav_[j] = j;
                 }
                 std::vector<size_t> shape(1);
                 shape[0] = 24;
-                marray::View<int> v(shape.begin(), shape.end(), datav_);
-                marray::View<int>& w = (v += 1);
+                andres::View<int> v(shape.begin(), shape.end(), datav_);
+                andres::View<int>& w = (v += 1);
 
                 test(&v == &w);
-                for(size_t j=0; j<v.size(); ++j) {
+                for(int j=0; j<v.size(); ++j) {
                     test(v(j) == data_[j] + 1);
                 }
             }
             {   
                 float datav_[24];
-                for(size_t j=0; j<24; ++j) {
+                for(int j=0; j<24; ++j) {
                     datav_[j] = float(j);
                 }
                 std::vector<size_t> shape(1);
                 shape[0] = 24;
-                marray::View<float> v(shape.begin(), shape.end(), datav_);
-                marray::View<float>& w = (v += 2.0f);
+                andres::View<float> v(shape.begin(), shape.end(), datav_);
+                andres::View<float>& w = (v += 2.0f);
 
                 test(&v == &w);
-                for(size_t j=0; j<v.size(); ++j) {
+                for(int j=0; j<v.size(); ++j) {
                     test(v(j) == data_[j] + 2.0f);
                 }
             }
@@ -7557,28 +7510,28 @@ void ViewTest::arithmeticOperatorsTest(){
             {   
                 float scalar1 = 815.0f;
                 float scalar2 = 4711.0f;
-                marray::View<float> v(&scalar1);
-                marray::View<float, true> w(&scalar2);
+                andres::View<float> v(&scalar1);
+                andres::View<float, true> w(&scalar2);
 
-                marray::View<float>& r = (v += w);
+                andres::View<float>& r = (v += w);
                 test(&r == &v);
                 test(scalar1 == 815.0f + 4711.0f);
             }
             // v is not a scalar and w is a scalar 
             {
                 float datav_[24];
-                for(size_t j=0; j<24; ++j) {
+                for(int j=0; j<24; ++j) {
                     datav_[j] = float(j);
                 }
                 std::vector<size_t> shape(1);
                 shape[0] = 24;
-                marray::View<float> v(shape.begin(), shape.end(), datav_);
+                andres::View<float> v(shape.begin(), shape.end(), datav_);
                 float scalarw = 4711.0f;
-                marray::View<float, true> w(&scalarw);
+                andres::View<float, true> w(&scalarw);
 
-                marray::View<float>& r = (v += w);
+                andres::View<float>& r = (v += w);
                 test(&r == &v);
-                for(size_t j=0; j<v.size(); ++j) {
+                for(int j=0; j<v.size(); ++j) {
                     test(v(j) == float(j) + scalarw);
                 }
             }
@@ -7586,7 +7539,7 @@ void ViewTest::arithmeticOperatorsTest(){
             {
                 int datav_[24];
                 int dataw_[24];
-                for(size_t j=0; j<24; ++j) {
+                for(int j=0; j<24; ++j) {
                     datav_[j] = 1;
                     dataw_[j] = j;
                 }
@@ -7594,10 +7547,10 @@ void ViewTest::arithmeticOperatorsTest(){
                 shape[0] = 6;
                 std::vector<size_t> strides(1);
                 strides[0] = 4;
-                marray::View<int> v(shape.begin(), shape.end(), datav_, marray::LastMajorOrder);
-                marray::View<int, true> w(shape.begin(), shape.end(),
-                    strides.begin(), dataw_, marray::FirstMajorOrder);
-                marray::View<int>& r = (v += w);
+                andres::View<int> v(shape.begin(), shape.end(), datav_, andres::LastMajorOrder);
+                andres::View<int, true> w(shape.begin(), shape.end(),
+                    strides.begin(), dataw_, andres::FirstMajorOrder);
+                andres::View<int>& r = (v += w);
 
                 test(&r == &v);
                 int i = 0; 
@@ -7612,7 +7565,7 @@ void ViewTest::arithmeticOperatorsTest(){
             {
                 int datav_[24];
                 int dataw_[24];
-                for(size_t j=0; j<24; ++j) {
+                for(int j=0; j<24; ++j) {
                     datav_[j] = j;
                     dataw_[j] = 1;
                 }
@@ -7620,10 +7573,10 @@ void ViewTest::arithmeticOperatorsTest(){
                 shape[0] = 6;
                 std::vector<size_t> strides(1);
                 strides[0] = 4;
-                marray::View<int> v(shape.begin(), shape.end(),
-                    strides.begin(), datav_, marray::FirstMajorOrder);
-                marray::View<int, true> w(shape.begin(), shape.end(), dataw_, marray::LastMajorOrder);
-                marray::View<int>& r = (v += w);
+                andres::View<int> v(shape.begin(), shape.end(),
+                    strides.begin(), datav_, andres::FirstMajorOrder);
+                andres::View<int, true> w(shape.begin(), shape.end(), dataw_, andres::LastMajorOrder);
+                andres::View<int>& r = (v += w);
 
                 test(&r == &v);
                 int i = 0; 
@@ -7638,7 +7591,7 @@ void ViewTest::arithmeticOperatorsTest(){
             {
                 int datav_[24];
                 int dataw_[24];
-                for(size_t j=0; j<24; ++j) {
+                for(int j=0; j<24; ++j) {
                     datav_[j] = j;
                     dataw_[j] = j;
                 }
@@ -7646,11 +7599,11 @@ void ViewTest::arithmeticOperatorsTest(){
                 shape[0] = 6;
                 std::vector<size_t> strides(1);
                 strides[0] = 4;
-                marray::View<int> v(shape.begin(), shape.end(),
-                    strides.begin(), datav_, marray::FirstMajorOrder);
-                marray::View<int, true> w(shape.begin(), shape.end(),
-                    strides.begin(), dataw_, marray::LastMajorOrder);
-                marray::View<int>& r = (v += w);
+                andres::View<int> v(shape.begin(), shape.end(),
+                    strides.begin(), datav_, andres::FirstMajorOrder);
+                andres::View<int, true> w(shape.begin(), shape.end(),
+                    strides.begin(), dataw_, andres::LastMajorOrder);
+                andres::View<int>& r = (v += w);
 
                 test(&r == &v);
                 int i = 0; 
@@ -7665,40 +7618,40 @@ void ViewTest::arithmeticOperatorsTest(){
             {   
                 int datav_[24];
                 int dataw_[24];
-                for(size_t j=0; j<24; ++j) {
+                for(int j=0; j<24; ++j) {
                     datav_[j] = 1;
                     dataw_[j] = 2;
                 }
                 std::vector<size_t> shape(1);
                 shape[0] = 24;
-                marray::View<int> v(shape.begin(), shape.end(), datav_);
-                marray::View<int, true> w(shape.begin(), shape.end(), dataw_);
-                marray::View<int>& r = (v += w);
+                andres::View<int> v(shape.begin(), shape.end(), datav_);
+                andres::View<int, true> w(shape.begin(), shape.end(), dataw_);
+                andres::View<int>& r = (v += w);
 
                 test(&r == &v);
-                for(size_t j=0; j<v.size(); ++j) {
+                for(int j=0; j<v.size(); ++j) {
                     test(v(j) == 3);
                 }
             }
             {   
                 int datav_[24];
-                for(size_t j=0; j<24; ++j) {
+                for(int j=0; j<24; ++j) {
                     datav_[j] = 1;
                 }
                 std::vector<size_t> shape(1);
                 shape[0] = 24;
-                marray::View<int> v(shape.begin(), shape.end(), datav_);
-                marray::View<int>& r = (v += v);
+                andres::View<int> v(shape.begin(), shape.end(), datav_);
+                andres::View<int>& r = (v += v);
 
                 test(&r == &v);
-                for(size_t j=0; j<v.size(); ++j) {
+                for(int j=0; j<v.size(); ++j) {
                     test(v(j) == 2);
                 }
             }
             // v is not simple, += scalar
             {   
                 int datav_[24];
-                for(size_t j=0; j<24; ++j) {
+                for(int j=0; j<24; ++j) {
                     datav_[j] = 1;
                 }
                 std::vector<size_t> shape(2);
@@ -7707,9 +7660,9 @@ void ViewTest::arithmeticOperatorsTest(){
                 std::vector<size_t> strides(2);
                 strides[0] = 2;
                 strides[1] = 8;
-                marray::View<int> v(shape.begin(), shape.end(), 
-                    strides.begin(), datav_, marray::LastMajorOrder);
-                marray::View<int>& r = (v += 2);
+                andres::View<int> v(shape.begin(), shape.end(), 
+                    strides.begin(), datav_, andres::LastMajorOrder);
+                andres::View<int>& r = (v += 2);
 
                 test(&r == &v);
                 std::vector<bool> covered(24, false);
@@ -7737,9 +7690,9 @@ void ViewTest::arithmeticOperatorsTest(){
             {
                 int scalarv = 1;
                 int scalarw = 2;
-                marray::View<int, true> v(&scalarv);
-                marray::View<int, true> w(&scalarw);
-                marray::Marray<int> m;
+                andres::View<int, true> v(&scalarv);
+                andres::View<int, true> w(&scalarw);
+                andres::Marray<int> m;
                 m = v + w;
 
                 test(m.size()==v.size() && m.dimension()==v.dimension()
@@ -7749,9 +7702,9 @@ void ViewTest::arithmeticOperatorsTest(){
             {
                 float scalarv = 1.0f;
                 float scalarw = 2.0f;
-                marray::View<float, true> v(&scalarv);
-                marray::View<float, true> w(&scalarw);
-                marray::Marray<float> m;
+                andres::View<float, true> v(&scalarv);
+                andres::View<float, true> w(&scalarw);
+                andres::Marray<float> m;
                 m = v + w;
 
                 test(m.size()==v.size() && m.dimension()==v.dimension()
@@ -7761,8 +7714,8 @@ void ViewTest::arithmeticOperatorsTest(){
             // a View and variable
             {
                 float scalar = 1;
-                marray::View<float, true> v(&scalar);
-                marray::Marray<float> m;
+                andres::View<float, true> v(&scalar);
+                andres::Marray<float> m;
                 m = v + 2.0f;
 
                 test(m.size()==v.size() && m.dimension()==v.dimension()
@@ -7771,15 +7724,15 @@ void ViewTest::arithmeticOperatorsTest(){
             }
             {
                 int datav_[24];
-                for(size_t j=0; j<24; ++j) {
+                for(int j=0; j<24; ++j) {
                     datav_[j] = j;
                 }
                 std::vector<size_t> shape(3);
                 shape[0] = 2;
                 shape[1] = 4;
                 shape[2] = 3;
-                marray::View<int, true> v(shape.begin(), shape.end(), datav_);
-                marray::Marray<int> m;
+                andres::View<int, true> v(shape.begin(), shape.end(), datav_);
+                andres::Marray<int> m;
                 m = v + 1;
 
                 test(m.size()==v.size() && m.dimension()==v.dimension()
@@ -7794,15 +7747,15 @@ void ViewTest::arithmeticOperatorsTest(){
             }
             {
                 float datav_[24];
-                for(size_t j=0; j<24; ++j) {
+                for(int j=0; j<24; ++j) {
                     datav_[j] = float(j);
                 }
                 std::vector<size_t> shape(3);
                 shape[0] = 2;
                 shape[1] = 4;
                 shape[2] = 3;
-                marray::View<float, true> v(shape.begin(), shape.end(), datav_);
-                marray::Marray<float> m;
+                andres::View<float, true> v(shape.begin(), shape.end(), datav_);
+                andres::Marray<float> m;
                 m = v + 1.0f;
 
                 test(m.size()==v.size() && m.dimension()==v.dimension()
@@ -7818,8 +7771,8 @@ void ViewTest::arithmeticOperatorsTest(){
             // variable and a View
             {
                 float scalar = 1;
-                marray::View<float, true> v(&scalar);
-                marray::Marray<float> m;
+                andres::View<float, true> v(&scalar);
+                andres::Marray<float> m;
                 m = 2.0f + v;
 
                 test(m.size()==v.size() && m.dimension()==v.dimension()
@@ -7828,15 +7781,15 @@ void ViewTest::arithmeticOperatorsTest(){
             }
             {
                 int datav_[24];
-                for(size_t j=0; j<24; ++j) {
+                for(int j=0; j<24; ++j) {
                     datav_[j] = j;
                 }
                 std::vector<size_t> shape(3);
                 shape[0] = 2;
                 shape[1] = 4;
                 shape[2] = 3;
-                marray::View<int, true> v(shape.begin(), shape.end(), datav_);
-                marray::Marray<int> m;
+                andres::View<int, true> v(shape.begin(), shape.end(), datav_);
+                andres::Marray<int> m;
                 m = 1 + v;
 
                 test(m.size()==v.size() && m.dimension()==v.dimension()
@@ -7851,15 +7804,15 @@ void ViewTest::arithmeticOperatorsTest(){
             }
             {
                 float datav_[24];
-                for(size_t j=0; j<24; ++j) {
+                for(int j=0; j<24; ++j) {
                     datav_[j] = float(j);
                 }
                 std::vector<size_t> shape(3);
                 shape[0] = 2;
                 shape[1] = 4;
                 shape[2] = 3;
-                marray::View<float, true> v(shape.begin(), shape.end(), datav_);
-                marray::Marray<float> m;
+                andres::View<float, true> v(shape.begin(), shape.end(), datav_);
+                andres::Marray<float> m;
                 m = 1.0f + v;
 
                 test(m.size()==v.size() && m.dimension()==v.dimension()
@@ -7876,7 +7829,7 @@ void ViewTest::arithmeticOperatorsTest(){
             {
                 int datav_[24];
                 int dataw_[24];
-                for(size_t j=0; j<24; ++j) {
+                for(int j=0; j<24; ++j) {
                     datav_[j] = 1;
                     dataw_[j] = 2;
                 }
@@ -7884,9 +7837,9 @@ void ViewTest::arithmeticOperatorsTest(){
                 shape[0] = 2;
                 shape[1] = 4;
                 shape[2] = 3;
-                marray::View<int, true> v(shape.begin(), shape.end(), datav_);
-                marray::View<int, true> w(shape.begin(), shape.end(), dataw_);
-                marray::Marray<int> m;
+                andres::View<int, true> v(shape.begin(), shape.end(), datav_);
+                andres::View<int, true> w(shape.begin(), shape.end(), dataw_);
+                andres::Marray<int> m;
                 m = v + w;
 
                 test(m.size()==v.size() &&  m.dimension()==v.dimension()
@@ -7897,8 +7850,8 @@ void ViewTest::arithmeticOperatorsTest(){
             }
             {
                 int scalar = 3;
-                marray::View<int, true> v(&scalar);
-                marray::Marray<int> m;
+                andres::View<int, true> v(&scalar);
+                andres::Marray<int> m;
                 m = v + v;
 
                 test(m.size()==v.size() &&  m.dimension()==v.dimension()
@@ -7907,15 +7860,15 @@ void ViewTest::arithmeticOperatorsTest(){
             }
             {
                 int datav_[24];
-                for(size_t j=0; j<24; ++j) {
+                for(int j=0; j<24; ++j) {
                     datav_[j] = 1;
                 }
                 std::vector<size_t> shape(3);
                 shape[0] = 2;
                 shape[1] = 4;
                 shape[2] = 3;
-                marray::View<int, true> v(shape.begin(), shape.end(), datav_);
-                marray::Marray<int> m;
+                andres::View<int, true> v(shape.begin(), shape.end(), datav_);
+                andres::Marray<int> m;
                 m = v + v;
 
                 test(m.size()==v.size() &&  m.dimension()==v.dimension()
@@ -7931,8 +7884,8 @@ void ViewTest::arithmeticOperatorsTest(){
         // scalar
         {   
             int scalar = 2;
-            marray::View<int> v(&scalar);
-            marray::View<int>& r = (++v);
+            andres::View<int> v(&scalar);
+            andres::View<int>& r = (++v);
 
             test(&r == &v
             );
@@ -7941,13 +7894,13 @@ void ViewTest::arithmeticOperatorsTest(){
         // 1D 
         {   
             int datav_[24];
-            for(size_t j=0; j<24; ++j) {
+            for(int j=0; j<24; ++j) {
                 datav_[j] = j;
             }
             std::vector<size_t> shape(1);
             shape[0] = 24;
-            marray::View<int> v(shape.begin(), shape.end(), datav_);
-            marray::View<int>& r = (++v);
+            andres::View<int> v(shape.begin(), shape.end(), datav_);
+            andres::View<int>& r = (++v);
 
             test(&r == &v
             );
@@ -7963,13 +7916,13 @@ void ViewTest::arithmeticOperatorsTest(){
             // variable
             {   
                 int datav_[24];
-                for(size_t j=0; j<24; ++j) {
+                for(int j=0; j<24; ++j) {
                     datav_[j] = j;
                 }
                 std::vector<size_t> shape(1);
                 shape[0] = 24;
-                marray::View<int> v(shape.begin(), shape.end(), datav_);
-                marray::View<int>& r = (v -= 1);
+                andres::View<int> v(shape.begin(), shape.end(), datav_);
+                andres::View<int>& r = (v -= 1);
 
                 test(&r == &v
                 );
@@ -7984,8 +7937,8 @@ void ViewTest::arithmeticOperatorsTest(){
                 }
                 std::vector<size_t> shape(1);
                 shape[0] = 24;
-                marray::View<float> v(shape.begin(), shape.end(), datav_);
-                marray::View<float>& r = (v -= 1.0f);
+                andres::View<float> v(shape.begin(), shape.end(), datav_);
+                andres::View<float>& r = (v -= 1.0f);
 
                 test(&r == &v
                 );
@@ -7997,10 +7950,10 @@ void ViewTest::arithmeticOperatorsTest(){
             {   
                 float scalar1 = 815.0f;
                 float scalar2 = 4711.0f;
-                marray::View<float> v(&scalar1);
-                marray::View<float, true> w(&scalar2);
+                andres::View<float> v(&scalar1);
+                andres::View<float, true> w(&scalar2);
 
-                marray::View<float>& r = (v -= w);
+                andres::View<float>& r = (v -= w);
                 test(&r == &v);
                 test(scalar1 == 815.0f - 4711.0f);
             }
@@ -8012,11 +7965,11 @@ void ViewTest::arithmeticOperatorsTest(){
                 }
                 std::vector<size_t> shape(1);
                 shape[0] = 24;
-                marray::View<float> v(shape.begin(), shape.end(), datav_);
+                andres::View<float> v(shape.begin(), shape.end(), datav_);
                 float scalarw = 4711.0f;
-                marray::View<float, true> w(&scalarw);
+                andres::View<float, true> w(&scalarw);
 
-                marray::View<float>& r = (v -= w);
+                andres::View<float>& r = (v -= w);
                 test(&r == &v);
                 for(size_t j=0; j<v.size(); ++j) {
                     test(v(j) == float(j) - scalarw);
@@ -8026,7 +7979,7 @@ void ViewTest::arithmeticOperatorsTest(){
             {
                 int datav_[24];
                 int dataw_[24];
-                for(size_t j=0; j<24; ++j) {
+                for(int j=0; j<24; ++j) {
                     datav_[j] = 1;
                     dataw_[j] = j;
                 }
@@ -8034,10 +7987,10 @@ void ViewTest::arithmeticOperatorsTest(){
                 shape[0] = 6;
                 std::vector<size_t> strides(1);
                 strides[0] = 4;
-                marray::View<int> v(shape.begin(), shape.end(), datav_, marray::LastMajorOrder);
-                marray::View<int, true> w(shape.begin(), shape.end(),
-                    strides.begin(), dataw_, marray::FirstMajorOrder);
-                marray::View<int>& r = (v -= w);
+                andres::View<int> v(shape.begin(), shape.end(), datav_, andres::LastMajorOrder);
+                andres::View<int, true> w(shape.begin(), shape.end(),
+                    strides.begin(), dataw_, andres::FirstMajorOrder);
+                andres::View<int>& r = (v -= w);
 
                 test(&r == &v);
                 int i = 0; 
@@ -8052,7 +8005,7 @@ void ViewTest::arithmeticOperatorsTest(){
             {
                 int datav_[24];
                 int dataw_[24];
-                for(size_t j=0; j<24; ++j) {
+                for(int j=0; j<24; ++j) {
                     datav_[j] = j;
                     dataw_[j] = 1;
                 }
@@ -8060,10 +8013,10 @@ void ViewTest::arithmeticOperatorsTest(){
                 shape[0] = 6;
                 std::vector<size_t> strides(1);
                 strides[0] = 4;
-                marray::View<int> v(shape.begin(), shape.end(),
-                    strides.begin(), datav_, marray::FirstMajorOrder);
-                marray::View<int, true> w(shape.begin(), shape.end(), dataw_, marray::LastMajorOrder);
-                marray::View<int>& r = (v -= w);
+                andres::View<int> v(shape.begin(), shape.end(),
+                    strides.begin(), datav_, andres::FirstMajorOrder);
+                andres::View<int, true> w(shape.begin(), shape.end(), dataw_, andres::LastMajorOrder);
+                andres::View<int>& r = (v -= w);
 
                 test(&r == &v);
                 int i = 0; 
@@ -8078,7 +8031,7 @@ void ViewTest::arithmeticOperatorsTest(){
             {
                 int datav_[24];
                 int dataw_[24];
-                for(size_t j=0; j<24; ++j) {
+                for(int j=0; j<24; ++j) {
                     datav_[j] = j;
                     dataw_[j] = j;
                 }
@@ -8086,11 +8039,11 @@ void ViewTest::arithmeticOperatorsTest(){
                 shape[0] = 6;
                 std::vector<size_t> strides(1);
                 strides[0] = 4;
-                marray::View<int> v(shape.begin(), shape.end(),
-                    strides.begin(), datav_, marray::FirstMajorOrder);
-                marray::View<int, true> w(shape.begin(), shape.end(),
-                    strides.begin(), dataw_, marray::LastMajorOrder);
-                marray::View<int>& r = (v -= w);
+                andres::View<int> v(shape.begin(), shape.end(),
+                    strides.begin(), datav_, andres::FirstMajorOrder);
+                andres::View<int, true> w(shape.begin(), shape.end(),
+                    strides.begin(), dataw_, andres::LastMajorOrder);
+                andres::View<int>& r = (v -= w);
 
                 test(&r == &v);
                 int i = 0; 
@@ -8105,15 +8058,15 @@ void ViewTest::arithmeticOperatorsTest(){
             {   
                 int datav_[24];
                 int dataw_[24];
-                for(size_t j=0; j<24; ++j) {
+                for(int j=0; j<24; ++j) {
                     datav_[j] = 1;
                     dataw_[j] = 2;
                 }
                 std::vector<size_t> shape(1);
                 shape[0] = 24;
-                marray::View<int> v(shape.begin(), shape.end(), datav_);
-                marray::View<int, true> w(shape.begin(), shape.end(), dataw_);
-                marray::View<int>& r = (v -= w);
+                andres::View<int> v(shape.begin(), shape.end(), datav_);
+                andres::View<int, true> w(shape.begin(), shape.end(), dataw_);
+                andres::View<int>& r = (v -= w);
 
                 test(&r == &v);
                 for(size_t j=0; j<v.size(); ++j) {
@@ -8127,8 +8080,8 @@ void ViewTest::arithmeticOperatorsTest(){
                 }
                 std::vector<size_t> shape(1);
                 shape[0] = 24;
-                marray::View<int> v(shape.begin(), shape.end(), datav_);
-                marray::View<int>& r = (v -= v);
+                andres::View<int> v(shape.begin(), shape.end(), datav_);
+                andres::View<int>& r = (v -= v);
 
                 test(&r == &v
                 );
@@ -8143,8 +8096,8 @@ void ViewTest::arithmeticOperatorsTest(){
         // scalar
         {   
             int scalar = 2;
-            marray::View<int> v(&scalar);
-            marray::View<int>& r = (--v);
+            andres::View<int> v(&scalar);
+            andres::View<int>& r = (--v);
 
             test(&r == &v
             );
@@ -8153,13 +8106,13 @@ void ViewTest::arithmeticOperatorsTest(){
         // 1D 
         {   
             int datav_[24];
-            for(size_t j=0; j<24; ++j) {
+            for(int j=0; j<24; ++j) {
                 datav_[j] = j;
             }
             std::vector<size_t> shape(1);
             shape[0] = 24;
-            marray::View<int> v(shape.begin(), shape.end(), datav_);
-            marray::View<int>& r = (--v);
+            andres::View<int> v(shape.begin(), shape.end(), datav_);
+            andres::View<int>& r = (--v);
 
             test(&r == &v
             );
@@ -8173,8 +8126,8 @@ void ViewTest::arithmeticOperatorsTest(){
         // scalar
         {
             int scalar = 2;
-            marray::View<int, true> v(&scalar);
-            marray::Marray<int> m;
+            andres::View<int, true> v(&scalar);
+            andres::Marray<int> m;
             m = -v;
 
             test(m.size()==v.size() && m.dimension()==v.dimension());
@@ -8183,15 +8136,15 @@ void ViewTest::arithmeticOperatorsTest(){
         // 3D
         {
             int datav_[24];
-            for(size_t j=0; j<24; ++j) {
-                datav_[j] = static_cast<int>(j);
+            for(int j=0; j<24; ++j) {
+                datav_[j] = j;
             }
             std::vector<size_t> shape(3);
             shape[0] = 2;
             shape[1] = 4;
             shape[2] = 3;
-            marray::View<int, true> v(shape.begin(), shape.end(), datav_);
-            marray::Marray<int> m;
+            andres::View<int, true> v(shape.begin(), shape.end(), datav_);
+            andres::Marray<int> m;
             m = -v;
 
             test(m.size()==v.size() && m.dimension()==v.dimension());
@@ -8212,9 +8165,9 @@ void ViewTest::arithmeticOperatorsTest(){
             {
                 int scalarv = 2;
                 int scalarw = 1;
-                marray::View<int, true> v(&scalarv);
-                marray::View<int, true> w(&scalarw);
-                marray::Marray<int> m;
+                andres::View<int, true> v(&scalarv);
+                andres::View<int, true> w(&scalarw);
+                andres::Marray<int> m;
                 m = v - w;
 
                 test(m.size()==v.size() && m.dimension()==v.dimension());
@@ -8223,9 +8176,9 @@ void ViewTest::arithmeticOperatorsTest(){
             {
                 float scalarv = 2.0f;
                 float scalarw = 1.0f;
-                marray::View<float, true> v(&scalarv);
-                marray::View<float, true> w(&scalarw);
-                marray::Marray<float> m;
+                andres::View<float, true> v(&scalarv);
+                andres::View<float, true> w(&scalarw);
+                andres::Marray<float> m;
                 m = v - w;
 
                 test(m.size()==v.size() && m.dimension()==v.dimension());
@@ -8234,8 +8187,8 @@ void ViewTest::arithmeticOperatorsTest(){
             // a View and variable
             {
                 float scalar = 1;
-                marray::View<float, true> v(&scalar);
-                marray::Marray<float> m;
+                andres::View<float, true> v(&scalar);
+                andres::Marray<float> m;
                 m = v - 2.0f;
 
                 test(m.size()==v.size() && m.dimension()==v.dimension()
@@ -8244,15 +8197,15 @@ void ViewTest::arithmeticOperatorsTest(){
             }
             {
                 int datav_[24];
-                for(size_t j=0; j<24; ++j) {
+                for(int j=0; j<24; ++j) {
                     datav_[j] = j;
                 }
                 std::vector<size_t> shape(3);
                 shape[0] = 2;
                 shape[1] = 4;
                 shape[2] = 3;
-                marray::View<int, true> v(shape.begin(), shape.end(), datav_);
-                marray::Marray<int> m;
+                andres::View<int, true> v(shape.begin(), shape.end(), datav_);
+                andres::Marray<int> m;
                 m = v - 1;
 
                 test(m.size()==v.size() && m.dimension()==v.dimension()
@@ -8274,8 +8227,8 @@ void ViewTest::arithmeticOperatorsTest(){
                 shape[0] = 2;
                 shape[1] = 4;
                 shape[2] = 3;
-                marray::View<float, true> v(shape.begin(), shape.end(), datav_);
-                marray::Marray<float> m;
+                andres::View<float, true> v(shape.begin(), shape.end(), datav_);
+                andres::Marray<float> m;
                 m = v - 1.0f;
 
                 test(m.size()==v.size() && m.dimension()==v.dimension()
@@ -8291,8 +8244,8 @@ void ViewTest::arithmeticOperatorsTest(){
             // variable and a View
             {
                 float scalar = 1;
-                marray::View<float, true> v(&scalar);
-                marray::Marray<float> m;
+                andres::View<float, true> v(&scalar);
+                andres::Marray<float> m;
                 m = 2.0f - v;
 
                 test(m.size()==v.size() && m.dimension()==v.dimension()
@@ -8301,15 +8254,15 @@ void ViewTest::arithmeticOperatorsTest(){
             }
             {
                 int datav_[24];
-                for(size_t j=0; j<24; ++j) {
+                for(int j=0; j<24; ++j) {
                     datav_[j] = j;
                 }
                 std::vector<size_t> shape(3);
                 shape[0] = 2;
                 shape[1] = 4;
                 shape[2] = 3;
-                marray::View<int, true> v(shape.begin(), shape.end(), datav_);
-                marray::Marray<int> m = 1 - v;
+                andres::View<int, true> v(shape.begin(), shape.end(), datav_);
+                andres::Marray<int> m = 1 - v;
 
                 test(m.size()==v.size() && m.dimension()==v.dimension()
                 );
@@ -8330,8 +8283,8 @@ void ViewTest::arithmeticOperatorsTest(){
                 shape[0] = 2;
                 shape[1] = 4;
                 shape[2] = 3;
-                marray::View<float, true> v(shape.begin(), shape.end(), datav_);
-                marray::Marray<float> m = 1.0f - v;
+                andres::View<float, true> v(shape.begin(), shape.end(), datav_);
+                andres::Marray<float> m = 1.0f - v;
 
                 test(m.size()==v.size() && m.dimension()==v.dimension()
                 );
@@ -8355,9 +8308,9 @@ void ViewTest::arithmeticOperatorsTest(){
                 shape[0] = 2;
                 shape[1] = 4;
                 shape[2] = 3;
-                marray::View<int, true> v(shape.begin(), shape.end(), datav_);
-                marray::View<int, true> w(shape.begin(), shape.end(), dataw_);
-                marray::Marray<int> m = v - w;
+                andres::View<int, true> v(shape.begin(), shape.end(), datav_);
+                andres::View<int, true> w(shape.begin(), shape.end(), dataw_);
+                andres::Marray<int> m = v - w;
 
                 test(m.size()==v.size() &&  m.dimension()==v.dimension()
                 );
@@ -8367,8 +8320,8 @@ void ViewTest::arithmeticOperatorsTest(){
             }
             {
                 int scalar = 3;
-                marray::View<int, true> v(&scalar);
-                marray::Marray<int> m;
+                andres::View<int, true> v(&scalar);
+                andres::Marray<int> m;
                 m = v - v;
 
                 test(m.size()==v.size() &&  m.dimension()==v.dimension()
@@ -8384,8 +8337,8 @@ void ViewTest::arithmeticOperatorsTest(){
                 shape[0] = 2;
                 shape[1] = 4;
                 shape[2] = 3;
-                marray::View<int, true> v(shape.begin(), shape.end(), datav_);
-                marray::Marray<int> m = v - v;
+                andres::View<int, true> v(shape.begin(), shape.end(), datav_);
+                andres::Marray<int> m = v - v;
 
                 test(m.size()==v.size() &&  m.dimension()==v.dimension()
                 );
@@ -8402,13 +8355,13 @@ void ViewTest::arithmeticOperatorsTest(){
             // variable
             {   
                 int datav_[24];
-                for(size_t j=0; j<24; ++j) {
+                for(int j=0; j<24; ++j) {
                     datav_[j] = j;
                 }
                 std::vector<size_t> shape(1);
                 shape[0] = 24;
-                marray::View<int> v(shape.begin(), shape.end(), datav_);
-                marray::View<int>& r = (v *= 2);
+                andres::View<int> v(shape.begin(), shape.end(), datav_);
+                andres::View<int>& r = (v *= 2);
 
                 test(&r == &v
                 );
@@ -8423,8 +8376,8 @@ void ViewTest::arithmeticOperatorsTest(){
                 }
                 std::vector<size_t> shape(1);
                 shape[0] = 24;
-                marray::View<float> v(shape.begin(), shape.end(), datav_);
-                marray::View<float>& r = (v *= 2.0f);
+                andres::View<float> v(shape.begin(), shape.end(), datav_);
+                andres::View<float>& r = (v *= 2.0f);
 
                 test(&r == &v
                 );
@@ -8436,10 +8389,10 @@ void ViewTest::arithmeticOperatorsTest(){
             {   
                 float scalar1 = 815.0f;
                 float scalar2 = 4711.0f;
-                marray::View<float> v(&scalar1);
-                marray::View<float, true> w(&scalar2);
+                andres::View<float> v(&scalar1);
+                andres::View<float, true> w(&scalar2);
 
-                marray::View<float>& r = (v *= w);
+                andres::View<float>& r = (v *= w);
                 test(&r == &v);
                 test(scalar1 == 815.0f * 4711.0f);
             }
@@ -8451,11 +8404,11 @@ void ViewTest::arithmeticOperatorsTest(){
                 }
                 std::vector<size_t> shape(1);
                 shape[0] = 24;
-                marray::View<float> v(shape.begin(), shape.end(), datav_);
+                andres::View<float> v(shape.begin(), shape.end(), datav_);
                 float scalarw = 4711.0f;
-                marray::View<float, true> w(&scalarw);
+                andres::View<float, true> w(&scalarw);
 
-                marray::View<float>& r = (v *= w);
+                andres::View<float>& r = (v *= w);
                 test(&r == &v);
                 for(size_t j=0; j<v.size(); ++j) {
                     test(v(j) == float(j) * scalarw);
@@ -8465,7 +8418,7 @@ void ViewTest::arithmeticOperatorsTest(){
             {
                 int datav_[24];
                 int dataw_[24];
-                for(size_t j=0; j<24; ++j) {
+                for(int j=0; j<24; ++j) {
                     datav_[j] = 1;
                     dataw_[j] = j;
                 }
@@ -8473,10 +8426,10 @@ void ViewTest::arithmeticOperatorsTest(){
                 shape[0] = 6;
                 std::vector<size_t> strides(1);
                 strides[0] = 4;
-                marray::View<int> v(shape.begin(), shape.end(), datav_, marray::LastMajorOrder);
-                marray::View<int, true> w(shape.begin(), shape.end(),
-                    strides.begin(), dataw_, marray::FirstMajorOrder);
-                marray::View<int>& r = (v *= w);
+                andres::View<int> v(shape.begin(), shape.end(), datav_, andres::LastMajorOrder);
+                andres::View<int, true> w(shape.begin(), shape.end(),
+                    strides.begin(), dataw_, andres::FirstMajorOrder);
+                andres::View<int>& r = (v *= w);
 
                 test(&r == &v);
                 int i = 0; 
@@ -8491,7 +8444,7 @@ void ViewTest::arithmeticOperatorsTest(){
             {
                 int datav_[24];
                 int dataw_[24];
-                for(size_t j=0; j<24; ++j) {
+                for(int j=0; j<24; ++j) {
                     datav_[j] = j;
                     dataw_[j] = 1;
                 }
@@ -8499,10 +8452,10 @@ void ViewTest::arithmeticOperatorsTest(){
                 shape[0] = 6;
                 std::vector<size_t> strides(1);
                 strides[0] = 4;
-                marray::View<int> v(shape.begin(), shape.end(),
-                    strides.begin(), datav_, marray::FirstMajorOrder);
-                marray::View<int, true> w(shape.begin(), shape.end(), dataw_, marray::LastMajorOrder);
-                marray::View<int>& r = (v *= w);
+                andres::View<int> v(shape.begin(), shape.end(),
+                    strides.begin(), datav_, andres::FirstMajorOrder);
+                andres::View<int, true> w(shape.begin(), shape.end(), dataw_, andres::LastMajorOrder);
+                andres::View<int>& r = (v *= w);
 
                 test(&r == &v);
                 int i = 0; 
@@ -8517,7 +8470,7 @@ void ViewTest::arithmeticOperatorsTest(){
             {
                 int datav_[24];
                 int dataw_[24];
-                for(size_t j=0; j<24; ++j) {
+                for(int j=0; j<24; ++j) {
                     datav_[j] = j;
                     dataw_[j] = j;
                 }
@@ -8525,11 +8478,11 @@ void ViewTest::arithmeticOperatorsTest(){
                 shape[0] = 6;
                 std::vector<size_t> strides(1);
                 strides[0] = 4;
-                marray::View<int> v(shape.begin(), shape.end(),
-                    strides.begin(), datav_, marray::FirstMajorOrder);
-                marray::View<int, true> w(shape.begin(), shape.end(),
-                    strides.begin(), dataw_, marray::LastMajorOrder);
-                marray::View<int>& r = (v *= w);
+                andres::View<int> v(shape.begin(), shape.end(),
+                    strides.begin(), datav_, andres::FirstMajorOrder);
+                andres::View<int, true> w(shape.begin(), shape.end(),
+                    strides.begin(), dataw_, andres::LastMajorOrder);
+                andres::View<int>& r = (v *= w);
 
                 test(&r == &v);
                 int i = 0; 
@@ -8550,9 +8503,9 @@ void ViewTest::arithmeticOperatorsTest(){
                 }
                 std::vector<size_t> shape(1);
                 shape[0] = 24;
-                marray::View<int> v(shape.begin(), shape.end(), datav_);
-                marray::View<int, true> w(shape.begin(), shape.end(), dataw_);
-                marray::View<int>& r = (v *= w);
+                andres::View<int> v(shape.begin(), shape.end(), datav_);
+                andres::View<int, true> w(shape.begin(), shape.end(), dataw_);
+                andres::View<int>& r = (v *= w);
 
                 test(&r == &v);
                 for(size_t j=0; j<v.size(); ++j) {
@@ -8566,8 +8519,8 @@ void ViewTest::arithmeticOperatorsTest(){
                 }
                 std::vector<size_t> shape(1);
                 shape[0] = 24;
-                marray::View<int> v(shape.begin(), shape.end(), datav_);
-                marray::View<int>& r = (v *= v);
+                andres::View<int> v(shape.begin(), shape.end(), datav_);
+                andres::View<int>& r = (v *= v);
 
                 test(&r == &v
                 );
@@ -8585,9 +8538,9 @@ void ViewTest::arithmeticOperatorsTest(){
             {
                 int scalarv = 2;
                 int scalarw = 3;
-                marray::View<int, true> v(&scalarv);
-                marray::View<int, true> w(&scalarw);
-                marray::Marray<int> m;
+                andres::View<int, true> v(&scalarv);
+                andres::View<int, true> w(&scalarw);
+                andres::Marray<int> m;
                 m = v * w;
 
                 test(m.size()==v.size() && m.dimension()==v.dimension()
@@ -8597,9 +8550,9 @@ void ViewTest::arithmeticOperatorsTest(){
             {
                 float scalarv = 2.0f;
                 float scalarw = 3.0f;
-                marray::View<float, true> v(&scalarv);
-                marray::View<float, true> w(&scalarw);
-                marray::Marray<float> m;
+                andres::View<float, true> v(&scalarv);
+                andres::View<float, true> w(&scalarw);
+                andres::Marray<float> m;
                 m = v * w;
 
                 test(m.size()==v.size() && m.dimension()==v.dimension()
@@ -8609,8 +8562,8 @@ void ViewTest::arithmeticOperatorsTest(){
             // a View and variable
             {
                 float scalar = 1;
-                marray::View<float, true> v(&scalar);
-                marray::Marray<float> m;
+                andres::View<float, true> v(&scalar);
+                andres::Marray<float> m;
                 m = v * 2.0f;
 
                 test(m.size()==v.size() && m.dimension()==v.dimension()
@@ -8619,15 +8572,15 @@ void ViewTest::arithmeticOperatorsTest(){
             }
             {
                 int datav_[24];
-                for(size_t j=0; j<24; ++j) {
+                for(int j=0; j<24; ++j) {
                     datav_[j] = j;
                 }
                 std::vector<size_t> shape(3);
                 shape[0] = 2;
                 shape[1] = 4;
                 shape[2] = 3;
-                marray::View<int, true> v(shape.begin(), shape.end(), datav_);
-                marray::Marray<int> m = v * 2;
+                andres::View<int, true> v(shape.begin(), shape.end(), datav_);
+                andres::Marray<int> m = v * 2;
 
                 test(m.size()==v.size() && m.dimension()==v.dimension()
                 );
@@ -8648,8 +8601,8 @@ void ViewTest::arithmeticOperatorsTest(){
                 shape[0] = 2;
                 shape[1] = 4;
                 shape[2] = 3;
-                marray::View<float, true> v(shape.begin(), shape.end(), datav_);
-                marray::Marray<float> m = v * 2.0f;
+                andres::View<float, true> v(shape.begin(), shape.end(), datav_);
+                andres::Marray<float> m = v * 2.0f;
 
                 test(m.size()==v.size() && m.dimension()==v.dimension()
                 );
@@ -8664,8 +8617,8 @@ void ViewTest::arithmeticOperatorsTest(){
             // variable and a View
             {
                 float scalar = 1;
-                marray::View<float, true> v(&scalar);
-                marray::Marray<float> m;
+                andres::View<float, true> v(&scalar);
+                andres::Marray<float> m;
                 m = 2.0f * v;
 
                 test(m.size()==v.size() && m.dimension()==v.dimension()
@@ -8674,15 +8627,15 @@ void ViewTest::arithmeticOperatorsTest(){
             }
             {
                 int datav_[24];
-                for(size_t j=0; j<24; ++j) {
+                for(int j=0; j<24; ++j) {
                     datav_[j] = j;
                 }
                 std::vector<size_t> shape(3);
                 shape[0] = 2;
                 shape[1] = 4;
                 shape[2] = 3;
-                marray::View<int, true> v(shape.begin(), shape.end(), datav_);
-                marray::Marray<int> m = 2*v;
+                andres::View<int, true> v(shape.begin(), shape.end(), datav_);
+                andres::Marray<int> m = 2*v;
 
                 test(m.size()==v.size() && m.dimension()==v.dimension()
                 );
@@ -8703,8 +8656,8 @@ void ViewTest::arithmeticOperatorsTest(){
                 shape[0] = 2;
                 shape[1] = 4;
                 shape[2] = 3;
-                marray::View<float, true> v(shape.begin(), shape.end(), datav_);
-                marray::Marray<float> m = 2.0f * v;
+                andres::View<float, true> v(shape.begin(), shape.end(), datav_);
+                andres::Marray<float> m = 2.0f * v;
 
                 test(m.size()==v.size() && m.dimension()==v.dimension()
                 );
@@ -8728,9 +8681,9 @@ void ViewTest::arithmeticOperatorsTest(){
                 shape[0] = 2;
                 shape[1] = 4;
                 shape[2] = 3;
-                marray::View<int, true> v(shape.begin(), shape.end(), datav_);
-                marray::View<int, true> w(shape.begin(), shape.end(), dataw_);
-                marray::Marray<int> m = v*w;
+                andres::View<int, true> v(shape.begin(), shape.end(), datav_);
+                andres::View<int, true> w(shape.begin(), shape.end(), dataw_);
+                andres::Marray<int> m = v*w;
 
                 test(m.size()==v.size() &&  m.dimension()==v.dimension()
                 );
@@ -8740,8 +8693,8 @@ void ViewTest::arithmeticOperatorsTest(){
             }
             {
                 int scalar = 3;
-                marray::View<int, true> v(&scalar);
-                marray::Marray<int> m;
+                andres::View<int, true> v(&scalar);
+                andres::Marray<int> m;
                 m = v * v;
 
                 test(m.size()==v.size() &&  m.dimension()==v.dimension()
@@ -8757,8 +8710,8 @@ void ViewTest::arithmeticOperatorsTest(){
                 shape[0] = 2;
                 shape[1] = 4;
                 shape[2] = 3;
-                marray::View<int, true> v(shape.begin(), shape.end(), datav_);
-                marray::Marray<int> m = v * v;
+                andres::View<int, true> v(shape.begin(), shape.end(), datav_);
+                andres::Marray<int> m = v * v;
 
                 test(m.size()==v.size() &&  m.dimension()==v.dimension()
                 );
@@ -8782,8 +8735,8 @@ void ViewTest::arithmeticOperatorsTest(){
                 }
                 std::vector<size_t> shape(1);
                 shape[0] = 24;
-                marray::View<float> v(shape.begin(), shape.end(), datav_);
-                marray::View<float>& r = (v /= 2.0f);
+                andres::View<float> v(shape.begin(), shape.end(), datav_);
+                andres::View<float>& r = (v /= 2.0f);
                 
                 test(&r == &v
                 );
@@ -8795,10 +8748,10 @@ void ViewTest::arithmeticOperatorsTest(){
             {   
                 float scalar1 = 815.0f;
                 float scalar2 = 4711.0f;
-                marray::View<float> v(&scalar1);
-                marray::View<float, true> w(&scalar2);
+                andres::View<float> v(&scalar1);
+                andres::View<float, true> w(&scalar2);
 
-                marray::View<float>& r = (v /= w);
+                andres::View<float>& r = (v /= w);
                 test(&r == &v);
 
                 test(scalar1 == 815.0f / 4711.0f);
@@ -8811,11 +8764,11 @@ void ViewTest::arithmeticOperatorsTest(){
                 }
                 std::vector<size_t> shape(1);
                 shape[0] = 24;
-                marray::View<float> v(shape.begin(), shape.end(), datav_);
+                andres::View<float> v(shape.begin(), shape.end(), datav_);
                 float scalarw = 2.0f;
-                marray::View<float, true> w(&scalarw);
+                andres::View<float, true> w(&scalarw);
 
-                marray::View<float>& r = (v /= w);
+                andres::View<float>& r = (v /= w);
                 test(&r == &v);
                 for(size_t j=0; j<v.size(); ++j) {
                     test(v(j) == float(j) / scalarw);
@@ -8833,10 +8786,10 @@ void ViewTest::arithmeticOperatorsTest(){
                 shape[0] = 6;
                 std::vector<size_t> strides(1);
                 strides[0] = 4;
-                marray::View<float> v(shape.begin(), shape.end(), datav_, marray::LastMajorOrder);
-                marray::View<float, true> w(shape.begin(), shape.end(),
-                    strides.begin(), dataw_+1, marray::FirstMajorOrder);
-                marray::View<float>& r = (v /= w);
+                andres::View<float> v(shape.begin(), shape.end(), datav_, andres::LastMajorOrder);
+                andres::View<float, true> w(shape.begin(), shape.end(),
+                    strides.begin(), dataw_+1, andres::FirstMajorOrder);
+                andres::View<float>& r = (v /= w);
 
                 test(&r == &v);
                 int i = 1; 
@@ -8859,10 +8812,10 @@ void ViewTest::arithmeticOperatorsTest(){
                 shape[0] = 6;
                 std::vector<size_t> strides(1);
                 strides[0] = 4;
-                marray::View<float> v(shape.begin(), shape.end(),
-                    strides.begin(), datav_+1, marray::FirstMajorOrder);
-                marray::View<float, true> w(shape.begin(), shape.end(), dataw_, marray::LastMajorOrder);
-                marray::View<float>& r = (v /= w);
+                andres::View<float> v(shape.begin(), shape.end(),
+                    strides.begin(), datav_+1, andres::FirstMajorOrder);
+                andres::View<float, true> w(shape.begin(), shape.end(), dataw_, andres::LastMajorOrder);
+                andres::View<float>& r = (v /= w);
 
                 test(&r == &v);
                 int i = 1; 
@@ -8885,11 +8838,11 @@ void ViewTest::arithmeticOperatorsTest(){
                 shape[0] = 6;
                 std::vector<size_t> strides(1);
                 strides[0] = 4;
-                marray::View<float> v(shape.begin(), shape.end(),
-                    strides.begin(), datav_+1, marray::FirstMajorOrder);
-                marray::View<float, true> w(shape.begin(), shape.end(),
-                    strides.begin(), dataw_+1, marray::LastMajorOrder);
-                marray::View<float>& r = (v /= w);
+                andres::View<float> v(shape.begin(), shape.end(),
+                    strides.begin(), datav_+1, andres::FirstMajorOrder);
+                andres::View<float, true> w(shape.begin(), shape.end(),
+                    strides.begin(), dataw_+1, andres::LastMajorOrder);
+                andres::View<float>& r = (v /= w);
 
                 test(&r == &v);
                 for(int x = 0; x < 6; ++x){
@@ -8908,9 +8861,9 @@ void ViewTest::arithmeticOperatorsTest(){
                 }
                 std::vector<size_t> shape(1);
                 shape[0] = 24;
-                marray::View<int> v(shape.begin(), shape.end(), datav_);
-                marray::View<int, true> w(shape.begin(), shape.end(), dataw_);
-                marray::View<int>& r = (v /= w);
+                andres::View<int> v(shape.begin(), shape.end(), datav_);
+                andres::View<int, true> w(shape.begin(), shape.end(), dataw_);
+                andres::View<int>& r = (v /= w);
 
                 test(&r == &v);
                 for(size_t j=0; j<v.size(); ++j) {
@@ -8924,8 +8877,8 @@ void ViewTest::arithmeticOperatorsTest(){
                 }
                 std::vector<size_t> shape(1);
                 shape[0] = 24;
-                marray::View<int> v(shape.begin(), shape.end(), datav_);
-                marray::View<int>& r = (v /= v);
+                andres::View<int> v(shape.begin(), shape.end(), datav_);
+                andres::View<int>& r = (v /= v);
 
                 test(&r == &v
                 );
@@ -8943,9 +8896,9 @@ void ViewTest::arithmeticOperatorsTest(){
             {
                 int scalarv = 4;
                 int scalarw = 2;
-                marray::View<int, true> v(&scalarv);
-                marray::View<int, true> w(&scalarw);
-                marray::Marray<int> m;
+                andres::View<int, true> v(&scalarv);
+                andres::View<int, true> w(&scalarw);
+                andres::Marray<int> m;
                 m = v / w;
 
                 test(m.size()==v.size() && m.dimension()==v.dimension());
@@ -8954,9 +8907,9 @@ void ViewTest::arithmeticOperatorsTest(){
             {
                 float scalarv = 4.0f;
                 float scalarw = 2.0f;
-                marray::View<float, true> v(&scalarv);
-                marray::View<float, true> w(&scalarw);
-                marray::Marray<float> m;
+                andres::View<float, true> v(&scalarv);
+                andres::View<float, true> w(&scalarw);
+                andres::Marray<float> m;
                 m = v / w;
 
                 test(m.size()==v.size() && m.dimension()==v.dimension());
@@ -8965,8 +8918,8 @@ void ViewTest::arithmeticOperatorsTest(){
             // a View and variable
             {
                 float scalar = 1;
-                marray::View<float, true> v(&scalar);
-                marray::Marray<float> m;
+                andres::View<float, true> v(&scalar);
+                andres::Marray<float> m;
                 m = v / 2.0f;
 
                 test(m.size()==v.size() && m.dimension()==v.dimension()
@@ -8984,8 +8937,8 @@ void ViewTest::arithmeticOperatorsTest(){
                 shape[0] = 2;
                 shape[1] = 4;
                 shape[2] = 3;
-                marray::View<float, true> v(shape.begin(), shape.end(), datav_);
-                marray::Marray<float> m = v / 2.0f;
+                andres::View<float, true> v(shape.begin(), shape.end(), datav_);
+                andres::Marray<float> m = v / 2.0f;
 
                 test(m.size()==v.size() && m.dimension()==v.dimension()
                 );
@@ -9000,8 +8953,8 @@ void ViewTest::arithmeticOperatorsTest(){
             // variable and a View
             {
                 float scalar = 4.0f;
-                marray::View<float, true> v(&scalar);
-                marray::Marray<float> m;
+                andres::View<float, true> v(&scalar);
+                andres::Marray<float> m;
                 m = 2.0f / v;
 
                 test(m.size()==v.size() && m.dimension()==v.dimension()
@@ -9019,8 +8972,8 @@ void ViewTest::arithmeticOperatorsTest(){
                 shape[0] = 2;
                 shape[1] = 4;
                 shape[2] = 3;
-                marray::View<float, true> v(shape.begin(), shape.end(), datav_);
-                marray::Marray<float> m = 2.0f / v;
+                andres::View<float, true> v(shape.begin(), shape.end(), datav_);
+                andres::Marray<float> m = 2.0f / v;
 
                 test(m.size()==v.size() && m.dimension()==v.dimension()
                 );
@@ -9044,9 +8997,9 @@ void ViewTest::arithmeticOperatorsTest(){
                 shape[0] = 2;
                 shape[1] = 4;
                 shape[2] = 3;
-                marray::View<int, true> v(shape.begin(), shape.end(), datav_);
-                marray::View<int, true> w(shape.begin(), shape.end(), dataw_);
-                marray::Marray<int> m = v / w;
+                andres::View<int, true> v(shape.begin(), shape.end(), datav_);
+                andres::View<int, true> w(shape.begin(), shape.end(), dataw_);
+                andres::Marray<int> m = v / w;
 
                 test(m.size()==v.size() &&  m.dimension()==v.dimension()
                 );
@@ -9056,8 +9009,8 @@ void ViewTest::arithmeticOperatorsTest(){
             }
             {
                 int scalar = 3;
-                marray::View<int, true> v(&scalar);
-                marray::Marray<int> m;
+                andres::View<int, true> v(&scalar);
+                andres::Marray<int> m;
                 m = v / v;
 
                 test(m.size()==v.size() &&  m.dimension()==v.dimension()
@@ -9073,8 +9026,8 @@ void ViewTest::arithmeticOperatorsTest(){
                 shape[0] = 2;
                 shape[1] = 4;
                 shape[2] = 3;
-                marray::View<int, true> v(shape.begin(), shape.end(), datav_);
-                marray::Marray<int> m = v / v;
+                andres::View<int, true> v(shape.begin(), shape.end(), datav_);
+                andres::Marray<int> m = v / v;
 
                 test(m.size()==v.size() &&  m.dimension()==v.dimension()
                 );
@@ -9092,14 +9045,14 @@ void ViewTest::asStringTest()
     {
         size_t shape[3] = {3, 2, 4};
 
-        marray::View<int, constTarget> v(&shape[0], &shape[3], data_);
+        andres::View<int, constTarget> v(&shape[0], &shape[3], data_);
         std::stringstream s;
-        s << v.asString(marray::MatrixStyle);
-        s << v.asString(marray::TableStyle);
+        s << v.asString(andres::MatrixStyle);
+        s << v.asString(andres::TableStyle);
 
-        const marray::View<int, constTarget> w(&shape[0], &shape[3], data_);
-        s << w.asString(marray::MatrixStyle);
-        s << w.asString(marray::TableStyle);
+        const andres::View<int, constTarget> w(&shape[0], &shape[3], data_);
+        s << w.asString(andres::MatrixStyle);
+        s << w.asString(andres::TableStyle);
     }
 }
 
@@ -9110,8 +9063,8 @@ void ViewTest::reshapeTest()
         data[j] = static_cast<float>(j);
     }
     size_t shape[] = {2, 4, 3};
-    marray::View<float, false> v(&shape[0], &shape[3], data);
-    marray::View<float, false> w = v; // copy
+    andres::View<float, false> v(&shape[0], &shape[3], data);
+    andres::View<float, false> w = v; // copy
     
     size_t newShape[] = {4, 6};
     v.reshape(&newShape[0], &newShape[2]);
@@ -9126,12 +9079,12 @@ void ViewTest::reshapeTest()
         test(v(j) == w(j));
     }
 
-    if(!marray::MARRAY_NO_DEBUG) {
+    if(!andres::MARRAY_NO_DEBUG) {
         // negative test
         size_t base[] = {0, 1, 1};
         size_t shape[] = {2, 3, 2};
         size_t newShape[] = {3, 4};
-        marray::View<float, false> x = v.view(base, shape);
+        andres::View<float, false> x = v.view(base, shape);
         try {
             x.reshape(&newShape[0], &newShape[2]);
             test(0 == 1); // reshape should have thrown runtime_error
@@ -9143,13 +9096,15 @@ void ViewTest::reshapeTest()
 void ViewTest::overlapTreatmentTest()
 {
     {
-        marray::Matrix<int> m(3, 3, 0);
+        size_t shape[] = {3, 3};
+        andres::Marray<int> m(shape, shape + 2, 0);
         m(0, 0) = 1; m(0, 1) = 2; m(1, 0) = 3; m(1, 1) = 4;
         size_t base[] = {0, 0};
-        size_t shape[] = {2, 2};
-        marray::View<int> v = m.view(base, shape);
+        shape[0] = 2;
+        shape[1] = 2;
+        andres::View<int> v = m.view(base, shape);
         base[0] = 1; base[1] = 1;
-        marray::View<int> w = m.view(base, shape);
+        andres::View<int> w = m.view(base, shape);
 
         w = v;
 
@@ -9157,14 +9112,16 @@ void ViewTest::overlapTreatmentTest()
         test(w(0, 0) == 1 && w(0, 1) == 2 && w(1, 0) == 3 && w(1, 1) == 4);
     }
     {
-        marray::Matrix<int> m(3, 3, 0);
+        size_t shape[] = {3, 3};
+        andres::Marray<int> m(shape, shape + 2, 0);
         m(0, 0) = 1; m(0, 1) = 2; m(1, 0) = 3; m(1, 1) = 4;
-        marray::Matrix<int> n = m;
+        andres::Marray<int> n = m;
         size_t base[] = {0, 0};
-        size_t shape[] = {2, 2};
-        marray::View<int> v = m.view(base, shape);
+        shape[0] = 2;
+        shape[1] = 2;
+        andres::View<int> v = m.view(base, shape);
         base[0] = 1; base[1] = 1;
-        marray::View<int> w = m.view(base, shape);
+        andres::View<int> w = m.view(base, shape);
 
         w += v;
 
@@ -9175,14 +9132,16 @@ void ViewTest::overlapTreatmentTest()
                && w(1, 1) == n(2, 2)+n(1, 1) );
     }
     {
-        marray::Matrix<int> m(3, 3, 0);
+        size_t shape[] = {3, 3};
+        andres::Marray<int> m(shape, shape + 2, 0);
         m(0, 0) = 1; m(0, 1) = 2; m(1, 0) = 3; m(1, 1) = 4;
-        marray::Matrix<int> n = m;
+        andres::Marray<int> n = m;
         size_t base[] = {0, 0};
-        size_t shape[] = {2, 2};
-        marray::View<int> v = m.view(base, shape);
+        shape[0] = 2;
+        shape[1] = 2;
+        andres::View<int> v = m.view(base, shape);
         base[0] = 1; base[1] = 1;
-        marray::View<int> w = m.view(base, shape);
+        andres::View<int> w = m.view(base, shape);
 
         w -= v;
 
@@ -9193,14 +9152,16 @@ void ViewTest::overlapTreatmentTest()
                && w(1, 1) == n(2, 2)-n(1, 1) );
     }
     {
-        marray::Matrix<int> m(3, 3, 1);
+        size_t shape[] = {3, 3};
+        andres::Marray<int> m(shape, shape + 2, 1);
         m(0, 0) = 2; m(0, 1) = 3; m(1, 0) = 4; m(1, 1) = 5;
-        marray::Matrix<int> n = m;
+        andres::Marray<int> n = m;
         size_t base[] = {0, 0};
-        size_t shape[] = {2, 2};
-        marray::View<int> v = m.view(base, shape);
+        shape[0] = 2;
+        shape[1] = 2;
+        andres::View<int> v = m.view(base, shape);
         base[0] = 1; base[1] = 1;
-        marray::View<int> w = m.view(base, shape);
+        andres::View<int> w = m.view(base, shape);
 
         w *= v;
 
@@ -9211,14 +9172,16 @@ void ViewTest::overlapTreatmentTest()
                && w(1, 1) == n(2, 2)*n(1, 1) );
     }
     {
-        marray::Matrix<float> m(3, 3, 1);
+        size_t shape[] = {3, 3};
+        andres::Marray<float> m(shape, shape + 2, 1);
         m(0, 0) = 2; m(0, 1) = 4; m(1, 0) = 8; m(1, 1) = 16;
-        marray::Matrix<float> n = m;
+        andres::Marray<float> n = m;
         size_t base[] = {0, 0};
-        size_t shape[] = {2, 2};
-        marray::View<float> v = m.view(base, shape);
+        shape[0] = 2;
+        shape[1] = 2;
+        andres::View<float> v = m.view(base, shape);
         base[0] = 1; base[1] = 1;
-        marray::View<float> w = m.view(base, shape);
+        andres::View<float> w = m.view(base, shape);
 
         w /= v;
 
@@ -9236,10 +9199,10 @@ void ViewTest::compatibilityFunctionsTest()
     // permuteDimensions
     {
         size_t shape[] = {2, 4, 3}; 
-        marray::Marray<float> m(&shape[0], &shape[3]);
+        andres::Marray<float> m(&shape[0], &shape[3]);
         size_t perm[] = {0, 2, 1};
-        marray::View<float> v = m.permuteDimensions(perm);
-        marray::View<float> w = m.permutedView(perm);
+        andres::View<float> v = m.permuteDimensions(perm);
+        andres::View<float> w = m.permutedView(perm);
         
         test(v.dimension() == w.dimension());
         for(size_t j=0; j<v.dimension(); ++j) {
@@ -9253,9 +9216,9 @@ void ViewTest::compatibilityFunctionsTest()
     // shiftDimensions
     {
         size_t shape[] = {2, 4, 3}; 
-        marray::Marray<float> m(&shape[0], &shape[3]);
-        marray::View<float> v = m.shiftDimensions(2);
-        marray::View<float> w = m.shiftedView(2);
+        andres::Marray<float> m(&shape[0], &shape[3]);
+        andres::View<float> v = m.shiftDimensions(2);
+        andres::View<float> w = m.shiftedView(2);
         test(v.dimension() == w.dimension());
         for(size_t j=0; j<v.dimension(); ++j) {
             test(v.shape(j) == w.shape(j));
@@ -9268,12 +9231,12 @@ void ViewTest::compatibilityFunctionsTest()
     // subarray
     {
         size_t shape[] = {2, 4, 3}; 
-        marray::Marray<float> m(&shape[0], &shape[3]);
+        andres::Marray<float> m(&shape[0], &shape[3]);
         size_t b[] = {0, 2, 1};
         size_t s[] = {2, 1, 2};
-        marray::View<float> v = m.view(b, s);
+        andres::View<float> v = m.view(b, s);
         size_t e[] = {2, 3, 3};
-        marray::View<float> w = m.subarray(b, e);
+        andres::View<float> w = m.subarray(b, e);
         test(v.dimension() == w.dimension());
         for(size_t j=0; j<v.dimension(); ++j) {
             test(v.shape(j) == w.shape(j));
@@ -9287,7 +9250,7 @@ void ViewTest::compatibilityFunctionsTest()
 }
 
 IteratorTest::IteratorTest() {
-    for(size_t j=0; j<24; ++j) {
+    for(int j=0; j<24; ++j) {
         data_[j] = j*2;
     }
 }
@@ -9296,7 +9259,7 @@ template<bool constTarget>
 void IteratorTest::constructorTest(){
     // empty
     {
-        marray::Iterator<int, constTarget> it;
+        andres::Iterator<int, constTarget> it;
         test(it.index() == 0);
     }
     // view and index
@@ -9304,22 +9267,22 @@ void IteratorTest::constructorTest(){
         // scalar
         {
             int scalar = 42;
-            marray::View<int, constTarget> v(&scalar);
-            marray::Iterator<int, constTarget> it(v, 0);
+            andres::View<int, constTarget> v(&scalar);
+            andres::Iterator<int, constTarget> it(v, 0);
             
             test(*it == v(0));
         }
         {
             int scalar = 42;
-            const marray::View<int, true> v(&scalar);
-            marray::Iterator<int, true> it(v, 0);
+            const andres::View<int, true> v(&scalar);
+            andres::Iterator<int, true> it(v, 0);
             
             test(*it == v(0));
         }
         {
             int scalar = 42;
-            marray::View<int, false> v(&scalar);
-            marray::Iterator<int, true> it(v, 0);
+            andres::View<int, false> v(&scalar);
+            andres::Iterator<int, true> it(v, 0);
             
             test(*it == v(0));
         }
@@ -9329,8 +9292,8 @@ void IteratorTest::constructorTest(){
             {
                 std::vector<size_t> shape(1);
                 shape[0] = 24;
-                marray::View<int, constTarget> v(shape.begin(), shape.end(), data_);
-                marray::Iterator<int, constTarget> it(v, 0);
+                andres::View<int, constTarget> v(shape.begin(), shape.end(), data_);
+                andres::Iterator<int, constTarget> it(v, 0);
                 
                 for(size_t j = 0; j < 24; ++j){
                     test(*it == data_[j]);
@@ -9342,8 +9305,8 @@ void IteratorTest::constructorTest(){
             {
                 std::vector<size_t> shape(1);
                 shape[0] = 24;
-                const marray::View<int, true> v(shape.begin(), shape.end(), data_);
-                marray::Iterator<int, true> it(v, 0);
+                const andres::View<int, true> v(shape.begin(), shape.end(), data_);
+                andres::Iterator<int, true> it(v, 0);
                 
                 for(size_t j = 0; j < 24; ++j){
                     test(*it == data_[j]);
@@ -9355,8 +9318,8 @@ void IteratorTest::constructorTest(){
             {
                 std::vector<size_t> shape(1);
                 shape[0] = 24;
-                marray::View<int, false> v(shape.begin(), shape.end(), data_);
-                marray::Iterator<int, true> it(v, 0);
+                andres::View<int, false> v(shape.begin(), shape.end(), data_);
+                andres::Iterator<int, true> it(v, 0);
                 
                 for(size_t j = 0; j < 24; ++j){
                     test(*it == data_[j]);
@@ -9369,8 +9332,8 @@ void IteratorTest::constructorTest(){
             {
                 std::vector<size_t> shape(1);
                 shape[0] = 24;
-                marray::View<int, constTarget> v(shape.begin(), shape.end(), data_);
-                marray::Iterator<int, constTarget> it(v, 12);
+                andres::View<int, constTarget> v(shape.begin(), shape.end(), data_);
+                andres::Iterator<int, constTarget> it(v, 12);
                 
                 test(it.index() == 12
                 );
@@ -9384,8 +9347,8 @@ void IteratorTest::constructorTest(){
             {
                 std::vector<size_t> shape(1);
                 shape[0] = 24;
-                const marray::View<int, true> v(shape.begin(), shape.end(), data_);
-                marray::Iterator<int, true> it(v, 12);
+                const andres::View<int, true> v(shape.begin(), shape.end(), data_);
+                andres::Iterator<int, true> it(v, 12);
                 
                 test(it.index() == 12
                 );
@@ -9399,8 +9362,8 @@ void IteratorTest::constructorTest(){
             {
                 std::vector<size_t> shape(1);
                 shape[0] = 24;
-                marray::View<int, false> v(shape.begin(), shape.end(), data_);
-                marray::Iterator<int, true> it(v, 12);
+                andres::View<int, false> v(shape.begin(), shape.end(), data_);
+                andres::Iterator<int, true> it(v, 12);
                 
                 test(it.index() == 12
                 );
@@ -9419,8 +9382,8 @@ void IteratorTest::constructorTest(){
                 std::vector<size_t> shape(2);
                 shape[0] = 6;
                 shape[1] = 4;
-                marray::View<int, constTarget> v(shape.begin(), shape.end(), data_);
-                marray::Iterator<int, constTarget> it(v, 0);
+                andres::View<int, constTarget> v(shape.begin(), shape.end(), data_);
+                andres::Iterator<int, constTarget> it(v, 0);
                 
                 for(size_t j = 0; j < 24; ++j){
                     test(*it == data_[j]);
@@ -9433,8 +9396,8 @@ void IteratorTest::constructorTest(){
                 std::vector<size_t> shape(2);
                 shape[0] = 6;
                 shape[1] = 4;
-                const marray::View<int, true> v(shape.begin(), shape.end(), data_);
-                marray::Iterator<int, true> it(v, 0);
+                const andres::View<int, true> v(shape.begin(), shape.end(), data_);
+                andres::Iterator<int, true> it(v, 0);
                 
                 for(size_t j = 0; j < 24; ++j){
                     test(*it == data_[j]);
@@ -9447,8 +9410,8 @@ void IteratorTest::constructorTest(){
                 std::vector<size_t> shape(2);
                 shape[0] = 6;
                 shape[1] = 4;
-                marray::View<int, false> v(shape.begin(), shape.end(), data_);
-                marray::Iterator<int, true> it(v, 0);
+                andres::View<int, false> v(shape.begin(), shape.end(), data_);
+                andres::Iterator<int, true> it(v, 0);
                 
                 for(size_t j = 0; j < 24; ++j){
                     test(*it == data_[j]);
@@ -9462,8 +9425,8 @@ void IteratorTest::constructorTest(){
                 std::vector<size_t> shape(2);
                 shape[0] = 6;
                 shape[1] = 4;
-                marray::View<int, constTarget> v(shape.begin(), shape.end(), data_);
-                marray::Iterator<int, constTarget> it(v, 12);
+                andres::View<int, constTarget> v(shape.begin(), shape.end(), data_);
+                andres::Iterator<int, constTarget> it(v, 12);
                 
                 test(it.index() == 12);
                 for(size_t j = 12; j < 24; ++j){
@@ -9477,8 +9440,8 @@ void IteratorTest::constructorTest(){
                 std::vector<size_t> shape(2);
                 shape[0] = 6;
                 shape[1] = 4;
-                const marray::View<int, true> v(shape.begin(), shape.end(), data_);
-                marray::Iterator<int, true> it(v, 12);
+                const andres::View<int, true> v(shape.begin(), shape.end(), data_);
+                andres::Iterator<int, true> it(v, 12);
                 
                 test(it.index() == 12);
                 for(size_t j = 12; j < 24; ++j){
@@ -9492,8 +9455,8 @@ void IteratorTest::constructorTest(){
                 std::vector<size_t> shape(2);
                 shape[0] = 6;
                 shape[1] = 4;
-                marray::View<int, false> v(shape.begin(), shape.end(), data_);
-                marray::Iterator<int, true> it(v, 12);
+                andres::View<int, false> v(shape.begin(), shape.end(), data_);
+                andres::Iterator<int, true> it(v, 12);
                 
                 test(it.index() == 12);
                 for(size_t j = 12; j < 24; ++j){
@@ -9512,8 +9475,8 @@ void IteratorTest::constructorTest(){
                 shape[0] = 3;
                 shape[1] = 4;
                 shape[2] = 2;
-                marray::View<int, constTarget> v(shape.begin(), shape.end(), data_);
-                marray::Iterator<int, constTarget> it(v, 0);
+                andres::View<int, constTarget> v(shape.begin(), shape.end(), data_);
+                andres::Iterator<int, constTarget> it(v, 0);
                 
                 for(size_t j = 0; j < 24; ++j){
                     test(*it == data_[j]);
@@ -9527,8 +9490,8 @@ void IteratorTest::constructorTest(){
                 shape[0] = 3;
                 shape[1] = 4;
                 shape[2] = 2;
-                const marray::View<int, true> v(shape.begin(), shape.end(), data_);
-                marray::Iterator<int, true> it(v, 0);
+                const andres::View<int, true> v(shape.begin(), shape.end(), data_);
+                andres::Iterator<int, true> it(v, 0);
                 
                 for(size_t j = 0; j < 24; ++j){
                     test(*it == data_[j]);
@@ -9542,8 +9505,8 @@ void IteratorTest::constructorTest(){
                 shape[0] = 3;
                 shape[1] = 4;
                 shape[2] = 2;
-                marray::View<int, false> v(shape.begin(), shape.end(), data_);
-                marray::Iterator<int, true> it(v, 0);
+                andres::View<int, false> v(shape.begin(), shape.end(), data_);
+                andres::Iterator<int, true> it(v, 0);
                 
                 for(size_t j = 0; j < 24; ++j){
                     test(*it == data_[j]);
@@ -9558,8 +9521,8 @@ void IteratorTest::constructorTest(){
                 shape[0] = 3;
                 shape[1] = 4;
                 shape[2] = 2;
-                marray::View<int, constTarget> v(shape.begin(), shape.end(), data_);
-                marray::Iterator<int, constTarget> it(v, 12);
+                andres::View<int, constTarget> v(shape.begin(), shape.end(), data_);
+                andres::Iterator<int, constTarget> it(v, 12);
                 
                 test(it.index() == 12);
                 for(size_t j = 12; j < 24; ++j){
@@ -9574,8 +9537,8 @@ void IteratorTest::constructorTest(){
                 shape[0] = 3;
                 shape[1] = 4;
                 shape[2] = 2;
-                const marray::View<int, true> v(shape.begin(), shape.end(), data_);
-                marray::Iterator<int, true> it(v, 12);
+                const andres::View<int, true> v(shape.begin(), shape.end(), data_);
+                andres::Iterator<int, true> it(v, 12);
                 
                 test(it.index() == 12);
                 for(size_t j = 12; j < 24; ++j){
@@ -9590,8 +9553,8 @@ void IteratorTest::constructorTest(){
                 shape[0] = 3;
                 shape[1] = 4;
                 shape[2] = 2;
-                marray::View<int, false> v(shape.begin(), shape.end(), data_);
-                marray::Iterator<int, true> it(v, 12);
+                andres::View<int, false> v(shape.begin(), shape.end(), data_);
+                andres::Iterator<int, true> it(v, 12);
                 
                 test(it.index() == 12);
                 for(size_t j = 12; j < 24; ++j){
@@ -9607,10 +9570,10 @@ void IteratorTest::constructorTest(){
     {
         std::vector<size_t> shape(1);
         shape[0] = 24;
-        marray::View<int, false> v(shape.begin(), shape.end(), data_);
-        marray::Iterator<int, false> it;
+        andres::View<int, false> v(shape.begin(), shape.end(), data_);
+        andres::Iterator<int, false> it;
         it = v.begin();
-        marray::Iterator<int, true> itc(it);
+        andres::Iterator<int, true> itc(it);
 
         for(int i = 0; i < 24; ++i){
             test(*itc == data_[i]);
@@ -9627,8 +9590,8 @@ void IteratorTest::accessIteratorOperations() {
     {
         std::vector<size_t> shape(1);
         shape[0] = 24;
-        marray::View<int, constTarget> v(shape.begin(), shape.end(), data_);
-        marray::Iterator<int, constTarget> it;
+        andres::View<int, constTarget> v(shape.begin(), shape.end(), data_);
+        andres::Iterator<int, constTarget> it;
         it = v.begin();
         
         for(int i = 0; i < 24; ++i){
@@ -9641,8 +9604,8 @@ void IteratorTest::accessIteratorOperations() {
     {
         std::vector<size_t> shape(1);
         shape[0] = 24;
-        const marray::View<int, true> v(shape.begin(), shape.end(), data_);
-        marray::Iterator<int, true> it;
+        const andres::View<int, true> v(shape.begin(), shape.end(), data_);
+        andres::Iterator<int, true> it;
         it = v.begin();
         
         for(int i = 0; i < 24; ++i){
@@ -9655,8 +9618,8 @@ void IteratorTest::accessIteratorOperations() {
     {
         std::vector<size_t> shape(1);
         shape[0] = 24;
-        marray::View<int, false> v(shape.begin(), shape.end(), data_);
-        marray::Iterator<int, true> it;
+        andres::View<int, false> v(shape.begin(), shape.end(), data_);
+        andres::Iterator<int, true> it;
         it = v.begin();
         
         for(int i = 0; i < 24; ++i){
@@ -9674,9 +9637,9 @@ void IteratorTest::accessIteratorOperations() {
         }
         std::vector<size_t> shape(1);
         shape[0] = 24;
-        marray::View<TestType, constTarget> v(shape.begin(),
+        andres::View<TestType, constTarget> v(shape.begin(),
             shape.end(), &data[0]);
-        marray::Iterator<TestType, constTarget> it = v.begin();
+        andres::Iterator<TestType, constTarget> it = v.begin();
         for(size_t j=0; j<24; ++j) {
             test(it->data_ == j);
             ++it;
@@ -9689,9 +9652,9 @@ void IteratorTest::accessIteratorOperations() {
         }
         std::vector<size_t> shape(1);
         shape[0] = 24;
-        const marray::View<TestType, true> v(shape.begin(),
+        const andres::View<TestType, true> v(shape.begin(),
             shape.end(), &data[0]);
-        marray::Iterator<TestType, true> it = v.begin();
+        andres::Iterator<TestType, true> it = v.begin();
         for(size_t j=0; j<24; ++j) {
             test(it->data_ == j);
             ++it;
@@ -9704,9 +9667,9 @@ void IteratorTest::accessIteratorOperations() {
         }
         std::vector<size_t> shape(1);
         shape[0] = 24;
-        marray::View<TestType, false> v(shape.begin(),
+        andres::View<TestType, false> v(shape.begin(),
             shape.end(), &data[0]);
-        marray::Iterator<TestType, true> it = v.begin();
+        andres::Iterator<TestType, true> it = v.begin();
         for(size_t j=0; j<24; ++j) {
             test(it->data_ == j);
             ++it;
@@ -9716,8 +9679,8 @@ void IteratorTest::accessIteratorOperations() {
     {
         std::vector<size_t> shape(1);
         shape[0] = 24;
-        marray::View<int, constTarget> v(shape.begin(), shape.end(), data_);
-        marray::Iterator<int, constTarget> it;
+        andres::View<int, constTarget> v(shape.begin(), shape.end(), data_);
+        andres::Iterator<int, constTarget> it;
         it = v.begin();
 
         for(int i = 0; i < 24; ++i){
@@ -9730,8 +9693,8 @@ void IteratorTest::accessIteratorOperations() {
     {
         std::vector<size_t> shape(1);
         shape[0] = 24;
-        const marray::View<int, true> v(shape.begin(), shape.end(), data_);
-        marray::Iterator<int, true> it;
+        const andres::View<int, true> v(shape.begin(), shape.end(), data_);
+        andres::Iterator<int, true> it;
         it = v.begin();
 
         for(int i = 0; i < 24; ++i){
@@ -9744,8 +9707,8 @@ void IteratorTest::accessIteratorOperations() {
     {
         std::vector<size_t> shape(1);
         shape[0] = 24;
-        marray::View<int, false> v(shape.begin(), shape.end(), data_);
-        marray::Iterator<int, true> it;
+        andres::View<int, false> v(shape.begin(), shape.end(), data_);
+        andres::Iterator<int, true> it;
         it = v.begin();
 
         for(int i = 0; i < 24; ++i){
@@ -9763,8 +9726,8 @@ void IteratorTest::arithmeticOperatorsTest(){
     {
         std::vector<size_t> shape(1);
         shape[0] = 24;
-        marray::View<int, constTarget> v(shape.begin(), shape.end(), data_);
-        marray::Iterator<int, constTarget> it;
+        andres::View<int, constTarget> v(shape.begin(), shape.end(), data_);
+        andres::Iterator<int, constTarget> it;
         it = v.begin();
         
         for(int i = 0; i < 24; ++i){
@@ -9777,8 +9740,8 @@ void IteratorTest::arithmeticOperatorsTest(){
     {
         std::vector<size_t> shape(1);
         shape[0] = 24;
-        const marray::View<int, true> v(shape.begin(), shape.end(), data_);
-        marray::Iterator<int, true> it;
+        const andres::View<int, true> v(shape.begin(), shape.end(), data_);
+        andres::Iterator<int, true> it;
         it = v.begin();
         
         for(int i = 0; i < 24; ++i){
@@ -9791,8 +9754,8 @@ void IteratorTest::arithmeticOperatorsTest(){
     {
         std::vector<size_t> shape(1);
         shape[0] = 24;
-        marray::View<int, false> v(shape.begin(), shape.end(), data_);
-        marray::Iterator<int, true> it;
+        andres::View<int, false> v(shape.begin(), shape.end(), data_);
+        andres::Iterator<int, true> it;
         it = v.begin();
         
         for(int i = 0; i < 24; ++i){
@@ -9806,8 +9769,8 @@ void IteratorTest::arithmeticOperatorsTest(){
     {
         std::vector<size_t> shape(1);
         shape[0] = 24;
-        marray::View<int, constTarget> v(shape.begin(), shape.end(), data_);
-        marray::Iterator<int, constTarget> it;
+        andres::View<int, constTarget> v(shape.begin(), shape.end(), data_);
+        andres::Iterator<int, constTarget> it;
         it = v.end();
 
         
@@ -9821,8 +9784,8 @@ void IteratorTest::arithmeticOperatorsTest(){
     {
         std::vector<size_t> shape(1);
         shape[0] = 24;
-        const marray::View<int, true> v(shape.begin(), shape.end(), data_);
-        marray::Iterator<int, true> it;
+        const andres::View<int, true> v(shape.begin(), shape.end(), data_);
+        andres::Iterator<int, true> it;
         it = v.end();
         
         for(int i = 23; i >= 0; --i){
@@ -9835,8 +9798,8 @@ void IteratorTest::arithmeticOperatorsTest(){
     {
         std::vector<size_t> shape(1);
         shape[0] = 24;
-        marray::View<int, false> v(shape.begin(), shape.end(), data_);
-        marray::Iterator<int, true> it;
+        andres::View<int, false> v(shape.begin(), shape.end(), data_);
+        andres::Iterator<int, true> it;
         it = v.end();
         
         for(int i = 23; i >= 0; --i){
@@ -9850,8 +9813,8 @@ void IteratorTest::arithmeticOperatorsTest(){
     {
         std::vector<size_t> shape(1);
         shape[0] = 24;
-        marray::View<int, constTarget> v(shape.begin(), shape.end(), data_);
-        marray::Iterator<int, constTarget> it;
+        andres::View<int, constTarget> v(shape.begin(), shape.end(), data_);
+        andres::Iterator<int, constTarget> it;
         it = v.begin();
         
         for(int i = 0; i < 24; ++i){
@@ -9864,8 +9827,8 @@ void IteratorTest::arithmeticOperatorsTest(){
     {
         std::vector<size_t> shape(1);
         shape[0] = 24;
-        const marray::View<int, true> v(shape.begin(), shape.end(), data_);
-        marray::Iterator<int, true> it;
+        const andres::View<int, true> v(shape.begin(), shape.end(), data_);
+        andres::Iterator<int, true> it;
         it = v.begin();
         
         for(int i = 0; i < 24; ++i){
@@ -9878,8 +9841,8 @@ void IteratorTest::arithmeticOperatorsTest(){
     {
         std::vector<size_t> shape(1);
         shape[0] = 24;
-        marray::View<int, false> v(shape.begin(), shape.end(), data_);
-        marray::Iterator<int, true> it;
+        andres::View<int, false> v(shape.begin(), shape.end(), data_);
+        andres::Iterator<int, true> it;
         it = v.begin();
         
         for(int i = 0; i < 24; ++i){
@@ -9893,8 +9856,8 @@ void IteratorTest::arithmeticOperatorsTest(){
     {
         std::vector<size_t> shape(1);
         shape[0] = 24;
-        marray::View<int, constTarget> v(shape.begin(), shape.end(), data_);
-        marray::Iterator<int, constTarget> it;
+        andres::View<int, constTarget> v(shape.begin(), shape.end(), data_);
+        andres::Iterator<int, constTarget> it;
         it = v.end();
         
         for(int i = 23; i >= 0; --i){
@@ -9907,8 +9870,8 @@ void IteratorTest::arithmeticOperatorsTest(){
     {
         std::vector<size_t> shape(1);
         shape[0] = 24;
-        const marray::View<int, true> v(shape.begin(), shape.end(), data_);
-        marray::Iterator<int, true> it;
+        const andres::View<int, true> v(shape.begin(), shape.end(), data_);
+        andres::Iterator<int, true> it;
         it = v.end();
         
         for(int i = 23; i >= 0; --i){
@@ -9921,8 +9884,8 @@ void IteratorTest::arithmeticOperatorsTest(){
     {
         std::vector<size_t> shape(1);
         shape[0] = 24;
-        marray::View<int, false> v(shape.begin(), shape.end(), data_);
-        marray::Iterator<int, true> it;
+        andres::View<int, false> v(shape.begin(), shape.end(), data_);
+        andres::Iterator<int, true> it;
         it = v.end();
         
         for(int i = 23; i >= 0; --i){
@@ -9936,8 +9899,8 @@ void IteratorTest::arithmeticOperatorsTest(){
     {
         std::vector<size_t> shape(1);
         shape[0] = 24;
-        marray::View<int, constTarget> v(shape.begin(), shape.end(), data_);
-        marray::Iterator<int, constTarget> it;
+        andres::View<int, constTarget> v(shape.begin(), shape.end(), data_);
+        andres::Iterator<int, constTarget> it;
         it = v.begin();
         
         for(int i = 0; i < 24; ++i){
@@ -9950,8 +9913,8 @@ void IteratorTest::arithmeticOperatorsTest(){
     {
         std::vector<size_t> shape(1);
         shape[0] = 24;
-        const marray::View<int, true> v(shape.begin(), shape.end(), data_);
-        marray::Iterator<int, true> it;
+        const andres::View<int, true> v(shape.begin(), shape.end(), data_);
+        andres::Iterator<int, true> it;
         it = v.begin();
         
         for(int i = 0; i < 24; ++i){
@@ -9964,8 +9927,8 @@ void IteratorTest::arithmeticOperatorsTest(){
     {
         std::vector<size_t> shape(1);
         shape[0] = 24;
-        marray::View<int, false> v(shape.begin(), shape.end(), data_);
-        marray::Iterator<int, true> it;
+        andres::View<int, false> v(shape.begin(), shape.end(), data_);
+        andres::Iterator<int, true> it;
         it = v.begin();
         
         for(int i = 0; i < 24; ++i){
@@ -9979,8 +9942,8 @@ void IteratorTest::arithmeticOperatorsTest(){
     {
         std::vector<size_t> shape(1);
         shape[0] = 24;
-        marray::View<int, constTarget> v(shape.begin(), shape.end(), data_);
-        marray::Iterator<int, constTarget> it;
+        andres::View<int, constTarget> v(shape.begin(), shape.end(), data_);
+        andres::Iterator<int, constTarget> it;
         it = v.end();
         
         for(int i = 23; i >= 0; --i){
@@ -9993,8 +9956,8 @@ void IteratorTest::arithmeticOperatorsTest(){
     {
         std::vector<size_t> shape(1);
         shape[0] = 24;
-        const marray::View<int, true> v(shape.begin(), shape.end(), data_);
-        marray::Iterator<int, true> it;
+        const andres::View<int, true> v(shape.begin(), shape.end(), data_);
+        andres::Iterator<int, true> it;
         it = v.end();
         
         for(int i = 23; i >= 0; --i){
@@ -10007,8 +9970,8 @@ void IteratorTest::arithmeticOperatorsTest(){
     {
         std::vector<size_t> shape(1);
         shape[0] = 24;
-        marray::View<int, false> v(shape.begin(), shape.end(), data_);
-        marray::Iterator<int, true> it;
+        andres::View<int, false> v(shape.begin(), shape.end(), data_);
+        andres::Iterator<int, true> it;
         it = v.end();
         
         for(int i = 23; i >= 0; --i){
@@ -10026,9 +9989,9 @@ void IteratorTest::comparisonOperators(){
     {
         std::vector<size_t> shape(1);
         shape[0] = 24;
-        marray::View<int, constTarget> v(shape.begin(), shape.end(), data_);
-        marray::Iterator<int, constTarget> it1;
-        marray::Iterator<int, constTarget> it2;
+        andres::View<int, constTarget> v(shape.begin(), shape.end(), data_);
+        andres::Iterator<int, constTarget> it1;
+        andres::Iterator<int, constTarget> it2;
         it1 = v.begin();
         it2 = v.begin();
 
@@ -10052,9 +10015,9 @@ void IteratorTest::comparisonOperators(){
     {
         std::vector<size_t> shape(1);
         shape[0] = 24;
-        const marray::View<int, true> v(shape.begin(), shape.end(), data_);
-        marray::Iterator<int, true> it1;
-        marray::Iterator<int, true> it2;
+        const andres::View<int, true> v(shape.begin(), shape.end(), data_);
+        andres::Iterator<int, true> it1;
+        andres::Iterator<int, true> it2;
         it1 = v.begin();
         it2 = v.begin();
 
@@ -10078,9 +10041,9 @@ void IteratorTest::comparisonOperators(){
     {
         std::vector<size_t> shape(1);
         shape[0] = 24;
-        marray::View<int, false> v(shape.begin(), shape.end(), data_);
-        marray::Iterator<int, true> it1;
-        marray::Iterator<int, true> it2;
+        andres::View<int, false> v(shape.begin(), shape.end(), data_);
+        andres::Iterator<int, true> it1;
+        andres::Iterator<int, true> it2;
         it1 = v.begin();
         it2 = v.begin();
 
@@ -10105,9 +10068,9 @@ void IteratorTest::comparisonOperators(){
     {
         std::vector<size_t> shape(1);
         shape[0] = 24;
-        marray::View<int, constTarget> v(shape.begin(), shape.end(), data_);
-        marray::Iterator<int, constTarget> it1;
-        marray::Iterator<int, constTarget> it2;
+        andres::View<int, constTarget> v(shape.begin(), shape.end(), data_);
+        andres::Iterator<int, constTarget> it1;
+        andres::Iterator<int, constTarget> it2;
         it1 = v.begin();
         it2 = v.begin();
 
@@ -10122,9 +10085,9 @@ void IteratorTest::comparisonOperators(){
     {
         std::vector<size_t> shape(1);
         shape[0] = 24;
-        const marray::View<int, true> v(shape.begin(), shape.end(), data_);
-        marray::Iterator<int, true> it1;
-        marray::Iterator<int, true> it2;
+        const andres::View<int, true> v(shape.begin(), shape.end(), data_);
+        andres::Iterator<int, true> it1;
+        andres::Iterator<int, true> it2;
         it1 = v.begin();
         it2 = v.begin();
 
@@ -10139,9 +10102,9 @@ void IteratorTest::comparisonOperators(){
     {
         std::vector<size_t> shape(1);
         shape[0] = 24;
-        marray::View<int, false> v(shape.begin(), shape.end(), data_);
-        marray::Iterator<int, true> it1;
-        marray::Iterator<int, true> it2;
+        andres::View<int, false> v(shape.begin(), shape.end(), data_);
+        andres::Iterator<int, true> it1;
+        andres::Iterator<int, true> it2;
         it1 = v.begin();
         it2 = v.begin();
 
@@ -10157,9 +10120,9 @@ void IteratorTest::comparisonOperators(){
     {
         std::vector<size_t> shape(1);
         shape[0] = 24;
-        marray::View<int, constTarget> v(shape.begin(), shape.end(), data_);
-        marray::Iterator<int, constTarget> it1;
-        marray::Iterator<int, constTarget> it2;
+        andres::View<int, constTarget> v(shape.begin(), shape.end(), data_);
+        andres::Iterator<int, constTarget> it1;
+        andres::Iterator<int, constTarget> it2;
         it1 = v.begin();
         it2 = v.begin();
 
@@ -10172,9 +10135,9 @@ void IteratorTest::comparisonOperators(){
     {
         std::vector<size_t> shape(1);
         shape[0] = 24;
-        const marray::View<int, true> v(shape.begin(), shape.end(), data_);
-        marray::Iterator<int, true> it1;
-        marray::Iterator<int, true> it2;
+        const andres::View<int, true> v(shape.begin(), shape.end(), data_);
+        andres::Iterator<int, true> it1;
+        andres::Iterator<int, true> it2;
         it1 = v.begin();
         it2 = v.begin();
 
@@ -10187,9 +10150,9 @@ void IteratorTest::comparisonOperators(){
     {
         std::vector<size_t> shape(1);
         shape[0] = 24;
-        marray::View<int, false> v(shape.begin(), shape.end(), data_);
-        marray::Iterator<int, true> it1;
-        marray::Iterator<int, true> it2;
+        andres::View<int, false> v(shape.begin(), shape.end(), data_);
+        andres::Iterator<int, true> it1;
+        andres::Iterator<int, true> it2;
         it1 = v.begin();
         it2 = v.begin();
 
@@ -10203,9 +10166,9 @@ void IteratorTest::comparisonOperators(){
     {
         std::vector<size_t> shape(1);
         shape[0] = 24;
-        marray::View<int, constTarget> v(shape.begin(), shape.end(), data_);
-        marray::Iterator<int, constTarget> it1;
-        marray::Iterator<int, constTarget> it2;
+        andres::View<int, constTarget> v(shape.begin(), shape.end(), data_);
+        andres::Iterator<int, constTarget> it1;
+        andres::Iterator<int, constTarget> it2;
         it1 = v.begin();
         it2 = v.begin();
 
@@ -10218,9 +10181,9 @@ void IteratorTest::comparisonOperators(){
     {
         std::vector<size_t> shape(1);
         shape[0] = 24;
-        const marray::View<int, true> v(shape.begin(), shape.end(), data_);
-        marray::Iterator<int, true> it1;
-        marray::Iterator<int, true> it2;
+        const andres::View<int, true> v(shape.begin(), shape.end(), data_);
+        andres::Iterator<int, true> it1;
+        andres::Iterator<int, true> it2;
         it1 = v.begin();
         it2 = v.begin();
 
@@ -10233,9 +10196,9 @@ void IteratorTest::comparisonOperators(){
     {
         std::vector<size_t> shape(1);
         shape[0] = 24;
-        marray::View<int, false> v(shape.begin(), shape.end(), data_);
-        marray::Iterator<int, true> it1;
-        marray::Iterator<int, true> it2;
+        andres::View<int, false> v(shape.begin(), shape.end(), data_);
+        andres::Iterator<int, true> it1;
+        andres::Iterator<int, true> it2;
         it1 = v.begin();
         it2 = v.begin();
 
@@ -10249,9 +10212,9 @@ void IteratorTest::comparisonOperators(){
     {
         std::vector<size_t> shape(1);
         shape[0] = 24;
-        marray::View<int, constTarget> v(shape.begin(), shape.end(), data_);
-        marray::Iterator<int, constTarget> it1;
-        marray::Iterator<int, constTarget> it2;
+        andres::View<int, constTarget> v(shape.begin(), shape.end(), data_);
+        andres::Iterator<int, constTarget> it1;
+        andres::Iterator<int, constTarget> it2;
         it1 = v.begin();
         it2 = v.begin();
 
@@ -10264,9 +10227,9 @@ void IteratorTest::comparisonOperators(){
     {
         std::vector<size_t> shape(1);
         shape[0] = 24;
-        const marray::View<int, true> v(shape.begin(), shape.end(), data_);
-        marray::Iterator<int, true> it1;
-        marray::Iterator<int, true> it2;
+        const andres::View<int, true> v(shape.begin(), shape.end(), data_);
+        andres::Iterator<int, true> it1;
+        andres::Iterator<int, true> it2;
         it1 = v.begin();
         it2 = v.begin();
 
@@ -10279,9 +10242,9 @@ void IteratorTest::comparisonOperators(){
     {
         std::vector<size_t> shape(1);
         shape[0] = 24;
-        marray::View<int, false> v(shape.begin(), shape.end(), data_);
-        marray::Iterator<int, true> it1;
-        marray::Iterator<int, true> it2;
+        andres::View<int, false> v(shape.begin(), shape.end(), data_);
+        andres::Iterator<int, true> it1;
+        andres::Iterator<int, true> it2;
         it1 = v.begin();
         it2 = v.begin();
 
@@ -10295,9 +10258,9 @@ void IteratorTest::comparisonOperators(){
     {
         std::vector<size_t> shape(1);
         shape[0] = 24;
-        marray::View<int, constTarget> v(shape.begin(), shape.end(), data_);
-        marray::Iterator<int, constTarget> it1;
-        marray::Iterator<int, constTarget> it2;
+        andres::View<int, constTarget> v(shape.begin(), shape.end(), data_);
+        andres::Iterator<int, constTarget> it1;
+        andres::Iterator<int, constTarget> it2;
         it1 = v.begin();
         it2 = v.begin();
 
@@ -10311,9 +10274,9 @@ void IteratorTest::comparisonOperators(){
     {
         std::vector<size_t> shape(1);
         shape[0] = 24;
-        const marray::View<int, true> v(shape.begin(), shape.end(), data_);
-        marray::Iterator<int, true> it1;
-        marray::Iterator<int, true> it2;
+        const andres::View<int, true> v(shape.begin(), shape.end(), data_);
+        andres::Iterator<int, true> it1;
+        andres::Iterator<int, true> it2;
         it1 = v.begin();
         it2 = v.begin();
 
@@ -10327,9 +10290,9 @@ void IteratorTest::comparisonOperators(){
     {
         std::vector<size_t> shape(1);
         shape[0] = 24;
-        marray::View<int, false> v(shape.begin(), shape.end(), data_);
-        marray::Iterator<int, true> it1;
-        marray::Iterator<int, true> it2;
+        andres::View<int, false> v(shape.begin(), shape.end(), data_);
+        andres::Iterator<int, true> it1;
+        andres::Iterator<int, true> it2;
         it1 = v.begin();
         it2 = v.begin();
 
@@ -10344,9 +10307,9 @@ void IteratorTest::comparisonOperators(){
     {
         std::vector<size_t> shape(1);
         shape[0] = 24;
-        marray::View<int, constTarget> v(shape.begin(), shape.end(), data_);
-        marray::Iterator<int, constTarget> it1;
-        marray::Iterator<int, constTarget> it2;
+        andres::View<int, constTarget> v(shape.begin(), shape.end(), data_);
+        andres::Iterator<int, constTarget> it1;
+        andres::Iterator<int, constTarget> it2;
         it1 = v.begin();
         it2 = v.begin();
 
@@ -10360,9 +10323,9 @@ void IteratorTest::comparisonOperators(){
     {
         std::vector<size_t> shape(1);
         shape[0] = 24;
-        const marray::View<int, true> v(shape.begin(), shape.end(), data_);
-        marray::Iterator<int, true> it1;
-        marray::Iterator<int, true> it2;
+        const andres::View<int, true> v(shape.begin(), shape.end(), data_);
+        andres::Iterator<int, true> it1;
+        andres::Iterator<int, true> it2;
         it1 = v.begin();
         it2 = v.begin();
 
@@ -10376,9 +10339,9 @@ void IteratorTest::comparisonOperators(){
     {
         std::vector<size_t> shape(1);
         shape[0] = 24;
-        marray::View<int, false> v(shape.begin(), shape.end(), data_);
-        marray::Iterator<int, true> it1;
-        marray::Iterator<int, true> it2;
+        andres::View<int, false> v(shape.begin(), shape.end(), data_);
+        andres::Iterator<int, true> it1;
+        andres::Iterator<int, true> it2;
         it1 = v.begin();
         it2 = v.begin();
 
@@ -10396,8 +10359,8 @@ void IteratorTest::hasMoreTest() {
     {
         std::vector<size_t> shape(1);
         shape[0] = 24;
-        marray::View<int, constTarget> v(shape.begin(), shape.end(), data_);
-        marray::Iterator<int, constTarget> it;
+        andres::View<int, constTarget> v(shape.begin(), shape.end(), data_);
+        andres::Iterator<int, constTarget> it;
         it = v.begin();
 
         for(int i = 0; i < 24; ++i){
@@ -10409,8 +10372,8 @@ void IteratorTest::hasMoreTest() {
     {
         std::vector<size_t> shape(1);
         shape[0] = 24;
-        const marray::View<int, true> v(shape.begin(), shape.end(), data_);
-        marray::Iterator<int, true> it;
+        const andres::View<int, true> v(shape.begin(), shape.end(), data_);
+        andres::Iterator<int, true> it;
         it = v.begin();
 
         for(int i = 0; i < 24; ++i){
@@ -10422,8 +10385,8 @@ void IteratorTest::hasMoreTest() {
     {
         std::vector<size_t> shape(1);
         shape[0] = 24;
-        marray::View<int, false> v(shape.begin(), shape.end(), data_);
-        marray::Iterator<int, true> it;
+        andres::View<int, false> v(shape.begin(), shape.end(), data_);
+        andres::Iterator<int, true> it;
         it = v.begin();
 
         for(int i = 0; i < 24; ++i){
@@ -10439,8 +10402,8 @@ void IteratorTest::indexTest() {
     {
         std::vector<size_t> shape(1);
         shape[0] = 24;
-        marray::View<int, constTarget> v(shape.begin(), shape.end(), data_);
-        marray::Iterator<int, constTarget> it;
+        andres::View<int, constTarget> v(shape.begin(), shape.end(), data_);
+        andres::Iterator<int, constTarget> it;
         it = v.begin();
 
         for(int i = 0; i < 24; ++i){
@@ -10451,8 +10414,8 @@ void IteratorTest::indexTest() {
     {
         std::vector<size_t> shape(1);
         shape[0] = 24;
-        const marray::View<int, true> v(shape.begin(), shape.end(), data_);
-        marray::Iterator<int, true> it;
+        const andres::View<int, true> v(shape.begin(), shape.end(), data_);
+        andres::Iterator<int, true> it;
         it = v.begin();
 
         for(int i = 0; i < 24; ++i){
@@ -10463,8 +10426,8 @@ void IteratorTest::indexTest() {
     {
         std::vector<size_t> shape(1);
         shape[0] = 24;
-        marray::View<int, false> v(shape.begin(), shape.end(), data_);
-        marray::Iterator<int, true> it;
+        andres::View<int, false> v(shape.begin(), shape.end(), data_);
+        andres::Iterator<int, true> it;
         it = v.begin();
 
         for(int i = 0; i < 24; ++i){
@@ -10480,8 +10443,8 @@ void IteratorTest::coordinateTest() {
         std::vector<size_t> shape(2);
         shape[0] = 3;
         shape[1] = 8;
-        marray::View<int, constTarget> v(shape.begin(), shape.end(), data_);
-        marray::Iterator<int, constTarget> it(v, 0);
+        andres::View<int, constTarget> v(shape.begin(), shape.end(), data_);
+        andres::Iterator<int, constTarget> it(v, 0);
 
         for(size_t y=0; y<8; ++y) {
             for(size_t x=0; x<3; ++x) {
@@ -10496,8 +10459,8 @@ void IteratorTest::coordinateTest() {
         std::vector<size_t> shape(2);
         shape[0] = 3;
         shape[1] = 8;
-        const marray::View<int, true> v(shape.begin(), shape.end(), data_);
-        marray::Iterator<int, true> it(v, 0);
+        const andres::View<int, true> v(shape.begin(), shape.end(), data_);
+        andres::Iterator<int, true> it(v, 0);
 
         for(size_t y=0; y<8; ++y) {
             for(size_t x=0; x<3; ++x) {
@@ -10512,8 +10475,8 @@ void IteratorTest::coordinateTest() {
         std::vector<size_t> shape(2);
         shape[0] = 3;
         shape[1] = 8;
-        marray::View<int, false> v(shape.begin(), shape.end(), data_);
-        marray::Iterator<int, true> it(v, 0);
+        andres::View<int, false> v(shape.begin(), shape.end(), data_);
+        andres::Iterator<int, true> it(v, 0);
 
         for(size_t y=0; y<8; ++y) {
             for(size_t x=0; x<3; ++x) {
@@ -10527,11 +10490,11 @@ void IteratorTest::coordinateTest() {
 }
 
 MarrayTest::MarrayTest() : scalar_(42) {
-    for(size_t j=0; j<24; ++j) {
+    for(int j=0; j<24; ++j) {
         data_[j] = j;
         data2x_[j] = j*2;
     }
-    for(size_t j=0; j<100; ++j) {
+    for(int j=0; j<100; ++j) {
         data100_[j] = j;
     }
 }
@@ -10539,11 +10502,11 @@ MarrayTest::MarrayTest() : scalar_(42) {
 void MarrayTest::constructorTest(){
     // empty 
     {
-        marray::Marray<int> m;
+        andres::Marray<int> m;
     }
     // scalar
     {
-        marray::Marray<int> m(scalar_);
+        andres::Marray<int> m(scalar_);
         
         test(m.dimension()==0);
         test(m.size()==1);
@@ -10552,7 +10515,7 @@ void MarrayTest::constructorTest(){
     {
         std::vector<size_t> shape(1);
         shape[0] = 24;
-        marray::Marray<int> m(shape.begin(), shape.end(), scalar_);
+        andres::Marray<int> m(shape.begin(), shape.end(), scalar_);
 
         test(m.size()==24 && m.dimension()==1);
         test(m.shape(0) == 24);
@@ -10564,7 +10527,7 @@ void MarrayTest::constructorTest(){
         std::vector<size_t> shape(2);
         shape[0] = 6; 
         shape[1] = 4;
-        marray::Marray<int> m(shape.begin(), shape.end(), scalar_);
+        andres::Marray<int> m(shape.begin(), shape.end(), scalar_);
 
         test(m.size()==24 && m.dimension()==2);
         test(m.shape(0) == 6);
@@ -10580,7 +10543,7 @@ void MarrayTest::constructorTest(){
         shape[0] = 3;
         shape[1] = 4; 
         shape[2] = 2; 
-        marray::Marray<int> m(shape.begin(), shape.end(), scalar_);
+        andres::Marray<int> m(shape.begin(), shape.end(), scalar_);
 
         test(m.size()==24 && m.dimension()==3);
         test(m.shape(0) == 3);
@@ -10599,7 +10562,7 @@ void MarrayTest::constructorTest(){
         shape[0] = 3;
         shape[1] = 4; 
         shape[2] = 2; 
-        marray::Marray<int> m(marray::SkipInitialization,
+        andres::Marray<int> m(andres::SkipInitialization,
             shape.begin(), shape.end());
 
         test(m.size()==24 && m.dimension()==3);
@@ -10615,7 +10578,7 @@ void MarrayTest::assignTest()
         shape[0] = 3;
         shape[1] = 4; 
         shape[2] = 2; 
-        marray::Marray<int> m(marray::SkipInitialization,
+        andres::Marray<int> m(andres::SkipInitialization,
             shape.begin(), shape.end());
     m.assign();
     test(m.size() == 0);
@@ -10627,13 +10590,13 @@ void MarrayTest::copyConstructorTest() {
     {
         // empty 
         {
-            marray::Marray<int> m;
-            marray::Marray<int> n(m);
+            andres::Marray<int> m;
+            andres::Marray<int> n(m);
         }
         // scalar
         {
-            marray::Marray<int> m(scalar_);
-            marray::Marray<int> n(m);
+            andres::Marray<int> m(scalar_);
+            andres::Marray<int> n(m);
 
             test(m.dimension() == n.dimension());
             test(m.size() == n.size());
@@ -10643,8 +10606,8 @@ void MarrayTest::copyConstructorTest() {
         {
             std::vector<size_t> shape(1);
             shape[0] = 24;
-            marray::Marray<int> m(shape.begin(), shape.end(), scalar_);
-            marray::Marray<int> n(m);
+            andres::Marray<int> m(shape.begin(), shape.end(), scalar_);
+            andres::Marray<int> n(m);
 
             test(m.size()==n.size() && m.dimension()==n.dimension()
             );
@@ -10656,8 +10619,8 @@ void MarrayTest::copyConstructorTest() {
             std::vector<size_t> shape(2);
             shape[0] = 6; 
             shape[1] = 4;
-            marray::Marray<int> m(shape.begin(), shape.end(), scalar_);
-            marray::Marray<int> n(m);
+            andres::Marray<int> m(shape.begin(), shape.end(), scalar_);
+            andres::Marray<int> n(m);
 
             test(m.size()==n.size() && m.dimension()==n.dimension()
             );
@@ -10672,8 +10635,8 @@ void MarrayTest::copyConstructorTest() {
             shape[0] = 3;
             shape[1] = 4; 
             shape[2] = 2; 
-            marray::Marray<int> m(shape.begin(), shape.end(), scalar_);
-            marray::Marray<int> n(m);
+            andres::Marray<int> m(shape.begin(), shape.end(), scalar_);
+            andres::Marray<int> n(m);
 
             test(m.size()==n.size() && m.dimension()==n.dimension()
             );
@@ -10689,8 +10652,8 @@ void MarrayTest::copyConstructorTest() {
     {
         // scalar
         {
-            marray::View<int, constTarget> v(&scalar_);
-            marray::Marray<int> m(v);
+            andres::View<int, constTarget> v(&scalar_);
+            andres::Marray<int> m(v);
             test(v.size()==m.size() &&
                    v.dimension()==m.dimension() &&
                    v(0)==m(0));
@@ -10701,8 +10664,8 @@ void MarrayTest::copyConstructorTest() {
             {
                 std::vector<size_t> shape(1);
                 shape[0] = 24;
-                marray::View<int, constTarget> v(shape.begin(), shape.end(), data_);
-                marray::Marray<int> m(v);
+                andres::View<int, constTarget> v(shape.begin(), shape.end(), data_);
+                andres::Marray<int> m(v);
                 
                 test(v.size()==m.size() && v.dimension()==m.dimension()
                 );
@@ -10715,9 +10678,9 @@ void MarrayTest::copyConstructorTest() {
                 shape[0] = 6;
                 std::vector<size_t> strides(1);
                 strides[0] = 4;
-                marray::View<int, constTarget> v(shape.begin(), shape.end(),
-                    strides.begin(), data_, marray::LastMajorOrder);
-                marray::Marray<int> m(v);
+                andres::View<int, constTarget> v(shape.begin(), shape.end(),
+                    strides.begin(), data_, andres::LastMajorOrder);
+                andres::Marray<int> m(v);
 
                 int i = 0; 
                 for(int x = 0; x < 6; ++x){
@@ -10734,9 +10697,9 @@ void MarrayTest::copyConstructorTest() {
                 shape[0] = 6;
                 std::vector<size_t> strides(1);
                 strides[0] = 4;
-                marray::View<int, constTarget> v(shape.begin(), shape.end(),
-                    strides.begin(), data_+2, marray::LastMajorOrder);
-                marray::Marray<int> m(v);
+                andres::View<int, constTarget> v(shape.begin(), shape.end(),
+                    strides.begin(), data_+2, andres::LastMajorOrder);
+                andres::Marray<int> m(v);
 
                 int i = 2; 
                 for(int x = 0; x < 6; ++x){
@@ -10755,8 +10718,8 @@ void MarrayTest::copyConstructorTest() {
                 std::vector<size_t> shape(2);
                 shape[0] = 6; 
                 shape[1] = 4;
-                marray::View<int, constTarget> v(shape.begin(), shape.end(), data_);
-                marray::Marray<int> m(v);
+                andres::View<int, constTarget> v(shape.begin(), shape.end(), data_);
+                andres::Marray<int> m(v);
 
                 test(v.size()==m.size() && v.dimension()==m.dimension()
                 );
@@ -10773,8 +10736,8 @@ void MarrayTest::copyConstructorTest() {
                 std::vector<size_t> strides(2);
                 strides[0] = 1;
                 strides[1] = 3;
-                marray::View<int, constTarget> v(shape.begin(), shape.end(), strides.begin(), data_, marray::LastMajorOrder);
-                marray::Marray<int> m(v);
+                andres::View<int, constTarget> v(shape.begin(), shape.end(), strides.begin(), data_, andres::LastMajorOrder);
+                andres::Marray<int> m(v);
 
                 for(int y = 0; y < 2; ++y){
                     for(int x = 0; x < 3; ++x){
@@ -10793,9 +10756,9 @@ void MarrayTest::copyConstructorTest() {
                 std::vector<size_t> strides(2);
                 strides[0] = 1;
                 strides[1] = 3;
-                marray::View<int, constTarget> v(shape.begin(), shape.end(), strides.begin(),
-                    data100_+50, marray::LastMajorOrder);
-                marray::Marray<int> m(v);
+                andres::View<int, constTarget> v(shape.begin(), shape.end(), strides.begin(),
+                    data100_+50, andres::LastMajorOrder);
+                andres::Marray<int> m(v);
 
                 for(int y = 0; y < 2; ++y){
                     for(int x = 0; x < 3; ++x){
@@ -10815,8 +10778,8 @@ void MarrayTest::copyConstructorTest() {
                 shape[0] = 3;
                 shape[1] = 4; 
                 shape[2] = 2; 
-                marray::View<int, constTarget> v(shape.begin(), shape.end(), data_);
-                marray::Marray<int> m(v);
+                andres::View<int, constTarget> v(shape.begin(), shape.end(), data_);
+                andres::Marray<int> m(v);
 
                 test(v.size()==m.size() && v.dimension()==m.dimension()
                 );
@@ -10837,9 +10800,9 @@ void MarrayTest::copyConstructorTest() {
                 strides[0] = 2;
                 strides[1] = 10;
                 strides[2] = 35;
-                marray::View<int, constTarget> v(shape.begin(), shape.end(), strides.begin(),
-                    data100_, marray::LastMajorOrder);
-                marray::Marray<int> m(v);
+                andres::View<int, constTarget> v(shape.begin(), shape.end(), strides.begin(),
+                    data100_, andres::LastMajorOrder);
+                andres::Marray<int> m(v);
 
                 test(v.size()==m.size() && v.dimension()==m.dimension()
                 );
@@ -10859,9 +10822,9 @@ void MarrayTest::copyConstructorTest() {
                 strides[0] = 2;
                 strides[1] = 10;
                 strides[2] = 35;
-                marray::View<int, constTarget> v(shape.begin(), shape.end(), strides.begin(),
-                    data100_+30, marray::LastMajorOrder);
-                marray::Marray<int> m(v);
+                andres::View<int, constTarget> v(shape.begin(), shape.end(), strides.begin(),
+                    data100_+30, andres::LastMajorOrder);
+                andres::Marray<int> m(v);
 
                 test(v.size()==m.size() && v.dimension()==m.dimension()
                 );
@@ -10883,14 +10846,14 @@ void MarrayTest::assignmentOperatorTest(){
         {
             // empty
             {
-                marray::Marray<int> m;
-                marray::Marray<int> n;
+                andres::Marray<int> m;
+                andres::Marray<int> n;
                 n = m;
             }
             // scalar
             {
-                marray::Marray<int> m(scalar_);
-                marray::Marray<int> n;
+                andres::Marray<int> m(scalar_);
+                andres::Marray<int> n;
                 n = m;
 
                 test(m.dimension() == n.dimension() &&
@@ -10901,8 +10864,8 @@ void MarrayTest::assignmentOperatorTest(){
             {
                 std::vector<size_t> shape(1);
                 shape[0] = 24;
-                marray::Marray<int> m(shape.begin(), shape.end(), scalar_);
-                marray::Marray<int> n;
+                andres::Marray<int> m(shape.begin(), shape.end(), scalar_);
+                andres::Marray<int> n;
                 n = m;
 
                 test(m.size()==n.size() && m.dimension()==n.dimension()
@@ -10915,9 +10878,9 @@ void MarrayTest::assignmentOperatorTest(){
                 std::vector<size_t> shape(2);
                 shape[0] = 6; 
                 shape[1] = 4;
-                marray::Marray<int> m(shape.begin(), shape.end(), scalar_);
+                andres::Marray<int> m(shape.begin(), shape.end(), scalar_);
 
-                marray::Marray<int> n;
+                andres::Marray<int> n;
                 n = m;
 
                 test(m.size()==n.size() && m.dimension()==n.dimension()
@@ -10933,8 +10896,8 @@ void MarrayTest::assignmentOperatorTest(){
                 shape[0] = 3;
                 shape[1] = 4; 
                 shape[2] = 2; 
-                marray::Marray<int> m(shape.begin(), shape.end(), scalar_);
-                marray::Marray<int> n;
+                andres::Marray<int> m(shape.begin(), shape.end(), scalar_);
+                andres::Marray<int> n;
                 n = m;
 
                 test(m.size()==n.size() && m.dimension()==n.dimension()
@@ -10951,14 +10914,14 @@ void MarrayTest::assignmentOperatorTest(){
         {
             // empty
             {
-                marray::View<int, constTarget> v;
-                marray::Marray<int> m;
+                andres::View<int, constTarget> v;
+                andres::Marray<int> m;
                 m = v;
             }
             // scalar
             {
-                marray::View<int, constTarget> v(&scalar_);
-                marray::Marray<int> m;
+                andres::View<int, constTarget> v(&scalar_);
+                andres::Marray<int> m;
                 m = v;
 
                 test(v.size()==m.size() &&
@@ -10969,8 +10932,8 @@ void MarrayTest::assignmentOperatorTest(){
             {
                 std::vector<size_t> shape(1);
                 shape[0] = 24;
-                marray::View<int, constTarget> v(shape.begin(), shape.end(), data_);
-                marray::Marray<int> m;
+                andres::View<int, constTarget> v(shape.begin(), shape.end(), data_);
+                andres::Marray<int> m;
                 m = v;
                 
                 test(v.size()==m.size() && v.dimension()==m.dimension()
@@ -10983,8 +10946,8 @@ void MarrayTest::assignmentOperatorTest(){
                 std::vector<size_t> shape(2);
                 shape[0] = 6; 
                 shape[1] = 4;
-                marray::View<int, constTarget> v(shape.begin(), shape.end(), data_);
-                marray::Marray<int> m;
+                andres::View<int, constTarget> v(shape.begin(), shape.end(), data_);
+                andres::Marray<int> m;
                 m = v;
 
                 test(v.size()==m.size() && v.dimension()==m.dimension()
@@ -11000,8 +10963,8 @@ void MarrayTest::assignmentOperatorTest(){
                 shape[0] = 3;
                 shape[1] = 4; 
                 shape[2] = 2; 
-                marray::View<int, constTarget> v(shape.begin(), shape.end(), data_);
-                marray::Marray<int> m;
+                andres::View<int, constTarget> v(shape.begin(), shape.end(), data_);
+                andres::Marray<int> m;
                 m = v;
 
                 test(v.size()==m.size() &&
@@ -11021,15 +10984,15 @@ void MarrayTest::assignmentOperatorTest(){
         {
             // empty
             {
-                marray::Marray<int> m;
-                marray::Marray<int> n(scalar_);
+                andres::Marray<int> m;
+                andres::Marray<int> n(scalar_);
                 n = m;
             }
             // scalar
             {
                 int scalar = 2;
-                marray::Marray<int> m(scalar);
-                marray::Marray<int> n(scalar_);
+                andres::Marray<int> m(scalar);
+                andres::Marray<int> n(scalar_);
                 int* n_address = &n(0);
                 n = m;
                 
@@ -11043,14 +11006,14 @@ void MarrayTest::assignmentOperatorTest(){
         {
             // empty
             {
-                marray::View<int, constTarget> v;
-                marray::Marray<int> m(scalar_);
+                andres::View<int, constTarget> v;
+                andres::Marray<int> m(scalar_);
                 m = v;
             }
             // scalar
             {
-                marray::View<int, constTarget> v(&scalar_);
-                marray::Marray<int> m(scalar_);
+                andres::View<int, constTarget> v(&scalar_);
+                andres::Marray<int> m(scalar_);
                 int* m_address = &m(0);
                 m = v;
                 
@@ -11067,10 +11030,10 @@ void MarrayTest::assignmentOperatorTest(){
         {
             // empty
             {
-                marray::Marray<int> m;
+                andres::Marray<int> m;
                 std::vector<size_t> shapen(1);
                 shapen[0] = 24;
-                marray::Marray<int> n(shapen.begin(), shapen.end(), scalar_);
+                andres::Marray<int> n(shapen.begin(), shapen.end(), scalar_);
                 n = m;
             }
             // 1D
@@ -11078,10 +11041,10 @@ void MarrayTest::assignmentOperatorTest(){
                 int scalar = 2;
                 std::vector<size_t> shape(1);
                 shape[0] = 24;
-                marray::Marray<int> m(shape.begin(), shape.end(), scalar);
+                andres::Marray<int> m(shape.begin(), shape.end(), scalar);
                 std::vector<size_t> shapen(1);
                 shapen[0] = 24;
-                marray::Marray<int> n(shapen.begin(), shapen.end(), scalar_);
+                andres::Marray<int> n(shapen.begin(), shapen.end(), scalar_);
                 int* n_address = &n(0);
                 n = m;
                 
@@ -11097,20 +11060,20 @@ void MarrayTest::assignmentOperatorTest(){
         {
             // empty
             {
-                marray::View<int, constTarget> v;
+                andres::View<int, constTarget> v;
                 std::vector<size_t> shapem(1);
                 shapem[0] = 24;
-                marray::Marray<int> m(shapem.begin(), shapem.end(), scalar_);
+                andres::Marray<int> m(shapem.begin(), shapem.end(), scalar_);
                 m = v;
             }
             // 1D
             {
                 std::vector<size_t> shape(1);
                 shape[0] = 24;
-                marray::View<int, constTarget> v(shape.begin(), shape.end(), data_);
+                andres::View<int, constTarget> v(shape.begin(), shape.end(), data_);
                 std::vector<size_t> shapem(1);
                 shapem[0] = 24;
-                marray::Marray<int> m(shapem.begin(), shapem.end(), scalar_);
+                andres::Marray<int> m(shapem.begin(), shapem.end(), scalar_);
                 int* m_address = &m(0);
                 m = v;
                 
@@ -11129,11 +11092,11 @@ void MarrayTest::assignmentOperatorTest(){
         {
             // empty
             {
-                marray::Marray<int> m;
+                andres::Marray<int> m;
                 std::vector<size_t> shapen(2);
                 shapen[0] = 4;
                 shapen[1] = 6;
-                marray::Marray<int> n(shapen.begin(), shapen.end(), scalar_);
+                andres::Marray<int> n(shapen.begin(), shapen.end(), scalar_);
                 n = m;
             }
             // 2D
@@ -11142,11 +11105,11 @@ void MarrayTest::assignmentOperatorTest(){
                 std::vector<size_t> shape(2);
                 shape[0] = 6; 
                 shape[1] = 4;
-                marray::Marray<int> m(shape.begin(), shape.end(), scalar);
+                andres::Marray<int> m(shape.begin(), shape.end(), scalar);
                 std::vector<size_t> shapen(2);
                 shapen[0] = 6;
                 shapen[1] = 4;
-                marray::Marray<int> n(shapen.begin(), shapen.end(), scalar_);
+                andres::Marray<int> n(shapen.begin(), shapen.end(), scalar_);
                 int* n_address = &n(0);
                 n = m;
                 
@@ -11162,11 +11125,11 @@ void MarrayTest::assignmentOperatorTest(){
         {
             // empty
             {
-                marray::View<int, constTarget> v;
+                andres::View<int, constTarget> v;
                 std::vector<size_t> shapen(2);
                 shapen[0] = 4;
                 shapen[1] = 6;
-                marray::Marray<int> m(shapen.begin(), shapen.end(), scalar_);
+                andres::Marray<int> m(shapen.begin(), shapen.end(), scalar_);
                 m = v;
             }
             // 2D
@@ -11174,11 +11137,11 @@ void MarrayTest::assignmentOperatorTest(){
                 std::vector<size_t> shape(2);
                 shape[0] = 6; 
                 shape[1] = 4;
-                marray::View<int, constTarget> v(shape.begin(), shape.end(), data_);
+                andres::View<int, constTarget> v(shape.begin(), shape.end(), data_);
                 std::vector<size_t> shapen(2);
                 shapen[0] = 6;
                 shapen[1] = 4;
-                marray::Marray<int> m(shapen.begin(), shapen.end(), scalar_);
+                andres::Marray<int> m(shapen.begin(), shapen.end(), scalar_);
                 int* m_address = &m(0);
                 m = v;
                 
@@ -11197,12 +11160,12 @@ void MarrayTest::assignmentOperatorTest(){
         {
             // empty
             {
-                marray::Marray<int> m;
+                andres::Marray<int> m;
                 std::vector<size_t> shapen(3);
                 shapen[0] = 2;
                 shapen[1] = 3;
                 shapen[2] = 4;
-                marray::Marray<int> n(shapen.begin(), shapen.end(), scalar_);
+                andres::Marray<int> n(shapen.begin(), shapen.end(), scalar_);
                 n = m;
             }
             // 3D 
@@ -11212,12 +11175,12 @@ void MarrayTest::assignmentOperatorTest(){
                 shape[0] = 3;
                 shape[1] = 4; 
                 shape[2] = 2; 
-                marray::Marray<int> m(shape.begin(), shape.end(), scalar);
+                andres::Marray<int> m(shape.begin(), shape.end(), scalar);
                 std::vector<size_t> shapen(3);
                 shapen[0] = 3;
                 shapen[1] = 4;
                 shapen[2] = 2;
-                marray::Marray<int> n(shapen.begin(), shapen.end(), scalar_);
+                andres::Marray<int> n(shapen.begin(), shapen.end(), scalar_);
                 int* n_address = &n(0);
                 n = m;
                 
@@ -11235,12 +11198,12 @@ void MarrayTest::assignmentOperatorTest(){
         {
             // empty
             {
-                marray::View<int, constTarget> v;
+                andres::View<int, constTarget> v;
                 std::vector<size_t> shapen(3);
                 shapen[0] = 2;
                 shapen[1] = 3;
                 shapen[2] = 4;
-                marray::Marray<int> m(shapen.begin(), shapen.end(), scalar_);
+                andres::Marray<int> m(shapen.begin(), shapen.end(), scalar_);
                 m = v;
             }
             // 3D
@@ -11249,12 +11212,12 @@ void MarrayTest::assignmentOperatorTest(){
                 shape[0] = 3;
                 shape[1] = 4; 
                 shape[2] = 2; 
-                marray::View<int, constTarget> v(shape.begin(), shape.end(), data_);
+                andres::View<int, constTarget> v(shape.begin(), shape.end(), data_);
                 std::vector<size_t> shapen(3);
                 shapen[0] = 3;
                 shapen[1] = 4;
                 shapen[2] = 2;
-                marray::Marray<int> m(shapen.begin(), shapen.end(), scalar_);
+                andres::Marray<int> m(shapen.begin(), shapen.end(), scalar_);
                 int* m_address = &m(0);
                 m = v;
                 
@@ -11279,7 +11242,7 @@ void MarrayTest::reshapeTest() {
         std::vector<size_t> shape(2); 
         shape[0] = 6; 
         shape[1] = 4;
-        marray::Marray<int> m(shape.begin(), shape.end(), scalar_);
+        andres::Marray<int> m(shape.begin(), shape.end(), scalar_);
         shape[0] = 4; 
         shape[1] = 6; 
         m.reshape(shape.begin(), shape.end());
@@ -11291,7 +11254,7 @@ void MarrayTest::reshapeTest() {
         std::vector<size_t> shape(2); 
         shape[0] = 6; 
         shape[1] = 4;
-        marray::Marray<int> m(shape.begin(), shape.end(), scalar_, marray::FirstMajorOrder);
+        andres::Marray<int> m(shape.begin(), shape.end(), scalar_, andres::FirstMajorOrder);
         shape[0] = 4; 
         shape[1] = 6; 
         m.reshape(shape.begin(), shape.end());
@@ -11305,7 +11268,7 @@ void MarrayTest::reshapeTest() {
         shape[0] = 3;
         shape[1] = 4; 
         shape[2] = 2;
-        marray::Marray<int> m(shape.begin(), shape.end(), scalar_);
+        andres::Marray<int> m(shape.begin(), shape.end(), scalar_);
         shape[0] = 2;
         shape[1] = 3; 
         shape[2] = 4;
@@ -11320,7 +11283,7 @@ void MarrayTest::reshapeTest() {
         shape[0] = 3;
         shape[1] = 4; 
         shape[2] = 2;
-        marray::Marray<int> m(shape.begin(), shape.end(), scalar_, marray::FirstMajorOrder);
+        andres::Marray<int> m(shape.begin(), shape.end(), scalar_, andres::FirstMajorOrder);
         shape[0] = 2;
         shape[1] = 3; 
         shape[2] = 4;
@@ -11332,7 +11295,7 @@ void MarrayTest::reshapeTest() {
     }
 }
 
-template<marray::CoordinateOrder coordinateOrder>
+template<andres::CoordinateOrder coordinateOrder>
 void MarrayTest::resizeTest() {
     // 1D
     {
@@ -11340,7 +11303,7 @@ void MarrayTest::resizeTest() {
         {
             std::vector<size_t> shape(1);
             shape[0] = 24; 
-            marray::Marray<int> m(shape.begin(), shape.end(), scalar_, coordinateOrder);
+            andres::Marray<int> m(shape.begin(), shape.end(), scalar_, coordinateOrder);
             shape[0] = 12; 
             m.resize(shape.begin(), shape.end(), 12);
 
@@ -11352,14 +11315,14 @@ void MarrayTest::resizeTest() {
         {
             std::vector<size_t> shape(1), shape0(0);
             shape[0] = 24; 
-            marray::Marray<int> m(shape.begin(), shape.end(), scalar_, coordinateOrder);
+            andres::Marray<int> m(shape.begin(), shape.end(), scalar_, coordinateOrder);
             m.resize(shape0.begin(), shape0.end(), 1);
         }
         // shrink to scalar 
         {
             std::vector<size_t> shape(1);
             shape[0] = 24; 
-            marray::Marray<int> m(shape.begin(), shape.end(), scalar_, coordinateOrder);
+            andres::Marray<int> m(shape.begin(), shape.end(), scalar_, coordinateOrder);
             shape[0] = 1; 
             m.resize(shape.begin(), shape.end(), 3);
 
@@ -11372,7 +11335,7 @@ void MarrayTest::resizeTest() {
             int scalar = 1;
             std::vector<size_t> shape(1);
             shape[0] = 24; 
-            marray::Marray<int> m(scalar);
+            andres::Marray<int> m(scalar);
             m.resize(shape.begin(), shape.end(), 3);
 
             test(m.shape(0)==24 &&
@@ -11387,7 +11350,7 @@ void MarrayTest::resizeTest() {
         {
             std::vector<size_t> shape(1);
             shape[0] = 12; 
-            marray::Marray<int> m(shape.begin(), shape.end(), scalar_, coordinateOrder);
+            andres::Marray<int> m(shape.begin(), shape.end(), scalar_, coordinateOrder);
             shape[0] = 24; 
             m.resize(shape.begin(), shape.end(), 3);
 
@@ -11406,7 +11369,7 @@ void MarrayTest::resizeTest() {
         // grow scalar to 3D
         {
             int scalar = 1;
-            marray::Marray<int> m(scalar); 
+            andres::Marray<int> m(scalar); 
             std::vector<size_t> newShape(3);
             newShape[0] = 5;
             newShape[1] = 5; 
@@ -11434,7 +11397,7 @@ void MarrayTest::resizeTest() {
         {
             std::vector<size_t> shape(1);
             shape[0] = 12; 
-            marray::Marray<int> m(shape.begin(), shape.end(), scalar_, coordinateOrder); 
+            andres::Marray<int> m(shape.begin(), shape.end(), scalar_, coordinateOrder); 
             std::vector<size_t> newShape(3);
             newShape[0] = 5;
             newShape[1] = 5; 
@@ -11466,7 +11429,7 @@ void MarrayTest::resizeTest() {
             std::vector<size_t> shape(2); 
             shape[0] = 6; 
             shape[1] = 4;
-            marray::Marray<int> m(shape.begin(), shape.end(), scalar_, coordinateOrder);
+            andres::Marray<int> m(shape.begin(), shape.end(), scalar_, coordinateOrder);
             shape[0] = 3; 
             shape[1] = 2; 
             m.resize(shape.begin(), shape.end(), 6);
@@ -11481,7 +11444,7 @@ void MarrayTest::resizeTest() {
             std::vector<size_t> shape(2); 
             shape[0] = 3; 
             shape[1] = 2;
-            marray::Marray<int> m(shape.begin(), shape.end(), scalar_, coordinateOrder);
+            andres::Marray<int> m(shape.begin(), shape.end(), scalar_, coordinateOrder);
             shape[0] = 6; 
             shape[1] = 4; 
             m.resize(shape.begin(), shape.end(), 3);
@@ -11506,7 +11469,7 @@ void MarrayTest::resizeTest() {
             std::vector<size_t> shape(2); 
             shape[0] = 6; 
             shape[1] = 4;
-            marray::Marray<int> m(shape.begin(), shape.end(), scalar_, coordinateOrder);
+            andres::Marray<int> m(shape.begin(), shape.end(), scalar_, coordinateOrder);
             std::vector<size_t> newShape(0); 
             m.resize(newShape.begin(), newShape.end(), 3);
         }
@@ -11516,7 +11479,7 @@ void MarrayTest::resizeTest() {
             shape[0] = 6; 
             shape[1] = 4;
 
-            marray::Marray<int> m(shape.begin(), shape.end(), scalar_, coordinateOrder);
+            andres::Marray<int> m(shape.begin(), shape.end(), scalar_, coordinateOrder);
             std::vector<size_t> newShape(1); 
             newShape[0] = 12; 
             m.resize(newShape.begin(), newShape.end(), 3);
@@ -11529,7 +11492,7 @@ void MarrayTest::resizeTest() {
             std::vector<size_t> shape(2); 
             shape[0] = 6; 
             shape[1] = 4;
-            marray::Marray<int> m(shape.begin(), shape.end(), scalar_, coordinateOrder);
+            andres::Marray<int> m(shape.begin(), shape.end(), scalar_, coordinateOrder);
             std::vector<size_t> newShape(1); 
             newShape[0] = 12; 
             m.resize(newShape.begin(), newShape.end(), 3);
@@ -11547,7 +11510,7 @@ void MarrayTest::resizeTest() {
             std::vector<size_t> shape(2); 
             shape[0] = 3; 
             shape[1] = 2;
-            marray::Marray<int> m(shape.begin(), shape.end(), scalar_, coordinateOrder);
+            andres::Marray<int> m(shape.begin(), shape.end(), scalar_, coordinateOrder);
             std::vector<size_t> newShape(3);
             newShape[0] = 5;
             newShape[1] = 5; 
@@ -11580,7 +11543,7 @@ void MarrayTest::resizeTest() {
             shape[0] = 3;
             shape[1] = 4; 
             shape[2] = 2;
-            marray::Marray<int> m(shape.begin(), shape.end(), scalar_, coordinateOrder);
+            andres::Marray<int> m(shape.begin(), shape.end(), scalar_, coordinateOrder);
             shape[0] = 2;
             shape[1] = 2; 
             shape[2] = 2;
@@ -11598,7 +11561,7 @@ void MarrayTest::resizeTest() {
             shape[0] = 3;
             shape[1] = 4; 
             shape[2] = 2;
-            marray::Marray<int> m(shape.begin(), shape.end(), scalar_, coordinateOrder);
+            andres::Marray<int> m(shape.begin(), shape.end(), scalar_, coordinateOrder);
             shape[0] = 5;
             shape[1] = 5; 
             shape[2] = 2;
@@ -11627,7 +11590,7 @@ void MarrayTest::resizeTest() {
             shape[0] = 3;
             shape[1] = 4; 
             shape[2] = 2;
-            marray::Marray<int> m(shape.begin(), shape.end(), scalar_, coordinateOrder);
+            andres::Marray<int> m(shape.begin(), shape.end(), scalar_, coordinateOrder);
             std::vector<size_t> newShape(0); 
             m.resize(newShape.begin(), newShape.end(), 3);
         }
@@ -11637,7 +11600,7 @@ void MarrayTest::resizeTest() {
             shape[0] = 3;
             shape[1] = 4; 
             shape[2] = 2;
-            marray::Marray<int> m(shape.begin(), shape.end(), scalar_, coordinateOrder);
+            andres::Marray<int> m(shape.begin(), shape.end(), scalar_, coordinateOrder);
             std::vector<size_t> newShape(1); 
             newShape[0] = 12; 
             m.resize(newShape.begin(), newShape.end(), 3);
@@ -11652,7 +11615,7 @@ void MarrayTest::resizeTest() {
             shape[0] = 3;
             shape[1] = 4; 
             shape[2] = 2;
-            marray::Marray<int> m(shape.begin(), shape.end(), scalar_, coordinateOrder);
+            andres::Marray<int> m(shape.begin(), shape.end(), scalar_, coordinateOrder);
             std::vector<size_t> newShape(1); 
             newShape[0] = 12; 
             m.resize(newShape.begin(), newShape.end(), 3);
@@ -11671,7 +11634,7 @@ void MarrayTest::resizeTest() {
             shape[0] = 3;
             shape[1] = 4; 
             shape[2] = 2;
-            marray::Marray<int> m(shape.begin(), shape.end(), scalar_, coordinateOrder);
+            andres::Marray<int> m(shape.begin(), shape.end(), scalar_, coordinateOrder);
             std::vector<size_t> newShape(2); 
             newShape[0] = 6; 
             newShape[1] = 4; 
@@ -11695,591 +11658,6 @@ void MarrayTest::resizeTest() {
     }
 }
 
-VectorTest::VectorTest(): scalar_(42) {
-    for(size_t j=0; j<24; ++j) {
-        data_[j] = j;
-    }
-    for(size_t j=0; j<100; ++j) {
-        data100_[j] = j;
-    }
-}
-
-template<bool constTarget>
-void VectorTest::constructorTest() {
-    // empty
-    {
-        marray::Vector<int> v;
-    test(v.size() == 0);
-
-    marray::Vector<int> w(0);
-    test(w.size() == 0);
-  }
-    // 1D 
-    {
-        marray::Vector<int> v(24, scalar_);
-        for(int i = 0; i < 24; ++i){
-            test(v(i)==scalar_);
-        }
-  }
-    // from View
-    {
-        // empty
-        {
-            marray::View<int, constTarget> v;
-            marray::Vector<int> m(v);
-        }
-        // scalar
-        {
-            int scalar = 42;
-            marray::View<int, constTarget> v(&scalar);
-            marray::Vector<int> m(v);
-            test(m.size()==v.size() && m(0)==v(0));
-        }
-        // 1D
-        {
-            // without strides
-            {
-                std::vector<size_t> shape(1);
-                shape[0] = 24;
-                marray::View<int, constTarget> v(shape.begin(), shape.end(), data_);
-                marray::Vector<int> m(v);
-                for(size_t j = 0; j < 24; ++j){
-                    test(m(j)==v(j));
-                }
-                test(m.size() == v.size());
-            }
-            // with strides and without offset 
-            {
-            std::vector<size_t> shape(1);
-            shape[0] = 6;
-            std::vector<size_t> strides(1);
-            strides[0] = 4;
-            marray::View<int, constTarget> v(shape.begin(), shape.end(),
-                  strides.begin(), data_, marray::LastMajorOrder);
-            marray::Vector<int> m(v);
-            for(int x = 0; x < 6; ++x){
-                  test(v(x) == m(x));
-            }
-            test(m.size() == v.size());
-            }
-            // with strides and offset
-            {
-          std::vector<size_t> shape(1);
-          shape[0] = 6;
-          std::vector<size_t> strides(1);
-          strides[0] = 4;
-          marray::View<int, constTarget> v(shape.begin(), shape.end(),
-                strides.begin(), data_+2, marray::LastMajorOrder);
-          marray::Vector<int> m(v);
-          for(int x = 0; x < 6; ++x){
-                test(v(x) == m(x));
-          }
-          test(m.size() == v.size());
-          }
-        }
-    }
-    // initialization skipping
-    {
-    // empty
-    marray::Vector<int> w(marray::SkipInitialization, 0);
-    test(w.size() == 0);
-    // not empty
-        marray::Vector<int> v(marray::SkipInitialization, 24);
-        test(v.size() == 24);
-    }
-}
-
-template<bool constTarget>
-void VectorTest::assignmentOperatorTest() {
-    // from a Vector
-    {   
-    // empty
-    {
-          marray::Vector<int> v;
-          marray::Vector<int> m(24);
-      m = v;
-      test(m.size() == 0);
-    }
-    // not empty
-    {
-          marray::Vector<int> v(24, scalar_);
-          marray::Vector<int> m = v;
-          for(int i = 0; i < 24; ++i){
-              test(m(i)==scalar_);
-          }
-    }
-    }
-    // from a View
-    {
-    // empty
-    {
-        marray::View<int, constTarget> v;
-        marray::Vector<int> m(24, 1);
-        m = v;
-        test(m.size() == 0);
-    }
-    // scalar
-    {
-      marray::View<int, constTarget> v(&scalar_);
-      marray::Vector<int> m(24, 1);
-      m = v;
-      test(m.dimension() == 1);
-      test(m.size() == 1);
-      test(m[0] == scalar_);
-    }
-        // 1D
-        {
-            std::vector<size_t> shape(1);
-            shape[0] = 24;
-            marray::View<int, constTarget> v(shape.begin(), shape.end(), data_) ;
-            marray::Vector<int> m(24, 1);
-            m = v;
-            for(int i = 0; i < 24; ++i){
-                test(m(i)==data_[i]);
-            }
-        }
-    }
-}
-
-template<bool constTarget>
-void VectorTest::elementAccessTest(){
-    // 1D 
-    {
-        marray::Vector<int> v(24, scalar_);
-
-        for(int i = 0; i < 24; ++i){
-            test(v[i] == scalar_);
-        }
-    }
-    // 1D const 
-    {
-        const marray::Vector<int> v(24, scalar_);
-
-        for(int i = 0; i < 24; ++i){
-            test(v[i] == scalar_);
-        }
-    }
-    // 1D from View 
-    {
-        std::vector<size_t> shape(1);
-        shape[0] = 24;
-        marray::View<int, constTarget> v(shape.begin(), shape.end(), data_) ;
-        marray::Vector<int> m(24, 1);
-        m = v;
-
-        for(int i = 0; i < 24; ++i){
-            test(m[i]==data_[i]);
-        }
-    }
-}
-
-template<bool constTarget>
-void VectorTest::resizeTest(){
-    // 1D Vector
-    {
-    {
-      // resize to zero
-            marray::Vector<int> v(24, scalar_);
-            v.resize(0);
-      test(v.size() == 0);
-    }
-        {
-            marray::Vector<int> v(24, scalar_);
-            v.resize(12);
-
-            for(int i = 0; i < 12; ++i){
-                test(v(i) == scalar_);
-            }
-            test(v.size() == 12);
-        }
-        {
-            marray::Vector<int> v(24, scalar_);
-            v.resize(30, 55);
-
-            for(int i = 0; i < 24; ++i){
-                test(v(i) == scalar_);
-            }
-            test(v.size() == 30
-            );
-            for(int i = 24; i < 30; ++i){
-                test(v(i) == 55);
-            }
-        }
-        {
-            marray::Vector<int> v(24, scalar_);
-            v.resize(30);
-
-            for(int i = 0; i < 24; ++i){
-                test(v(i) == scalar_);
-            }
-            test(v.size() == 30);
-            for(int i = 24; i < 30; ++i){
-                test(v(i) == 0);
-            }
-        }
-    }
-    // 1D View 
-    {
-        {
-            std::vector<size_t> shape(1);
-            shape[0] = 24;
-            marray::View<int, constTarget> v(shape.begin(), shape.end(), data_) ;
-            marray::Vector<int> m(24, 1);
-            m = v;
-            m.resize(12);
-
-            for(int i = 0; i < 12; ++i){
-                test(m(i)==data_[i]);
-            }
-        }
-        {
-            std::vector<size_t> shape(1);
-            shape[0] = 24;
-            marray::View<int, constTarget> v(shape.begin(), shape.end(), data_) ;
-            marray::Vector<int> m(24, 1);
-            m = v;
-            m.resize(30, 55);
-
-            for(int i = 0; i < 24; ++i){
-                test(m(i)==data_[i]);
-            }
-            for(int i = 24; i < 30; ++i){
-                test(m(i) == 55);
-            }
-        }
-        {
-            std::vector<size_t> shape(1);
-            shape[0] = 24;
-            marray::View<int, constTarget> v(shape.begin(), shape.end(), data_) ;
-            marray::Vector<int> m(24, 1);
-            m = v;
-            m.resize(30);
-
-            for(int i = 0; i < 24; ++i){
-                test(m(i)==data_[i]);
-            }
-            for(int i = 24; i < 30; ++i){
-                test(m(i) == 0);
-            }
-        }
-    }
-}
-
-MatrixTest::MatrixTest(): scalar_(42) {
-    for(size_t j=0; j<24; ++j) {
-        data_[j] = j;
-    }
-    for(size_t j=0; j<100; ++j) {
-        data100_[j] = j;
-    }
-}
-
-template<bool constTarget>
-void MatrixTest::constructorTest() {
-    // empty
-    {
-        marray::Matrix<int> m;
-    test(m.size() == 0);
-
-    marray::Matrix<int> n(24, 0);
-    test(m.size() == 0);
-    }
-    // scalar from a view
-    {
-        marray::View<int, constTarget> v(&scalar_);
-        marray::Matrix<int> m(v); 
-
-        test(m(0) == v(0) &&
-               m(0, 0) == v(0) &&
-               m.size() == v.size() &&
-               m.dimension() == 2);
-    }
-    // 2D
-    {
-        std::vector<size_t> shape(2); 
-        shape[0] = 6;
-        shape[1] = 4;
-        marray::View<int, constTarget> v(shape.begin(), shape.end(), data_);
-        marray::Matrix<int> m(v);
-
-        test(m.size() == v.size() &&
-               m.dimension() == v.dimension() &&
-               m.shape(0) == v.shape(0) &&
-               m.shape(1) == v.shape(1)
-        );
-        for(int x = 0; x < 6; ++x){
-            for(int y = 0; y < 4; ++y){
-                test(m(x, y) == v(x, y));
-            }
-        }
-    }
-    // 2D with strides and offset 
-    {
-        std::vector<size_t> shape(2);
-        shape[0] = 3;
-        shape[1] = 2;
-        std::vector<size_t> strides(2);
-        strides[0] = 1;
-        strides[1] = 3;
-        marray::View<int, constTarget> v(shape.begin(), shape.end(), strides.begin(), data100_+50, marray::LastMajorOrder);
-        marray::Matrix<int> m(v);
-
-        test(m.size() == v.size() &&
-               m.dimension() == v.dimension() &&
-               m.shape(0) == v.shape(0) &&
-               m.shape(1) == v.shape(1)
-        );
-        for(int x = 0; x < 3; ++x){
-            for(int y = 0; y < 2; ++y){
-                test(m(x, y) == v(x, y));
-            }
-        }
-    }
-    // 2D matrix
-    {
-        marray::Matrix<int> m(6, 4, scalar_);
-
-        test(m.size() == 24 &&
-               m.shape(0) == 6 &&
-               m.shape(1) == 4 &&
-               m.dimension() == 2
-        );
-        for(int x = 0; x < 6; ++x){
-            for(int y = 0; y < 4; ++y){
-                test(m(x, y) == scalar_);
-            }
-        }
-    }
-    // 2D matrix default
-    {
-        marray::Matrix<int> m(6, 4);
-
-        test(m.size() == 24 &&
-               m.shape(0) == 6 &&
-               m.shape(1) == 4 &&
-               m.dimension() == 2
-        );
-        for(int x = 0; x < 6; ++x){
-            for(int y = 0; y < 4; ++y){
-                test(m(x, y) == 0);
-            }
-        }
-    }
-    // 2D matrix without initialization
-    {
-        marray::Matrix<int> m(marray::SkipInitialization, 6, 4);
-
-        test(m.size() == 24 &&
-               m.shape(0) == 6 &&
-               m.shape(1) == 4 &&
-               m.dimension() == 2
-        );
-    }
-}
-
-template<bool constTarget>
-void MatrixTest::assignmentOperatorTest() {
-    // 2D matrix
-    {
-        marray::Matrix<int> v(6, 4, scalar_);
-        marray::Matrix<int> m = v;
-
-        test(m.size() == 24 &&
-               m.shape(0) == 6 &&
-               m.shape(1) == 4 &&
-               m.dimension() == 2);
-        for(int x = 0; x < 6; ++x){
-            for(int y = 0; y < 4; ++y){
-                test(m(x, y) == v(x, y));
-            }
-        }
-    }
-    // scalar from a view
-    {
-        marray::View<int, constTarget> v(&scalar_);
-        marray::Matrix<int> m(2, 4);
-    m = v;
-
-        test(m(0) == v(0) &&
-               m(0, 0) == v(0) &&
-               m.size() == v.size() &&
-               m.dimension() == 2);
-    }
-    // 2D
-    {
-        std::vector<size_t> shape(2); 
-        shape[0] = 6;
-        shape[1] = 4;
-        marray::View<int, constTarget> v(shape.begin(), shape.end(), data_);
-        marray::Matrix<int> m(3, 4);
-    m = v;
-
-        test(m.size() == v.size() &&
-               m.dimension() == v.dimension() &&
-               m.shape(0) == v.shape(0) &&
-               m.shape(1) == v.shape(1));
-        for(int x = 0; x < 6; ++x){
-            for(int y = 0; y < 4; ++y){
-                test(m(x, y) == v(x, y));
-            }
-        }
-    }
-}
-
-template<bool constTarget>
-void MatrixTest::transposeTest() {
-    marray::Matrix<int> m(6, 4);
-    for(size_t j=0; j<m.size(); ++j) {
-        m(j) = j;
-    }
-    marray::Matrix<int> n = m; // copy
-
-    n.transpose();
-
-    test(n.shape(0) == m.shape(1));
-    test(n.shape(1) == m.shape(0));
-    for(size_t x=0; x<n.shape(0); ++x)
-    for(size_t y=0; y<n.shape(1); ++y) {
-        test(n(x, y) == m(y, x));
-    }
-}
-
-template<bool constTarget>
-void MatrixTest::resizeTest() {
-    // from view
-    {
-    // resize to zero
-    {
-      marray::Matrix<int> m(3, 2);
-      m.resize(42, 0);
-      test(m.size() == 0);
-    }
-        // shrink 
-        {
-            std::vector<size_t> shape(2); 
-            shape[0] = 6;
-            shape[1] = 4;
-            marray::View<int, constTarget> v(shape.begin(), shape.end(), data_);
-            marray::Matrix<int> m = v;
-            m.resize(2, 3);
-
-            test(m.size() == 6 &&
-                   m.dimension() == v.dimension() &&
-                   m.shape(0) == 2 &&
-                   m.shape(1) == 3);
-            int i = 0;
-            for(int y = 0; y < 3; ++y){
-                for(int x = 0; x < 2; ++x){
-                    test(m(x, y) == v(x, y));
-                    ++i;
-                }
-            }
-        }
-        // grow 
-        {
-            std::vector<size_t> shape(2); 
-            shape[0] = 2;
-            shape[1] = 3;
-            marray::View<int, constTarget> v(shape.begin(), shape.end(), data_);
-            marray::Matrix<int> m = v;
-            m.resize(4, 4, scalar_);
-
-            test(m.size() == 16 &&
-                   m.dimension() == v.dimension() &&
-                   m.shape(0) == 4 &&
-                   m.shape(1) == 4);
-            for(int y = 0; y < 4; ++y){
-                for(int x = 0; x < 4; ++x){
-                    if(y < 3 && x < 2) {
-                        test(m(x, y) == v(x, y));
-                    }
-                    else {
-                        test(m(x, y) == scalar_);
-                    }
-                }
-            }
-        }
-    }
-    // from matrix
-    {
-        // shrink
-        {
-            marray::Matrix<int> m(6, 4, scalar_);
-            m.resize(2, 3);
-
-            test(m.size() == 6 &&
-                   m.shape(0) == 2 &&
-                   m.shape(1) == 3 &&
-                   m.dimension() == 2);
-            for(int x = 0; x < 2; ++x){
-                for(int y = 0; y < 3; ++y){
-                    test(m(x, y) == scalar_);
-                }
-            }
-        }
-        // grow
-        {
-            marray::Matrix<int> m(6, 4, scalar_);
-            m.resize(8, 8, 3);
-
-            test(m.size() == 64 &&
-                   m.shape(0) == 8 &&
-                   m.shape(1) == 8 &&
-                   m.dimension() == 2);
-            for(int y = 0; y < 8; ++y){
-                for(int x = 0; x < 8; ++x){
-                    if(y < 4 && x < 6) {
-                        test(m(x, y) == scalar_);
-                    }
-                    else {
-                        test(m(x, y) == 3);
-                    }
-                }
-            }
-        }
-    }
-}
-
-template<bool constTarget>
-void MatrixTest::reshapeTest() {
-    // 2D matrix
-    {
-        marray::Matrix<int> m(6, 4, scalar_);
-        m.reshape(4, 6);
-
-        test(m.size() == 24 &&
-               m.shape(0) == 4 &&
-               m.shape(1) == 6 &&
-               m.dimension() == 2);
-        for(int x = 0; x < 4; ++x){
-            for(int y = 0; y < 6; ++y){
-                test(m(x, y) == scalar_);
-            }
-        }
-    }
-    // from view
-    {
-        std::vector<size_t> shape(2); 
-        shape[0] = 6;
-        shape[1] = 4;
-        marray::View<int, constTarget> v(shape.begin(), shape.end(), data_);
-        marray::Matrix<int> m = v;
-        m.reshape(4, 6);
-
-        test(m.size() == 24 &&
-               m.dimension() == v.dimension() &&
-               m.shape(0) == 4 &&
-               m.shape(1) == 6);
-        int i = 0;
-        for(int y = 0; y < 6; ++y){
-            for(int x = 0; x < 4; ++x){
-                test(m(x, y) == data_[i]);
-                ++i;
-            }
-        }
-    }
-}
-
 ExpressionTemplateTest::ExpressionTemplateTest()
 {
     for(size_t j=0; j<24; ++j) {
@@ -12290,8 +11668,8 @@ ExpressionTemplateTest::ExpressionTemplateTest()
 void ExpressionTemplateTest::arithmeticOperatorsTest()
 {
     size_t shape[] = {2, 3, 2};
-    marray::View<int> v(shape, shape+3, dataInt_);
-    marray::View<int> w(shape, shape+3, dataInt_ + 2);
+    andres::View<int> v(shape, shape+3, dataInt_);
+    andres::View<int> w(shape, shape+3, dataInt_ + 2);
     for(size_t z=0; z<2; ++z) {
         for(size_t y=0; y<3; ++y) {
             for(size_t x=0; x<2; ++x) {
@@ -12328,9 +11706,9 @@ void ExpressionTemplateTest::constructionAndAssignmentTest()
     // Marray
     {
         size_t shape[] = {2, 3, 2};
-        marray::View<int> v(shape, shape+3, dataInt_);
-        marray::View<int> w(shape, shape+3, dataInt_ + 2);
-        marray::Marray<int> r(v + w); // construction
+        andres::View<int> v(shape, shape+3, dataInt_);
+        andres::View<int> w(shape, shape+3, dataInt_ + 2);
+        andres::Marray<int> r(v + w); // construction
         for(size_t z=0; z<2; ++z) {
             for(size_t y=0; y<3; ++y) {
                 for(size_t x=0; x<2; ++x) {
@@ -12344,39 +11722,6 @@ void ExpressionTemplateTest::constructionAndAssignmentTest()
                 for(size_t x=0; x<2; ++x) {
                     test( r(x,y,z) == (v * w)(x,y,z) );
                 }
-            }
-        }
-    }
-
-    // Vector 
-    {
-        size_t shape[] = {10};
-        marray::View<int> v(shape, shape+1, dataInt_);
-        marray::View<int> w(shape, shape+1, dataInt_ + 2);
-        marray::Vector<int> r(v + w); // construction
-        for(size_t x=0; x<10; ++x) {
-            test( r(x) == (v + w)(x) );
-        }
-        r = v * w; // assignment
-        for(size_t x=0; x<10; ++x) {
-            test( r(x) == (v * w)(x) );
-        }
-    }
-    // Matrix 
-    {
-        size_t shape[] = {4, 3};
-        marray::View<int> v(shape, shape+2, dataInt_);
-        marray::View<int> w(shape, shape+2, dataInt_ + 2);
-        marray::Matrix<int> r(v + w); // construction
-        for(size_t y=0; y<3; ++y) {
-            for(size_t x=0; x<4; ++x) {
-                test( r(x,y) == (v + w)(x,y) );
-            }
-        }
-        r = v * w; // assignment
-        for(size_t y=0; y<3; ++y) {
-            for(size_t x=0; x<4; ++x) {
-                test( r(x,y) == (v * w)(x,y) );
             }
         }
     }
@@ -12397,8 +11742,8 @@ void DifferingTypesTest::constructionTest()
         // from View 
         {
             size_t shape[] = {3, 2, 4};
-            marray::View<short> v(shape, shape+3, dataShort_);
-            marray::Marray<int> m(v);
+            andres::View<short> v(shape, shape+3, dataShort_);
+            andres::Marray<int> m(v);
             test(v.size() == m.size());
             for(size_t j=0; j<v.size(); ++j) {
                 test(v(j) == m(j));
@@ -12407,8 +11752,8 @@ void DifferingTypesTest::constructionTest()
         // from ViewExpression
         {
             size_t shape[] = {3, 2, 4};
-            marray::View<short> v(shape, shape+3, dataShort_);
-            marray::Marray<int> m(v + v);
+            andres::View<short> v(shape, shape+3, dataShort_);
+            andres::Marray<int> m(v + v);
             test(v.size() == m.size());
             for(size_t j=0; j<v.size(); ++j) {
                 test(v(j)+v(j) == m(j));
@@ -12417,57 +11762,11 @@ void DifferingTypesTest::constructionTest()
         // from Marray
         {
             size_t shape[] = {3, 2, 4};
-            marray::Marray<short> m(shape, shape+3);
-            marray::Marray<int> n(m);
+            andres::Marray<short> m(shape, shape+3);
+            andres::Marray<int> n(m);
             test(n.size() == m.size());
             for(size_t j=0; j<n.size(); ++j) {
                 test(n(j) == m(j));
-            }
-        }
-    }
-    // Vector
-    {
-        // from View
-        {
-            marray::Vector<short> v(10, 42);
-            marray::View<short> w(v);
-            marray::Vector<int> x(w);
-            test(v.size() == x.size());
-            for(size_t j=0; j<v.size(); ++j) {
-                test(x(j) == w(j));
-            }
-        }
-        // from ViewExpression
-        {
-            marray::Vector<short> v(10, 42);
-            marray::View<short> w(v);
-            marray::Vector<int> x(w + w);
-            test(v.size() == x.size());
-            for(size_t j=0; j<v.size(); ++j) {
-                test(x(j) == w(j) + w(j));
-            }
-        }
-    }
-    // Matrix
-    {
-        // from View
-        {
-            marray::Matrix<short> v(2, 2, 42);
-            marray::View<short> w(v);
-            marray::Matrix<int> x(w);
-            test(v.size() == x.size());
-            for(size_t j=0; j<v.size(); ++j) {
-                test(x(j) == w(j));
-            }
-        }
-        // from ViewExpression
-        {
-            marray::Matrix<short> v(2, 2, 42);
-            marray::View<short> w(v);
-            marray::Matrix<int> x(w + w);
-            test(v.size() == x.size());
-            for(size_t j=0; j<v.size(); ++j) {
-                test(x(j) == w(j) + w(j));
             }
         }
     }
@@ -12480,7 +11779,7 @@ void DifferingTypesTest::assignmentTest()
         // from constant
         {
             size_t shape[] = {3, 2, 4};
-            marray::View<short> v(shape, shape+3, dataShort_);
+            andres::View<short> v(shape, shape+3, dataShort_);
             v = 2;
             for(size_t j=0; j<v.size(); ++j) {
                 test(v(j) == 2);
@@ -12491,8 +11790,8 @@ void DifferingTypesTest::assignmentTest()
             // compilers may issue a warning here
             if(sizeof(float) == sizeof(int)) {
                 size_t shape[] = {3, 2, 4};
-                marray::View<int> v(shape, shape+3, dataInt_);
-                marray::View<float, true> w;
+                andres::View<int> v(shape, shape+3, dataInt_);
+                andres::View<float, true> w;
                 w = v;
                 for(size_t j=0; j<v.size(); ++j) {
                     test( w(j) == *static_cast<float*>(
@@ -12503,8 +11802,8 @@ void DifferingTypesTest::assignmentTest()
         // from ViewExpression
         { 
             size_t shape[] = {3, 2, 4};
-            marray::View<short> v(shape, shape+3, dataShort_);
-            marray::View<int> w(shape, shape+3, dataInt_);
+            andres::View<short> v(shape, shape+3, dataShort_);
+            andres::View<int> w(shape, shape+3, dataInt_);
             w = v + v;
             for(size_t j=0; j<w.size(); ++j) {
                 test(w(j) == (v + v)(j));
@@ -12516,7 +11815,7 @@ void DifferingTypesTest::assignmentTest()
         // from constant
         {
             size_t shape[] = {3, 2, 4};
-            marray::Marray<short> m(shape, shape+3);
+            andres::Marray<short> m(shape, shape+3);
             m = 2;
             for(size_t j=0; j<m.size(); ++j) {
                 test(m(j) == 2);
@@ -12525,8 +11824,8 @@ void DifferingTypesTest::assignmentTest()
         // from View 
         {
             size_t shape[] = {3, 2, 4};
-            marray::View<short> v(shape, shape+3, dataShort_);
-            marray::Marray<int> m;
+            andres::View<short> v(shape, shape+3, dataShort_);
+            andres::Marray<int> m;
             m = v;
             test(v.size() == m.size());
             for(size_t j=0; j<v.size(); ++j) {
@@ -12536,8 +11835,8 @@ void DifferingTypesTest::assignmentTest()
         // from ViewExpression
         {
             size_t shape[] = {3, 2, 4};
-            marray::View<short> v(shape, shape+3, dataShort_);
-            marray::Marray<int> m;
+            andres::View<short> v(shape, shape+3, dataShort_);
+            andres::Marray<int> m;
             m = v + v;
             test(v.size() == m.size());
             for(size_t j=0; j<v.size(); ++j) {
@@ -12547,8 +11846,8 @@ void DifferingTypesTest::assignmentTest()
         // from Marray
         {
             size_t shape[] = {3, 2, 4};
-            marray::Marray<short> m(shape, shape+3);
-            marray::Marray<int> n;
+            andres::Marray<short> m(shape, shape+3);
+            andres::Marray<int> n;
             n = m;
             test(n.size() == m.size());
             for(size_t j=0; j<n.size(); ++j) {
@@ -12556,82 +11855,15 @@ void DifferingTypesTest::assignmentTest()
             }
         }
     }
-    // Vector
-    {
-        // from constant
-        {
-            marray::Vector<short> v(10);
-            v = 2;
-            for(size_t j=0; j<v.size(); ++j) {
-                test(v(j) == 2);
-            }
-        }
-        // from View
-        {
-            marray::Vector<short> v(10, 42);
-            marray::View<short> w(v);
-            marray::Vector<int> x;
-            x = w; 
-            test(v.size() == x.size());
-            for(size_t j=0; j<v.size(); ++j) {
-                test(x(j) == w(j));
-            }
-        }
-        // from ViewExpression
-        {
-            marray::Vector<short> v(10, 42);
-            marray::View<short> w(v);
-            marray::Vector<int> x;
-            x = w + w;
-            test(v.size() == x.size());
-            for(size_t j=0; j<v.size(); ++j) {
-                test(x(j) == w(j) + w(j));
-            }
-        }
-    }
-    // Matrix
-    {
-        // from constant
-        {
-            marray::Matrix<short> v(2, 3);
-            v = 2;
-            for(size_t j=0; j<v.size(); ++j) {
-                test(v(j) == 2);
-            }
-        }
-        // from View
-        {
-            marray::Matrix<short> v(2, 2, 42);
-            marray::View<short> w(v);
-            marray::Matrix<int> x;
-            x = w; 
-            test(v.size() == x.size());
-            for(size_t j=0; j<v.size(); ++j) {
-                test(x(j) == w(j));
-            }
-        }
-        // from ViewExpression
-        {
-            marray::Matrix<short> v(2, 2, 42);
-            marray::View<short> w(v);
-            marray::Matrix<int> x;
-            x = w + w;
-            test(v.size() == x.size());
-            for(size_t j=0; j<v.size(); ++j) {
-                test(x(j) == w(j) + w(j));
-            }
-        }
-    }
 }
 
 void DifferingTypesTest::arithmeticOperatorsTest()
 {
-
     // ViewExpression
     {
         size_t shape[] = {2, 3, 2};
-        marray::View<short> v(shape, shape+3, dataShort_);
-        marray::View<int> w(shape, shape+3, dataInt_);
+        andres::View<short> v(shape, shape+3, dataShort_);
+        andres::View<int> w(shape, shape+3, dataInt_);
         for(size_t z=0; z<2; ++z) {
             for(size_t y=0; y<3; ++y) {
                 for(size_t x=0; x<2; ++x) {
@@ -12663,11 +11895,11 @@ void DifferingTypesTest::arithmeticOperatorsTest()
         // += constant
         {
             size_t shape[] = {2, 3, 4};
-            marray::Marray<short> m(shape, shape+3);
+            andres::Marray<short> m(shape, shape+3);
             for(size_t j=0; j<m.size(); ++j) {
                 m(j) = static_cast<short>(j+1);
             }
-            marray::Marray<short> n(m); // copy for comparsion
+            andres::Marray<short> n(m); // copy for comparsion
             m += 2;
             for(size_t j=0; j<m.size(); ++j) {
                 test(m(j) == n(j) + 2);
@@ -12676,13 +11908,13 @@ void DifferingTypesTest::arithmeticOperatorsTest()
         // += Marray
         {
             size_t shape[] = {2, 3, 4};
-            marray::Marray<short> m1(shape, shape+3);
-            marray::Marray<int> m2(shape, shape+3);
+            andres::Marray<short> m1(shape, shape+3);
+            andres::Marray<int> m2(shape, shape+3);
             for(size_t j=0; j<m1.size(); ++j) {
                 m1(j) = static_cast<short>(j+1);
                 m2(j) = static_cast<int>(j+1);
             }
-            marray::Marray<short> n(m1); // copy for comparison
+            andres::Marray<short> n(m1); // copy for comparison
             m1 += m2;
             for(size_t j=0; j<m1.size(); ++j) {
                 test(m1(j) == n(j) + m2(j));
@@ -12691,11 +11923,11 @@ void DifferingTypesTest::arithmeticOperatorsTest()
         // -= constant
         {
             size_t shape[] = {2, 3, 4};
-            marray::Marray<short> m(shape, shape+3);
+            andres::Marray<short> m(shape, shape+3);
             for(size_t j=0; j<m.size(); ++j) {
                 m(j) = static_cast<short>(j+1);
             }
-            marray::Marray<short> n(m); // copy for comparsion
+            andres::Marray<short> n(m); // copy for comparsion
             m -= 2;
             for(size_t j=0; j<m.size(); ++j) {
                 test(m(j) == n(j) - 2);
@@ -12704,13 +11936,13 @@ void DifferingTypesTest::arithmeticOperatorsTest()
         // -= Marray
         {
             size_t shape[] = {2, 3, 4};
-            marray::Marray<short> m1(shape, shape+3);
-            marray::Marray<int> m2(shape, shape+3);
+            andres::Marray<short> m1(shape, shape+3);
+            andres::Marray<int> m2(shape, shape+3);
             for(size_t j=0; j<m1.size(); ++j) {
                 m1(j) = static_cast<short>(j+1);
                 m2(j) = static_cast<int>(j+1);
             }
-            marray::Marray<short> n(m1); // copy for comparison
+            andres::Marray<short> n(m1); // copy for comparison
             m1 -= m2;
             for(size_t j=0; j<m1.size(); ++j) {
                 test(m1(j) == n(j) - m2(j));
@@ -12719,11 +11951,11 @@ void DifferingTypesTest::arithmeticOperatorsTest()
         // *= constant
         {
             size_t shape[] = {2, 3, 4};
-            marray::Marray<short> m(shape, shape+3);
+            andres::Marray<short> m(shape, shape+3);
             for(size_t j=0; j<m.size(); ++j) {
                 m(j) = static_cast<short>(j+1);
             }
-            marray::Marray<short> n(m); // copy for comparsion
+            andres::Marray<short> n(m); // copy for comparsion
             m *= 2;
             for(size_t j=0; j<m.size(); ++j) {
                 test(m(j) == n(j) * 2);
@@ -12732,13 +11964,13 @@ void DifferingTypesTest::arithmeticOperatorsTest()
         // *= Marray
         {
             size_t shape[] = {2, 3, 4};
-            marray::Marray<short> m1(shape, shape+3);
-            marray::Marray<int> m2(shape, shape+3);
+            andres::Marray<short> m1(shape, shape+3);
+            andres::Marray<int> m2(shape, shape+3);
             for(size_t j=0; j<m1.size(); ++j) {
                 m1(j) = static_cast<short>(j+1);
                 m2(j) = static_cast<int>(j+1);
             }
-            marray::Marray<short> n(m1); // copy for comparison
+            andres::Marray<short> n(m1); // copy for comparison
             m1 *= m2;
             for(size_t j=0; j<m1.size(); ++j) {
                 test(m1(j) == n(j) * m2(j));
@@ -12747,11 +11979,11 @@ void DifferingTypesTest::arithmeticOperatorsTest()
         // /= constant
         {
             size_t shape[] = {2, 3, 4};
-            marray::Marray<short> m(shape, shape+3);
+            andres::Marray<short> m(shape, shape+3);
             for(size_t j=0; j<m.size(); ++j) {
                 m(j) = static_cast<short>(j+1);
             }
-            marray::Marray<short> n(m); // copy for comparsion
+            andres::Marray<short> n(m); // copy for comparsion
             m /= 2;
             for(size_t j=0; j<m.size(); ++j) {
                 test(m(j) == n(j) / 2);
@@ -12760,13 +11992,13 @@ void DifferingTypesTest::arithmeticOperatorsTest()
         // /= Marray
         {
             size_t shape[] = {2, 3, 4};
-            marray::Marray<short> m1(shape, shape+3);
-            marray::Marray<int> m2(shape, shape+3);
+            andres::Marray<short> m1(shape, shape+3);
+            andres::Marray<int> m2(shape, shape+3);
             for(size_t j=0; j<m1.size(); ++j) {
                 m1(j) = static_cast<short>(j+1);
                 m2(j) = static_cast<int>(j+1);
             }
-            marray::Marray<short> n(m1); // copy for comparison
+            andres::Marray<short> n(m1); // copy for comparison
             m1 /= m2;
             for(size_t j=0; j<m1.size(); ++j) {
                 test(m1(j) == n(j) / m2(j));
@@ -12779,17 +12011,20 @@ struct MyTestType {};
 
 void DifferingTypesTest::nonBasicTypesTest()
 {
-    marray::Matrix<MyTestType> m(3, 4);
+    size_t shape[] = {3, 4};
+    andres::Marray<MyTestType> m(shape, shape + 2);
     size_t base[] = {0, 0};
-    size_t shape[] = {2, 2};
-    marray::View<MyTestType> v = m.view(base, shape);
+    shape[0] = 2;
+    shape[1] = 2;
+    andres::View<MyTestType> v = m.view(base, shape);
     v(0, 1) = MyTestType();
 }
 
 void DifferingTypesTest::typePromotionTest()
 {
-    marray::Matrix<unsigned char> a(3, 4, 250);
-    marray::Matrix<int> b(3, 4, 1000);
+    size_t shape[] = {3, 4};
+    andres::Marray<unsigned char> a(shape, shape + 2, 250);
+    andres::Marray<int> b(shape, shape + 2, 1000);
     for(size_t j=0; j<a.size(); ++j) {
         test((a + b)(j) == 1250);
         test((a - b)(j) == -750);
@@ -12813,54 +12048,54 @@ class Cpp0xTest {
         
     void test() {
         {
-            marray::View<int, false> v({3,2,4}, data_, marray::LastMajorOrder, marray::LastMajorOrder);
+            andres::View<int, false> v({3,2,4}, data_, andres::LastMajorOrder, andres::LastMajorOrder);
             size_t a = 100;
             v.coordinatesToIndex({1,1,3}, a);
             v.coordinatesToOffset({1,1,3}, a);
         }
         {
-            marray::View<int, false> v({3,2,4}, data_, marray::LastMajorOrder, marray::LastMajorOrder);
+            andres::View<int, false> v({3,2,4}, data_, andres::LastMajorOrder, andres::LastMajorOrder);
             v.assign({6,4}, data_);
         }
         {
-            marray::View<int, false> v({3,2,4}, data_, marray::LastMajorOrder, marray::LastMajorOrder);
-            v.assign({6,4}, data_, marray::LastMajorOrder, marray::LastMajorOrder);
+            andres::View<int, false> v({3,2,4}, data_, andres::LastMajorOrder, andres::LastMajorOrder);
+            v.assign({6,4}, data_, andres::LastMajorOrder, andres::LastMajorOrder);
         }
         {
-            marray::View<int, false> v({3,2,4}, data_, marray::LastMajorOrder, marray::LastMajorOrder);
-            v.assign({24}, {3}, data_, marray::LastMajorOrder);
+            andres::View<int, false> v({3,2,4}, data_, andres::LastMajorOrder, andres::LastMajorOrder);
+            v.assign({24}, {3}, data_, andres::LastMajorOrder);
         }
         {
-            marray::View<int, false> v({3,2,4}, data_, marray::LastMajorOrder, marray::LastMajorOrder);
-            marray::View<int, true> v2;
-            marray::View<int, false> v3;
+            andres::View<int, false> v({3,2,4}, data_, andres::LastMajorOrder, andres::LastMajorOrder);
+            andres::View<int, true> v2;
+            andres::View<int, false> v3;
             v.view({0,0,0}, {1,1,1}, v3);
-            v.view({0,0,0}, {1,1,1}, marray::LastMajorOrder, v3);
-            v.view({0,0,0}, {1,1,1}, marray::LastMajorOrder, v3);
+            v.view({0,0,0}, {1,1,1}, andres::LastMajorOrder, v3);
+            v.view({0,0,0}, {1,1,1}, andres::LastMajorOrder, v3);
             v.constView({0,0,0}, {1,1,1}, v2);
-            v.constView({0,0,0}, {1,1,1}, marray::LastMajorOrder, v2);
+            v.constView({0,0,0}, {1,1,1}, andres::LastMajorOrder, v2);
         }
         {
-            marray::View<int, true> v1({6,4}, {4}, data_, marray::LastMajorOrder);
-            marray::View<int, true> v2({6,4}, {4}, data_, marray::LastMajorOrder);
+            andres::View<int, true> v1({6,4}, {4}, data_, andres::LastMajorOrder);
+            andres::View<int, true> v2({6,4}, {4}, data_, andres::LastMajorOrder);
         }
         {
-            marray::View<int, false> v({3,2,4}, data_, marray::LastMajorOrder, marray::LastMajorOrder);
+            andres::View<int, false> v({3,2,4}, data_, andres::LastMajorOrder, andres::LastMajorOrder);
             v.permute({0,2,1});
         }
         {
-            marray::View<int, false> v({3,2,4}, data_, marray::LastMajorOrder);
+            andres::View<int, false> v({3,2,4}, data_, andres::LastMajorOrder);
         }
         {
-            marray::Marray<int> v({3,2,4}, 0);
+            andres::Marray<int> v({3,2,4}, 0);
             v.reshape({6,4});
         }
         {
-            marray::Marray<int> v({3,2,4}, 0);
+            andres::Marray<int> v({3,2,4}, 0);
             v.resize({1,2,4});
         }
         {
-            marray::Vector<int> v({1,2,3,4,5,6,7,8,9});
+            andres::Vector<int> v({1,2,3,4,5,6,7,8,9});
         }
     }
 };
@@ -12891,8 +12126,8 @@ int main()
     { ViewTest t; t.shapeStrideAssignTest<false>(); }
     { ViewTest t; t.shapeStrideAssignTest<true>(); }
     { ViewTest t; t.copyConstructorTest(); } 
-    { ViewTest t; t.assignmentOperatorTest<marray::LastMajorOrder>(); } 
-    { ViewTest t; t.assignmentOperatorTest<marray::FirstMajorOrder>(); }
+    { ViewTest t; t.assignmentOperatorTest<andres::LastMajorOrder>(); } 
+    { ViewTest t; t.assignmentOperatorTest<andres::FirstMajorOrder>(); }
     { ViewTest t; t.queryTest<false>(); }
     { ViewTest t; t.queryTest<true>(); }
     { ViewTest t; t.elementAccessTest<false>(); }
@@ -12908,10 +12143,10 @@ int main()
     { ViewTest t; t.transposeTest<true>(); }
     { ViewTest t; t.permuteTest<false>(); }
     { ViewTest t; t.permuteTest<true>(); } 
-    { ViewTest t; t.shiftOperatorTest<false, marray::LastMajorOrder>(); }
-    { ViewTest t; t.shiftOperatorTest<false, marray::FirstMajorOrder>(); }
-    { ViewTest t; t.shiftOperatorTest<true, marray::LastMajorOrder>(); }
-    { ViewTest t; t.shiftOperatorTest<true, marray::FirstMajorOrder>(); } 
+    { ViewTest t; t.shiftOperatorTest<false, andres::LastMajorOrder>(); }
+    { ViewTest t; t.shiftOperatorTest<false, andres::FirstMajorOrder>(); }
+    { ViewTest t; t.shiftOperatorTest<true, andres::LastMajorOrder>(); }
+    { ViewTest t; t.shiftOperatorTest<true, andres::FirstMajorOrder>(); } 
     { ViewTest t; t.arithmeticOperatorsTest(); }
     { ViewTest t; t.asStringTest<true>(); } 
     { ViewTest t; t.asStringTest<false>(); } 
@@ -12941,28 +12176,8 @@ int main()
     { MarrayTest t; t.assignmentOperatorTest<false>(); }
     { MarrayTest t; t.assignmentOperatorTest<true>(); }
     { MarrayTest t; t.reshapeTest(); } 
-    { MarrayTest t; t.resizeTest<marray::LastMajorOrder>(); } 
-    { MarrayTest t; t.resizeTest<marray::FirstMajorOrder>(); } 
-
-    { VectorTest t; t.constructorTest<false>(); }
-    { VectorTest t; t.constructorTest<true>(); } 
-    { VectorTest t; t.assignmentOperatorTest<false>(); }
-    { VectorTest t; t.assignmentOperatorTest<true>(); }
-    { VectorTest t; t.elementAccessTest<false>(); }
-    { VectorTest t; t.elementAccessTest<true>(); }
-    { VectorTest t; t.resizeTest<false>(); }
-    { VectorTest t; t.resizeTest<true>(); }
-
-    { MatrixTest t; t.constructorTest<false>(); }
-    { MatrixTest t; t.constructorTest<true>(); }
-    { MatrixTest t; t.assignmentOperatorTest<false>(); }
-    { MatrixTest t; t.assignmentOperatorTest<true>(); }
-    { MatrixTest t; t.transposeTest<false>(); }
-    { MatrixTest t; t.transposeTest<true>(); }
-    { MatrixTest t; t.resizeTest<false>(); }
-    { MatrixTest t; t.resizeTest<true>(); }
-    { MatrixTest t; t.reshapeTest<false>(); }
-    { MatrixTest t; t.reshapeTest<true>(); }
+    { MarrayTest t; t.resizeTest<andres::LastMajorOrder>(); } 
+    { MarrayTest t; t.resizeTest<andres::FirstMajorOrder>(); } 
 
     { ExpressionTemplateTest t; t.constructionAndAssignmentTest(); }
     { ExpressionTemplateTest t; t.arithmeticOperatorsTest(); }

@@ -1,7 +1,8 @@
 /// \mainpage
 /// Marray: Fast Runtime-Flexible Multi-dimensional Arrays and Views in C++.
+/// \newline
 ///
-/// Copyright (c) 2011 by Bjoern Andres (bjoern@andres.sc).
+/// Copyright (c) 2013 by Bjoern Andres, bjoern@andres.sc
 ///
 /// \section section_abstract Short Description
 /// Marray is a single header file for fast multi-dimensional arrays and views 
@@ -9,44 +10,35 @@
 /// Blitz++, the dimension of Marray views and arrays can be set and changed at 
 /// runtime. Dimension is not a template parameter in Marray. Arrays and views 
 /// that have the same type of entries but different dimension are therefore of 
-/// the same C++ type (class). In conjunction with the comprehensive and 
+/// the same C++ type. In conjunction with the comprehensive and 
 /// convenient Marray interface, this brings some of the flexibility known from 
-/// high-level languages such as Python and MATLAB to C++.
+/// high-level languages such as Python, R and MATLAB to C++.
 ///
 /// \section section_features Features
-/// - Multi-dimensional arrays and views whose dimension, shape, size and 
-///   indexing order (first or last coordinate major order) can be set and 
+/// - Multi-dimensional arrays and views whose dimension, shape, size and
+///   indexing order (first or last coordinate major order) can be set and
 ///   changed at runtime
-/// - Derived classes for matrices and vectors
-/// - Access to entries via coordinates, scalar indices and STL-compliant
-///   random access iterators
+/// - Access to entries via coordinates, initializer lists, scalar indices and
+///   STL-compliant random access iterators
 /// - Arithmetic operators with type promotion and expression templates
-/// - Support of exchangeable STL-compliant allocators
-/// - Simple HDF5 inferface to load, save and exchange multi-dimensional data
-///   (see namespace marray::hdf5 in header include/marray/marray_hdf5.hxx)
+/// - Support for STL-compliant allocators
 /// - MIT License for worry-free use and distribution
 /// 
 /// \section section_tutorial Tutorial
 /// - An introductory tutorial can be found at src/tutorial/tutorial.cxx
 ///
-/// \section section_cpp0x C++0x Extensions
-/// - C++0x Extensions are enabled by defining
-///   - HAVE_CPP0X_TEMPLATE_ALIASES
-///   - HAVE_CPP0X_VARIADIC_TEMPLATES
-///   - HAVE_CPP0X_INITIALIZER_LISTS
+/// \section section_cpp0x C++11 Extensions
+/// - C++11 extensions are enabled by defining
+///   - HAVE_CPP11_VARIADIC_TEMPLATES
+///   - HAVE_CPP11_INITIALIZER_LISTS
+///   - HAVE_CPP11_TEMPLATE_ALIASES
 ///   .
 /// 
 /// \section section_license License
-///
-/// Copyright (c) 2011 by Bjoern Andres.
+/// Copyright (c) 2013 by Bjoern Andres.
 /// 
 /// This software was developed by Bjoern Andres.
 /// Enquiries shall be directed to bjoern@andres.sc.
-///
-/// All advertising materials mentioning features or use of this software must
-/// display the following acknowledgement: ``This product includes the Marray 
-/// package developed by Bjoern Andres. Please direct enquiries concerning the 
-/// Marray package to bjoern@andres.sc''.
 ///
 /// Redistribution and use in source and binary forms, with or without 
 /// modification, are permitted provided that the following conditions are met:
@@ -56,10 +48,6 @@
 /// - Redistributions in binary form must reproduce the above copyright notice, 
 ///   this list of conditions and the following disclaimer in the documentation
 ///   and/or other materials provided with the distribution.
-/// - All advertising materials mentioning features or use of this software must 
-///   display the following acknowledgement: ``This product includes the Marray 
-///   package developed by Bjoern Andres. Please direct enquiries concerning the 
-///   Marray package to bjoern@andres.sc''.
 /// - The name of the author must not be used to endorse or promote products 
 ///   derived from this software without specific prior written permission.
 ///
@@ -75,8 +63,8 @@
 /// ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /// 
 #pragma once
-#ifndef MARRAY_HXX
-#define MARRAY_HXX
+#ifndef ANDRES_MARRAY_HXX
+#define ANDRES_MARRAY_HXX
 
 #include <cassert>
 #include <stdexcept> // runtime_error
@@ -90,9 +78,13 @@
 #include <iostream> // cout
 #include <memory> // allocator
 #include <numeric> // accumulate
+#include <functional> // std::multiplies
+#ifdef HAVE_CPP11_INITIALIZER_LISTS
+    #include <initializer_list>
+#endif
 
 /// The public API.
-namespace marray {
+namespace andres {
 
 enum StringStyle {TableStyle, MatrixStyle}; ///< Flag to be used with the member function asString() of View.
 enum CoordinateOrder {FirstMajorOrder, LastMajorOrder}; ///< Flag setting the order of coordinate tuples.
@@ -105,7 +97,7 @@ static const InitializationSkipping SkipInitialization = InitializationSkipping(
 
 template<class E, class T> 
     class ViewExpression;
-// \cond suppress doxygen
+// \cond suppress_doxygen
 template<class E, class T, class UnaryFunctor> 
     class UnaryViewExpression;
 template<class E1, class T1, class E2, class T2, class BinaryFunctor> 
@@ -114,16 +106,14 @@ template<class E, class T, class S, class BinaryFunctor>
     class BinaryViewExpressionScalarFirst;
 template<class E, class T, class S, class BinaryFunctor> 
     class BinaryViewExpressionScalarSecond;
-// \endcond suppress doxygen
+// \endcond suppress_doxygen
 template<class T, bool isConst = false, class A = std::allocator<size_t> > 
     class View;
-#ifdef HAVE_CPP0X_TEMPLATE_ALIASES
+#ifdef HAVE_CPP11_TEMPLATE_ALIASES
     template<class T, class A> using ConstView = View<T, true, A>;
 #endif
 template<class T, bool isConst, class A = std::allocator<size_t> > 
     class Iterator;
-template<class T, class A = std::allocator<size_t> > class Vector;
-template<class T, class A = std::allocator<size_t> > class Matrix;
 template<class T, class A = std::allocator<size_t> > class Marray;
 
 // assertion testing
@@ -135,7 +125,7 @@ template<class T, class A = std::allocator<size_t> > class Marray;
     const bool MARRAY_NO_ARG_TEST = false; ///< Argument testing enabled.
 #endif
 
-// \cond suppress doxygen
+// \cond suppress_doxygen
 namespace marray_detail {
     // meta-programming
     template <bool PREDICATE, class TRUECASE, class FALSECASE>
@@ -253,7 +243,7 @@ namespace marray_detail {
     template<class T1, class T2, class U>
         struct DividedBy { U operator()(const T1& x, const T2& y) const { return x / y; } };
 }
-// \endcond suppress doxygen
+// \endcond suppress_doxygen
    
 /// Array-Interface to an interval of memory.
 ///
@@ -303,7 +293,7 @@ public:
         View(ShapeIterator, ShapeIterator, StrideIterator,
             pointer, const CoordinateOrder&, 
             const allocator_type& = allocator_type());
-    #ifdef HAVE_CPP0X_INITIALIZER_LISTS
+    #ifdef HAVE_CPP11_INITIALIZER_LISTS
         View(std::initializer_list<size_t>, pointer,
             const CoordinateOrder& = defaultOrder,
             const CoordinateOrder& = defaultOrder,
@@ -333,7 +323,7 @@ public:
         void assign(ShapeIterator, ShapeIterator, StrideIterator,
             pointer, const CoordinateOrder&, 
             const allocator_type& = allocator_type());
-    #ifdef HAVE_CPP0X_INITIALIZER_LISTS
+    #ifdef HAVE_CPP11_INITIALIZER_LISTS
         void assign(std::initializer_list<size_t>, pointer,
             const CoordinateOrder& = defaultOrder,
             const CoordinateOrder& = defaultOrder,
@@ -361,7 +351,7 @@ public:
     // element access
     template<class U> reference operator()(U); 
     template<class U> reference operator()(U) const; 
-    #ifndef HAVE_CPP0X_VARIADIC_TEMPLATES
+    #ifndef HAVE_CPP11_VARIADIC_TEMPLATES
         reference operator()(const size_t, const size_t);
         reference operator()(const size_t, const size_t) const;
         reference operator()(const size_t, const size_t, const size_t);
@@ -420,7 +410,7 @@ public:
     template<class BaseIterator, class ShapeIterator>
         View<T, true, A> constView(BaseIterator, ShapeIterator, 
             const CoordinateOrder&) const;
-    #ifdef HAVE_CPP0X_INITIALIZER_LISTS
+    #ifdef HAVE_CPP11_INITIALIZER_LISTS
         void view(std::initializer_list<size_t>,
             std::initializer_list<size_t>, View<T, isConst, A>&) const;
         void view(std::initializer_list<size_t>,
@@ -463,7 +453,7 @@ public:
     View<T, isConst, A> boundView(const size_t, const size_t = 0) const;
     View<T, isConst, A> squeezedView() const;
 
-    #ifdef HAVE_CPP0X_INITIALIZER_LISTS
+    #ifdef HAVE_CPP11_INITIALIZER_LISTS
         void reshape(std::initializer_list<size_t>);
         void permute(std::initializer_list<size_t>);
 
@@ -479,7 +469,7 @@ public:
     template<class CoordinateIterator>
         void indexToCoordinates(size_t, CoordinateIterator) const;
     void indexToOffset(size_t, size_t&) const;
-    #ifdef HAVE_CPP0X_INITIALIZER_LISTS
+    #ifdef HAVE_CPP11_INITIALIZER_LISTS
         void coordinatesToIndex(std::initializer_list<size_t>,
             size_t&) const;
         void coordinatesToOffset(std::initializer_list<size_t>,
@@ -509,11 +499,7 @@ template<class TLocal, bool isConstLocal, class ALocal>
     friend class View;
 template<class TLocal, class ALocal>
     friend class Marray;
-template<class TLocal, class ALocal>
-    friend class Vector;
-template<class TLocal, class ALocal>
-    friend class Matrix;
-// \cond suppress doxygen
+// \cond suppress_doxygen
 template<bool isConstTo, class TFrom, class TTo, class AFrom, class ATo> 
     friend struct marray_detail::AssignmentOperatorHelper;
 friend struct marray_detail::AccessOperatorHelper<true>;
@@ -532,7 +518,7 @@ template<class E, class U, class S, class BinaryFunctor>
 
 template<class Functor, class T1, class Alocal, class E, class T2>
     friend void marray_detail::operate(View<T1, false, Alocal>& v, const ViewExpression<E, T2>& expression, Functor f);
-// \endcond end suppress doxygen
+// \endcond end suppress_doxygen
 };
 
 /// STL-compliant random access iterator for View and Marray.
@@ -642,7 +628,7 @@ public:
         Marray(const InitializationSkipping&, ShapeIterator, ShapeIterator,
             const CoordinateOrder& = defaultOrder, 
             const allocator_type& = allocator_type());
-    #ifdef HAVE_CPP0X_INITIALIZER_LISTS
+    #ifdef HAVE_CPP11_INITIALIZER_LISTS
         Marray(std::initializer_list<size_t>, const T& = T(),
             const CoordinateOrder& = defaultOrder, 
             const allocator_type& = allocator_type());
@@ -669,7 +655,7 @@ public:
         void resize(ShapeIterator, ShapeIterator, const T& = T());
     template<class ShapeIterator>
         void resize(const InitializationSkipping&, ShapeIterator, ShapeIterator);
-    #ifdef HAVE_CPP0X_INITIALIZER_LISTS
+    #ifdef HAVE_CPP11_INITIALIZER_LISTS
         void resize(std::initializer_list<size_t>, const T& = T());
         void resize(const InitializationSkipping&, std::initializer_list<size_t>);
     #endif
@@ -682,122 +668,11 @@ private:
         void resizeHelper(ShapeIterator, ShapeIterator, const T& = T());
 
     allocator_type dataAllocator_;
-
-friend class Vector<T, A>;
-friend class Matrix<T, A>;
-};
-
-/// One-dimensional Marray.
-template<class T, class A> 
-class Vector
-: public Marray<T, A>
-{
-public:
-    typedef Marray<T, A> base;
-    typedef typename base::value_type value_type;
-    typedef typename base::pointer pointer;
-    typedef typename base::const_pointer const_pointer;
-    typedef typename base::reference reference;
-    typedef typename base::const_reference const_reference;
-    typedef typename base::iterator iterator;
-    typedef typename base::reverse_iterator reverse_iterator;
-    typedef typename base::const_iterator const_iterator;
-    typedef typename base::const_reverse_iterator const_reverse_iterator;
-    typedef typename base::allocator_type allocator_type;
-
-    // constructors and destructor
-    Vector(const allocator_type& = allocator_type());
-    template<class TLocal, bool isConstLocal, class ALocal>
-        Vector(const View<TLocal, isConstLocal, ALocal>&);
-    Vector(const size_t, const T& = T(), 
-        const allocator_type& = allocator_type());
-    Vector(const InitializationSkipping&, const size_t,
-        const allocator_type& = allocator_type());
-    template<class E, class Te>
-        Vector(const ViewExpression<E, Te>&,
-            const allocator_type& = allocator_type());
-    #ifdef HAVE_CPP0X_INITIALIZER_LISTS
-        Vector(std::initializer_list<T> list,
-            const allocator_type& = allocator_type());
-    #endif
-
-    // assignment operator
-    Vector<T, A>& operator=(const T&);
-    Vector<T, A>& operator=(const Vector<T, A>&); // over-write default
-    template<class TLocal, bool isConstLocal, class ALocal>
-        Vector<T, A>& operator=(const View<TLocal, isConstLocal, ALocal>&);
-    template<class E, class Te>
-        Vector<T, A>& operator=(const ViewExpression<E, Te>&);
-
-    // element access
-    T& operator[](const size_t);
-    const T& operator[](const size_t) const;
-
-    // reshape, resize
-    void reshape(const size_t);
-    void resize(const size_t, const T& = T());
-    void resize(const InitializationSkipping&, const size_t);
-
-private:
-    void testInvariant() const;
-};
-
-/// Two-dimensional Marray.
-template<class T, class A> 
-class Matrix
-: public Marray<T, A>
-{
-public:
-    typedef Marray<T, A> base;
-
-    typedef typename base::value_type value_type;
-    typedef typename base::pointer pointer;
-
-    typedef typename base::const_pointer const_pointer;
-    typedef typename base::reference reference;
-    typedef typename base::const_reference const_reference;
-    typedef typename base::iterator iterator;
-    typedef typename base::reverse_iterator reverse_iterator;
-    typedef typename base::const_iterator const_iterator;
-    typedef typename base::const_reverse_iterator const_reverse_iterator;
-    typedef typename base::allocator_type allocator_type;
-
-    // constructors and destructor
-    Matrix(const allocator_type& = allocator_type());
-    template<class TLocal, bool isConstLocal, class ALocal>
-        Matrix(const View<TLocal, isConstLocal, ALocal>&);
-    Matrix(const size_t, const size_t, const T& = T(),
-        const CoordinateOrder& = defaultOrder,
-        const allocator_type& = allocator_type());
-    Matrix(const InitializationSkipping&, 
-        const size_t, const size_t,
-        const CoordinateOrder& = defaultOrder,
-        const allocator_type& = allocator_type());
-    template<class E, class Te>
-        Matrix(const ViewExpression<E, Te>&,
-            const allocator_type& = allocator_type());
-
-    // assignment operator
-    Matrix<T, A>& operator=(const T&);
-    Matrix<T, A>& operator=(const Matrix<T, A>&); // over-write default
-        // overwrite standard operator=
-    template<class TLocal, bool isConstLocal, class ALocal>
-        Matrix<T, A>& operator=(const View<TLocal, isConstLocal, ALocal>&);
-    template<class E, class Te>
-        Matrix<T, A>& operator=(const ViewExpression<E, Te>&);
-
-    // resize and reshape
-    void reshape(const size_t, const size_t);
-    void resize(const size_t, const size_t, const T& = T());
-    void resize(const InitializationSkipping&, const size_t, const size_t);
-
-private:
-    void testInvariant() const;
 };
 
 // implementation of View
 
-#ifdef HAVE_CPP0X_INITIALIZER_LISTS
+#ifdef HAVE_CPP11_INITIALIZER_LISTS
 /// Compute the index that corresponds to a sequence of coordinates.
 ///
 /// \param coordinate Coordinate given as initializer list.
@@ -839,7 +714,7 @@ View<T, isConst, A>::coordinatesToIndex
     }
 }
 
-#ifdef HAVE_CPP0X_INITIALIZER_LISTS
+#ifdef HAVE_CPP11_INITIALIZER_LISTS
 /// Compute the offset that corresponds to a sequence of coordinates.
 ///
 /// \param it An iterator to the beginning of the coordinate sequence.
@@ -1101,7 +976,7 @@ View<T, isConst, A>::View
     testInvariant();
 }
 
-#ifdef HAVE_CPP0X_INITIALIZER_LISTS
+#ifdef HAVE_CPP11_INITIALIZER_LISTS
 /// Construct unstrided View
 /// 
 /// \param shape Shape initializer list.
@@ -1242,7 +1117,7 @@ View<T, isConst, A>::assign
     testInvariant();
 }
 
-#ifdef HAVE_CPP0X_INITIALIZER_LISTS
+#ifdef HAVE_CPP11_INITIALIZER_LISTS
 /// Initialize unstrided View
 /// 
 /// \param shape Shape initializer list.
@@ -1330,7 +1205,7 @@ View<T, isConst, A>::operator()
     return marray_detail::AccessOperatorHelper<std::numeric_limits<U>::is_integer>::execute(*this, u);
 }
 
-#ifndef HAVE_CPP0X_VARIADIC_TEMPLATES
+#ifndef HAVE_CPP11_VARIADIC_TEMPLATES
 
 /// Reference data in a 2-dimensional View by coordinates.
 ///
@@ -1750,7 +1625,7 @@ View<T, isConst, A>::operator()
         + static_cast<size_t>(elementAccessHelper(sizeof...(args)+1, args...)) ];
 }
 
-#endif // #ifndef HAVE_CPP0X_VARIADIC_TEMPLATES
+#endif // #ifndef HAVE_CPP11_VARIADIC_TEMPLATES
 
 /// Get the number of data items.
 ///
@@ -2231,7 +2106,7 @@ View<T, isConst, A>::constView
     return v;
 }
 
-#ifdef HAVE_CPP0X_INITIALIZER_LISTS
+#ifdef HAVE_CPP11_INITIALIZER_LISTS
 /// Get a sub-view.
 ///
 /// \param b Initializer list defining the coordinate sequence
@@ -2343,7 +2218,8 @@ View<T, isConst, A>::reshape
     testInvariant();
     marray_detail::Assert(MARRAY_NO_DEBUG || isSimple());
     if(!MARRAY_NO_ARG_TEST) {
-        size_t size = std::accumulate(begin, end, 1, std::multiplies<size_t>());
+        size_t size = std::accumulate(begin, end, static_cast<size_t>(1), 
+            std::multiplies<size_t>());
         marray_detail::Assert(size == this->size());
     }
     assign(begin, end, data_, coordinateOrder(), coordinateOrder());
@@ -2377,7 +2253,7 @@ View<T, isConst, A>::reshapedView
     return out;
 }
 
-#ifdef HAVE_CPP0X_INITIALIZER_LISTS
+#ifdef HAVE_CPP11_INITIALIZER_LISTS
 /// Reshape the View.
 /// 
 /// Two conditions have to be fulfilled in order for reshape to work:
@@ -2521,7 +2397,7 @@ View<T, isConst, A>::squeezedView() const
     return v;
 }
 
-#ifdef HAVE_CPP0X_INITIALIZER_LISTS
+#ifdef HAVE_CPP11_INITIALIZER_LISTS
 /// Permute dimensions.
 ///
 /// \param begin Iterator to the beginning of a sequence which
@@ -3065,7 +2941,7 @@ View<T, isConst, A>::asString
             std::vector<size_t> c2(dimension());
             unsigned short q = 2;
             if(coordinateOrder() == FirstMajorOrder) {
-                q = dimension()-3;
+                q = static_cast<unsigned char>(dimension() - 3);
             }
             for(const_iterator it = this->begin(); it.hasMore(); ++it) {
                 it.coordinate(c2.begin());
@@ -3597,7 +3473,8 @@ Marray<T, A>::Marray
 )
 : dataAllocator_(allocator)
 {
-    size_t size = std::accumulate(begin, end, 1, std::multiplies<size_t>());
+    size_t size = std::accumulate(begin, end, static_cast<size_t>(1), 
+        std::multiplies<size_t>());
     marray_detail::Assert(MARRAY_NO_ARG_TEST || size != 0);
     base::assign(begin, end, dataAllocator_.allocate(size), coordinateOrder, 
         coordinateOrder, allocator); 
@@ -3630,14 +3507,15 @@ Marray<T, A>::Marray
 ) 
 : dataAllocator_(allocator)
 {
-    size_t size = std::accumulate(begin, end, 1, std::multiplies<size_t>());
+    size_t size = std::accumulate(begin, end, static_cast<size_t>(1), 
+        std::multiplies<size_t>());
     marray_detail::Assert(MARRAY_NO_ARG_TEST || size != 0);
     base::assign(begin, end, dataAllocator_.allocate(size), coordinateOrder, 
         coordinateOrder, allocator); 
     testInvariant();
 }
 
-#ifdef HAVE_CPP0X_INITIALIZER_LISTS
+#ifdef HAVE_CPP11_INITIALIZER_LISTS
 /// Construct Marray with initialization.
 ///
 /// \param begin Shape given as initializer list.
@@ -3659,7 +3537,7 @@ Marray<T, A>::Marray
 : dataAllocator_(allocator)
 {
     size_t size = std::accumulate(shape.begin(), shape.end(), 
-        1, std::multiplies<size_t>());
+        static_cast<size_t>(1), std::multiplies<size_t>());
     marray_detail::Assert(MARRAY_NO_ARG_TEST || size != 0);
     base::assign(shape.begin(), shape.end(), dataAllocator_.allocate(size), 
                  coordinateOrder, coordinateOrder, allocator); 
@@ -3974,7 +3852,7 @@ Marray<T, A>::resize
     resizeHelper<true>(begin, end);
 }
 
-#ifdef HAVE_CPP0X_INITIALIZER_LISTS
+#ifdef HAVE_CPP11_INITIALIZER_LISTS
 /// Resize (existing entries are preserved, new entries are initialized).
 ///
 /// \param shape Shape given as initializer list.
@@ -4675,698 +4553,9 @@ Iterator<T, isConst, A>::coordinate
     }
 }
 
-// Vector implementation
+// implementation of expression templates
 
-/// Empty constructor.
-///
-/// \param allocator Allocator.
-///
-template<class T, class A>
-inline
-Vector<T, A>::Vector
-(
-    const allocator_type& allocator
-) 
-: base(allocator)
-{
-    testInvariant();
-}
-
-/// Copy constructor.
-///
-/// \param in Vector (source).
-///
-template<class T, class A>
-template<class TLocal, bool isConstLocal, class ALocal>
-inline
-Vector<T, A>::Vector
-(
-    const View<TLocal, isConstLocal, ALocal>& in
-)
-{
-    in.testInvariant();
-    marray_detail::Assert(MARRAY_NO_ARG_TEST ||
-        in.data_ == 0 // un-initialized
-        || (in.dimension() == 0 && in.size() == 1) // scalar
-        || in.dimension() == 1 // vector
-    );
-    this->geometry_.size() = in.size();
-    this->geometry_.coordinateOrder() = in.coordinateOrder();
-    if(in.data_ != 0) { // in is initialized
-        this->geometry_.resize(1);
-        this->geometry_.shape(0) = in.size();
-        this->geometry_.shapeStrides(0) = 1;
-        this->geometry_.strides(0) = 1;
-        this->data_ = this->dataAllocator_.allocate(this->size());
-        if(in.dimension() == 0) { // in is a scalar
-            this->data_[0] = static_cast<T>(in(0));
-        }
-        else {
-            if(in.isSimple() && marray_detail::IsEqual<T, TLocal>::type) {
-                memcpy(this->data_, in.data_, (this->size())*sizeof(T));
-            }
-            else {
-                for(size_t j=0; j<in.size(); ++j) {
-                    this->data_[j] = static_cast<T>(in(j));
-                }
-            }
-        }
-    }
-    testInvariant();
-}
-
-/// Construct Vector with initialization.
-///
-/// \param size Size.
-/// \param value Initial value of entries.
-/// \param allocator Allocator.
-/// 
-template<class T, class A>
-inline
-Vector<T, A>::Vector
-(
-    const size_t size,
-    const T& value,
-    const allocator_type& allocator
-) 
-: base(allocator)
-{
-    if(size != 0) {
-        size_t shape[1] = {size};
-        this->data_ = this->dataAllocator_.allocate(size);
-        base::base::assign(&shape[0], &shape[1], this->data_); 
-        for(size_t j=0; j<size; ++j) {
-            this->data_[j] = value;
-        }
-    }
-    testInvariant();
-}
-
-/// Construct Vector without initialization.
-///
-/// \param is Flag to be set to SkipInitialization.
-/// \param size Size.
-/// \param allocator Allocator.
-/// 
-template<class T, class A>
-inline
-Vector<T, A>::Vector
-(
-    const InitializationSkipping& is,
-    const size_t size,
-    const allocator_type& allocator
-) 
-: base(allocator)
-{
-    if(size != 0) {
-        size_t shape[1] = {size};
-        this->data_ = this->dataAllocator_.allocate(size);
-        base::base::assign(&shape[0], &shape[1], this->data_); 
-    }
-    testInvariant();
-}
-
-/// Construct Vector from ViewExpression.
-///
-/// \param expression ViewExpression.
-/// \param allocator Allocator.
-///
-template<class T, class A>
-template<class E, class Te>
-inline
-Vector<T, A>::Vector
-(
-    const ViewExpression<E, Te>& expression,
-    const allocator_type& allocator
-) 
-: base(expression, allocator)
-{
-    marray_detail::Assert(MARRAY_NO_ARG_TEST || expression.dimension() == 1);
-    marray_detail::Assert(MARRAY_NO_ARG_TEST || expression.size() > 0);
-    testInvariant();
-}
-
-#ifdef HAVE_CPP0X_INITIALIZER_LISTS
-/// Construct with initializer list (C++0x)
-///
-/// \param list Initializer list.
-/// \param allocator Allocator.
-///
-template<class T, class A>
-inline
-Vector<T, A>::Vector
-(
-    std::initializer_list<T> list,
-    const allocator_type& allocator
-)
-: base(allocator)
-{
-    if(list.size() != 0) {
-        size_t shape[1] = {list.size()};
-        this->data_ = this->dataAllocator_.allocate(list.size());
-        base::base::assign(&shape[0], &shape[1], this->data_);
-        int j=0;
-        for(const T *p = list.begin(); p != list.end(); ++p, ++j) {
-            this->data_[j] = *p;
-        }
-    }
-    testInvariant();
-}
-#endif
-
-/// Assignment.
-///
-/// \param value Value.
-///
-/// All entries are set to value.
-///
-template<class T, class A>
-inline Vector<T, A>&
-Vector<T, A>::operator=
-(
-    const T& value
-)
-{
-    marray_detail::Assert(MARRAY_NO_DEBUG || this->data_ != 0);
-    for(size_t j=0; j<this->size(); ++j) {
-        this->data_[j] = value;
-    }
-    return *this;
-}
-
-/// Assignment.
-///
-/// \param in Vector
-///
-/// The entries of 'in' are copied.
-///
-template<class T, class A>
-inline Vector<T, A>&
-Vector<T, A>::operator=
-(
-    const Vector<T, A>& in
-)
-{
-    in.testInvariant();
-    base::operator=(in);
-    testInvariant();
-    return *this;
-}
-
-/// Assignment from View.
-///
-/// \param in View.
-///
-/// The entries of 'in' are copied in the coordinate order of 'in'.
-///
-template<class T, class A>
-template<class TLocal, bool isConstLocal, class ALocal>
-inline Vector<T, A>&
-Vector<T, A>::operator=
-(
-    const View<TLocal, isConstLocal, ALocal>& in
-)
-{
-    in.testInvariant();
-    marray_detail::Assert(MARRAY_NO_ARG_TEST || 
-        in.data_ == 0 || // empty
-        (in.dimension() == 0 && in.size() == 1) || // scalar
-        in.dimension() == 1); // vector
-    if(in.geometry_.dimension() == 0 && in.geometry_.size() == 1) { // in is a View to a scalar
-        // copy data
-        if(this->size() != 1) {
-            this->dataAllocator_.deallocate(this->data_, this->size());
-            this->data_ = this->dataAllocator_.allocate(1);
-        }
-        this->data_[0] = static_cast<T>(in(0));
-        this->geometry_.resize(1);
-        this->geometry_.shape(0) = 1;
-        this->geometry_.shapeStrides(0) = 1;
-        this->geometry_.strides(0) = 1;
-        this->geometry_.size() = 1;
-        this->geometry_.isSimple() = true;
-        this->geometry_.coordinateOrder() = in.coordinateOrder();
-    }
-    else {
-        base::operator=(in);
-    }
-    testInvariant();
-    return *this;
-}
-
-/// Assignment from ViewExpression.
-///
-/// \param expression ViewExpression.
-///
-template<class T, class A>
-template<class E, class Te>
-inline Vector<T, A>&
-Vector<T, A>::operator=
-(
-    const ViewExpression<E, Te>& expression
-)
-{
-    marray_detail::Assert(MARRAY_NO_ARG_TEST || expression.dimension() == 1);
-    marray_detail::Assert(MARRAY_NO_ARG_TEST || expression.size() > 0);
-    base::operator=(expression);
-    return *this;
-}
-
-/// Reshape.
-///
-/// A Vector can only be reshaped into a Vector which has the same
-/// size and thus the same shape. The main pupose of this function
-/// is to hide the function reshape inherited from View in a
-/// way that is C++ standard complient.
-///
-/// \param size New size (which has to equal the current size).
-///
-template<class T, class A>
-inline void
-Vector<T, A>::reshape
-(
-    const size_t size
-)
-{
-    marray_detail::Assert(size == this->size());
-}
-
-/// Resize (existing entries are preserved, new entries are initialized).
-///
-/// \param size New size.
-/// \param value Value to be assigned to newly allocated entries.
-///
-template<class T, class A>
-inline void
-Vector<T, A>::resize
-(
-    const size_t size,
-    const T& value
-)
-{
-    if(size == 0) {
-        base::assign();
-    }
-    else {
-        size_t shape[1] = {size};
-        base::resize(&shape[0], &shape[1], value); 
-    }
-    testInvariant();
-}
-
-/// Resize (existing entries are preserved).
-///
-/// \param is Flag to be set to SkipInitialization.
-/// \param size New size.
-///
-template<class T, class A>
-inline void
-Vector<T, A>::resize
-(
-    const InitializationSkipping& is,
-    const size_t size
-)
-{
-    if(size == 0) {
-        base::assign();
-    }
-    else {
-        size_t shape[1] = {size};
-        base::resize(is, &shape[0], &shape[1]); 
-    }
-    testInvariant();
-}
-
-/// Element access.
-///
-template<class T, class A>
-inline T&
-Vector<T, A>::operator[]
-(
-    const size_t index
-)
-{
-    testInvariant();
-    return this->operator()(index);
-}
-
-/// Element access.
-///
-template<class T, class A>
-inline const T&
-Vector<T, A>::operator[]
-(
-    const size_t index
-) const
-{
-    testInvariant();
-    return this->operator()(index);
-}
-
-/// Invariant test.
-///
-template<class T, class A> 
-inline void
-Vector<T, A>::testInvariant() const
-{
-    View<T, false, A>::testInvariant();
-    marray_detail::Assert(MARRAY_NO_DEBUG || this->data_ == 0 || 
-        (this->geometry_.isSimple() && this->geometry_.dimension() == 1));
-}
-
-// Matrix implementation
-
-/// Empty constructor.
-///
-/// \param allocator Allocator.
-///
-template<class T, class A>
-inline
-Matrix<T, A>::Matrix
-(
-    const allocator_type& allocator
-)
-: base(allocator)
-{
-    testInvariant();
-}
-
-/// Copy from a View.
-///
-/// \param in View (source).
-///
-template<class T, class A>
-    template<class TLocal, bool isConstLocal, class ALocal>
-inline
-Matrix<T, A>::Matrix
-(
-    const View<TLocal, isConstLocal, ALocal>& in
-)
-{
-    in.testInvariant();
-    marray_detail::Assert(MARRAY_NO_ARG_TEST || 
-        in.data_ == 0 || // not initialized
-        (in.dimension() == 0 && in.size() == 1) || // scalar
-        in.dimension() == 2); // matrix
-    this->geometry_.size() = in.size();
-    this->geometry_.coordinateOrder() = in.coordinateOrder();
-    if(in.data_ != 0) { // 'in' is uninitialized
-        this->geometry_.resize(2); 
-        if(in.dimension() == 0) { // in is a scalar
-            this->geometry_.shape(0) = 1;
-            this->geometry_.shape(1) = 1;
-            this->geometry_.shapeStrides(0) = 1;
-            this->geometry_.shapeStrides(1) = 1;
-            this->geometry_.strides(0) = 1;
-            this->geometry_.strides(1) = 1;
-            this->data_ = this->dataAllocator_.allocate(1);
-            this->data_[0] = static_cast<T>(in(0));
-        }
-        else {
-            this->geometry_.shape(0) = in.shape(0);
-            this->geometry_.shape(1) = in.shape(1);
-            this->geometry_.shapeStrides(0) = in.geometry_.shapeStrides(0);
-            this->geometry_.shapeStrides(1) = in.geometry_.shapeStrides(1);
-            this->geometry_.strides(0) = in.geometry_.shapeStrides(0); // !
-            this->geometry_.strides(1) = in.geometry_.shapeStrides(1); // !
-            this->data_ = this->dataAllocator_.allocate(this->size());
-            if(in.isSimple() && marray_detail::IsEqual<T, TLocal>::type) {
-                memcpy(this->data_, in.data_, (this->size())*sizeof(T));
-            }
-            else {
-                for(size_t j=0; j<in.size(); ++j) {
-                    this->data_[j] = static_cast<T>(in(j));
-                }
-            }
-        }
-    }
-    testInvariant();
-}
-
-/// Construct Matrix with initialization.
-///
-/// \param n1 size in 1st dimension.
-/// \param n2 size in 2nd dimension.
-/// \param value Initial value of entries.
-/// \param coordinateOrder Flag specifying whether FirstMajorOrder or
-/// LastMajorOrder is to be used.
-/// \param allocator Allocator.
-///
-template<class T, class A>
-inline
-Matrix<T, A>::Matrix
-(
-    const size_t n1,
-    const size_t n2,
-    const T& value,
-    const CoordinateOrder& coordinateOrder,
-    const allocator_type& allocator
-)
-: base(allocator)
-{
-    if(n1 > 0 && n2 > 0) {
-        size_t shape[2] = {n1, n2};
-        T* data = this->dataAllocator_.allocate(n1 * n2);
-        base::base::assign(&shape[0], &shape[2], data,
-            coordinateOrder, coordinateOrder);
-        for(size_t j=0; j<this->size(); ++j) {
-            this->data_[j] = value;
-        }
-    }
-    testInvariant();
-}
-
-
-/// Construct Matrix without initialization.
-///
-/// \param is Flag to be set to SkipInitialization.
-/// \param n1 Size in 1st dimension.
-/// \param n2 Size in 2nd dimension.
-/// \param coordinateOrder Flag specifying whether FirstMajorOrder or
-/// LastMajorOrder is to be used.
-/// \param allocator Allocator.
-///
-template<class T, class A>
-inline
-Matrix<T, A>::Matrix
-(
-    const InitializationSkipping& is, 
-    const size_t n1,
-    const size_t n2,
-    const CoordinateOrder& coordinateOrder,
-    const allocator_type& allocator
-) 
-: base(allocator)
-{
-    if(n1 > 0 && n2 > 0) {
-        size_t shape[2] = {n1, n2};
-        this->data_ = this->dataAllocator_.allocate(n1 * n2);
-        base::base::assign(&shape[0], &shape[2], this->data_, 
-            coordinateOrder, coordinateOrder);
-    }
-    testInvariant();
-}
-
-/// Construct Matrix from ViewExpression.
-///
-/// \param expression ViewExpression.
-/// \param allocator Allocator.
-///
-template<class T, class A>
-template<class E, class Te>
-inline
-Matrix<T, A>::Matrix
-(
-    const ViewExpression<E, Te>& expression,
-    const allocator_type& allocator 
-)
-: base(expression, allocator)
-{
-    marray_detail::Assert(MARRAY_NO_ARG_TEST || expression.dimension() == 2);
-    marray_detail::Assert(MARRAY_NO_ARG_TEST || expression.size() > 0);
-    testInvariant();
-}
-
-/// Assignment.
-///
-/// \param value Value.
-///
-/// All entries are set to value.
-///
-template<class T, class A>
-inline Matrix<T, A>&
-Matrix<T, A>::operator=
-(
-    const T& value
-)
-{
-    marray_detail::Assert(MARRAY_NO_DEBUG || this->data_ != 0);
-    for(size_t j=0; j<this->size(); ++j) {
-        this->data_[j] = value;
-    }
-    return *this;
-}
-
-/// Assignment.
-///
-/// \param in Matrix (source).
-///
-template<class T, class A>
-inline Matrix<T, A>&
-Matrix<T, A>::operator=
-(
-    const Matrix<T, A>& in
-)
-{
-    in.testInvariant();
-    base::operator=(in);
-    testInvariant();
-    return *this;
-}
-
-/// Assignment from View
-///
-/// \param in View (source).
-///
-template<class T, class A>
-template<class TLocal, bool isConstLocal, class ALocal>
-inline Matrix<T, A>&
-Matrix<T, A>::operator=
-(
-    const View<TLocal, isConstLocal, ALocal>& in
-)
-{
-    marray_detail::Assert(MARRAY_NO_ARG_TEST || 
-        in.data_ != 0 || // empty
-        (in.dimension() == 0 && in.size() == 1) || // scalar
-        in.dimension() == 2);
-    if(in.dimension() == 0 && in.size() == 1) { // in is a View to a scalar
-        // copy data
-        if(this->size() != 1) {
-            this->dataAllocator_.deallocate(this->data_, this->size());
-            this->data_ = this->dataAllocator_.allocate(1);
-        }
-        this->data_[0] = static_cast<T>(in(0));
-        this->geometry_.resize(2);
-        this->geometry_.shape(0) = 1;
-        this->geometry_.shape(1) = 1;
-        this->geometry_.shapeStrides(0) = 1;
-        this->geometry_.shapeStrides(1) = 1;
-        this->geometry_.strides(0) = 1;
-        this->geometry_.strides(1) = 1;
-        this->geometry_.size() = 1;
-        this->geometry_.isSimple() = true;
-        this->geometry_.coordinateOrder() = in.coordinateOrder();
-    }
-    else {
-        base::operator=(in);
-    }
-    testInvariant();
-    return *this;
-}
-
-/// Assignment from ViewExpression.
-///
-/// \param expression ViewExpression.
-///
-template<class T, class A>
-template<class E, class Te>
-inline Matrix<T, A>&
-Matrix<T, A>::operator=
-(
-    const ViewExpression<E, Te>& expression
-)
-{
-    marray_detail::Assert(MARRAY_NO_ARG_TEST || expression.dimension() == 2);
-    marray_detail::Assert(MARRAY_NO_ARG_TEST || expression.size() > 0);
-    base::operator=(expression);
-    return *this;
-}
-
-/// Resize (existing entries are preserved, new entries are initialized).
-///
-/// \param n1 New extension in 1st dimension.
-/// \param n2 New extension in 1st dimension.
-/// \param value Initial value for newly allocated entries.
-///
-template<class T, class A>
-inline void
-Matrix<T, A>::resize
-(
-    const size_t n1,
-    const size_t n2,
-    const T& value
-)
-{
-    if(n1 == 0 || n2 == 0) {
-        base::assign();
-    }
-    else {
-        size_t shape[2] = {n1, n2};
-        base::resize(&shape[0], &shape[2], value);
-    }
-    testInvariant();
-}
-
-/// Resize (existing entries are preserved).
-///
-/// \param is Flag to be set to SkipInitialization.
-/// \param n1 New extension in 1st dimension.
-/// \param n2 New extension in 1st dimension.
-///
-template<class T, class A>
-inline void
-Matrix<T, A>::resize
-(
-    const InitializationSkipping& is,
-    const size_t n1,
-    const size_t n2
-)
-{
-    if(n1 == 0 || n2 == 0) {
-        base::assign();
-    }
-    else {
-        size_t shape[2] = {n1, n2};
-        base::resize(is, &shape[0], &shape[2]);
-    }
-    testInvariant();
-}
-
-/// Reshape.
-///
-/// \param n1 New extension in 1st dimension.
-/// \param n2 New extension in 1st dimension.
-///
-/// Is is necessary that n1*n2 == size().
-///
-template<class T, class A>
-inline void
-Matrix<T, A>::reshape
-(
-    const size_t n1,
-    const size_t n2
-)
-{
-    marray_detail::Assert(MARRAY_NO_ARG_TEST || (n2 > 0 && n1 > 0));
-    size_t shape[2] = {n1, n2};
-    base::reshape(&shape[0], &shape[2]); 
-    testInvariant();
-}
-
-/// Invariant test.
-///
-template<class T, class A> 
-inline void
-Matrix<T, A>::testInvariant() const
-{
-    View<T, false, A>::testInvariant();
-    marray_detail::Assert(MARRAY_NO_DEBUG || this->data_ == 0 ||
-        (this->geometry_.isSimple() && this->geometry_.dimension() == 2));
-}
-
-// expression templates
-
+/// Expression template for efficient arithmetic operations.
 template<class E, class T>
 class ViewExpression {
 public:
@@ -5408,7 +4597,7 @@ public:
     operator E const&() const 
         { return static_cast<const E&>(*this); }
 
-    // \cond suppress doxygen
+    // \cond suppress_doxygen
     class ExpressionIterator {
     public:
         ExpressionIterator(const ViewExpression<E, T>& expression)
@@ -5433,10 +4622,10 @@ public:
         const T* data_;
         size_t offset_;
     };
-    // \endcond suppress doxygen
+    // \endcond suppress_doxygen
 };
 
-// \cond suppress doxygen
+// \cond suppress_doxygen
 template<class E, class T, class UnaryFunctor>
 class UnaryViewExpression 
 : public ViewExpression<UnaryViewExpression<E, T, UnaryFunctor>, T> 
@@ -5736,11 +4925,11 @@ private:
     const scalar_type scalar_;
     BinaryFunctor binaryFunctor_;
 };
-// \endcond suppress doxygen
+// \endcond suppress_doxygen
 
 // implementation of marray_detail 
 
-// \cond suppress doxygen
+// \cond suppress_doxygen
 namespace marray_detail { 
 
 template<class A>
@@ -6786,9 +5975,8 @@ inline void operate
 }
 
 } // namespace marray_detail
-// \endcond suppress doxygen
+// \endcond suppress_doxygen
 
-} // namespace marray
+} // namespace andres
 
-#endif // #ifndef MARRAY_HXX
-
+#endif // #ifndef ANDRES_MARRAY_HXX
