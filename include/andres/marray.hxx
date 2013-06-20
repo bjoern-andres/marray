@@ -15,14 +15,14 @@
 /// high-level languages such as Python, R and MATLAB to C++.
 ///
 /// \section section_features Features
-/// - Multi-dimensional arrays and views whose dimension, shape, size and
-///   indexing order (first or last coordinate major order) can be set and
-///   changed at runtime
-/// - Access to entries via coordinates, initializer lists, scalar indices and
-///   STL-compliant random access iterators
-/// - Arithmetic operators with type promotion and expression templates
-/// - Support for STL-compliant allocators
-/// - MIT License for worry-free use and distribution
+/// - Multi-dimensional arrays and views whose dimension, shape, size and 
+///   indexing order (first or last coordinate major order) can be set and 
+///   changed at runtime.
+/// - Access to entries via coordinates, scalar indices, STL-compliant random 
+///   access iterators and C++11 initializer lists.
+/// - Arithmetic operators with expression templates and automatic type 
+///   promotion.
+/// - Support for STL-compliant allocators.
 /// 
 /// \section section_tutorial Tutorial
 /// - An introductory tutorial can be found at src/tutorial/tutorial.cxx
