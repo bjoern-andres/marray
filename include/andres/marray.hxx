@@ -78,6 +78,7 @@
 #include <memory> // allocator
 #include <numeric> // accumulate
 #include <functional> // std::multiplies
+#include <cstddef> // ptrdiff_t
 #ifdef HAVE_CPP11_INITIALIZER_LISTS
     #include <initializer_list>
 #endif
