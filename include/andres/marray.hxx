@@ -3541,9 +3541,7 @@ Marray<T, A>::Marray
     marray_detail::Assert(MARRAY_NO_ARG_TEST || size != 0);
     base::assign(shape.begin(), shape.end(), dataAllocator_.allocate(size), 
                  coordinateOrder, coordinateOrder, allocator); 
-    for(size_t j=0; j<size; ++j) {
-        this->data_[j] = value;
-    }
+    std::fill(this->data_, this->data_+size, value);
     testInvariant();
 }
 #endif
