@@ -34,7 +34,7 @@ inline void test(const bool& x)
     { if(!x) throw std::logic_error("test failed."); }
 
 struct TestType {
-    size_t data_;
+    std::size_t data_;
 };
 
 class GlobalFunctionTest {
@@ -171,11 +171,11 @@ public:
 void GlobalFunctionTest::shapeStrideTest() {
     // firstMajorOrder == false
     {
-        std::vector<size_t> shape(3);
+        std::vector<std::size_t> shape(3);
         shape[0] = 7;
         shape[1] = 3;
         shape[2] = 5;
-        std::vector<size_t> strides(3);
+        std::vector<std::size_t> strides(3);
         andres::marray_detail::stridesFromShape(shape.begin(), shape.end(),
             strides.begin(), andres::LastMajorOrder);
 
@@ -186,11 +186,11 @@ void GlobalFunctionTest::shapeStrideTest() {
     }
     // firstMajorOrder == true
     {
-        std::vector<size_t> shape(3);
+        std::vector<std::size_t> shape(3);
         shape[0] = 7;
         shape[1] = 3;
         shape[2] = 5;
-        std::vector<size_t> strides(3);
+        std::vector<std::size_t> strides(3);
         andres::marray_detail::stridesFromShape(shape.begin(), shape.end(),
             strides.begin(), andres::FirstMajorOrder);
 
@@ -215,19 +215,19 @@ template<bool constTarget>
 void ViewTest::coordinatesToOffsetTest() {
     // externalFirstMajorOrder == false
     {
-        std::vector<size_t> shape(3);
+        std::vector<std::size_t> shape(3);
         shape[0] = 3;
         shape[1] = 2;
         shape[2] = 4;
         andres::View<int, constTarget> v(shape.begin(), shape.end(),
             data_, andres::LastMajorOrder);
         
-        std::vector<size_t> c(3);
-        size_t trueOffset = 0;
+        std::vector<std::size_t> c(3);
+        std::size_t trueOffset = 0;
         for(c[2]=0; c[2]<shape[2]; ++c[2]) 
         for(c[1]=0; c[1]<shape[1]; ++c[1])
         for(c[0]=0; c[0]<shape[0]; ++c[0]) {
-            size_t offset = 100;
+            std::size_t offset = 100;
             v.coordinatesToOffset(c.begin(), offset);
             test(offset == trueOffset);
             ++trueOffset;
@@ -235,20 +235,20 @@ void ViewTest::coordinatesToOffsetTest() {
     }
     // externalFirstMajorOrder == true
     {
-        std::vector<size_t> shape(3);
+        std::vector<std::size_t> shape(3);
         shape[0] = 3;
         shape[1] = 2;
         shape[2] = 4;
         andres::View<int, constTarget> v(shape.begin(), shape.end(),
             data_, andres::FirstMajorOrder);
 
-        std::vector<size_t> c(3);
-        size_t trueOffset = 0;
+        std::vector<std::size_t> c(3);
+        std::size_t trueOffset = 0;
         for(c[0]=0; c[0]<shape[0]; ++c[0])
         for(c[1]=0; c[1]<shape[1]; ++c[1])
 
         for(c[2]=0; c[2]<shape[2]; ++c[2]) { 
-            size_t offset = 100;
+            std::size_t offset = 100;
             v.coordinatesToOffset(c.begin(), offset);
             test(offset == trueOffset);
             ++trueOffset;
@@ -257,25 +257,25 @@ void ViewTest::coordinatesToOffsetTest() {
     // test also with non-trivial strides and non-zero offset
     // externalFirstMajorOrder == false
     {
-        size_t list[] = {30, 32, 34, 40, 42, 44, 50, 52, 54, 60, 62, 64, 
+        std::size_t list[] = {30, 32, 34, 40, 42, 44, 50, 52, 54, 60, 62, 64, 
             65, 67, 69, 75, 77, 79, 85, 87, 89, 95, 97, 99};
-        std::vector<size_t> shape(3);
+        std::vector<std::size_t> shape(3);
         shape[0] = 3;
         shape[1] = 4;
         shape[2] = 2;
-        std::vector<size_t> strides(3);
+        std::vector<std::size_t> strides(3);
         strides[0] = 2;
         strides[1] = 10;
         strides[2] = 35;
         andres::View<int, constTarget> v(shape.begin(), shape.end(), strides.begin(),
             data100_+30, andres::LastMajorOrder);
         
-        std::vector<size_t> c(3);
-        size_t index = 0;
+        std::vector<std::size_t> c(3);
+        std::size_t index = 0;
         for(c[2]=0; c[2]<shape[2]; ++c[2]) 
         for(c[1]=0; c[1]<shape[1]; ++c[1])
         for(c[0]=0; c[0]<shape[0]; ++c[0]) {
-            size_t offset = 0;
+            std::size_t offset = 0;
             v.coordinatesToOffset(c.begin(), offset);
             test(offset == list[index]-30);
             ++index;
@@ -283,25 +283,25 @@ void ViewTest::coordinatesToOffsetTest() {
     }
     // externalFirstMajorOrder == true
     {
-        size_t list[] = {30, 65, 40, 75, 50, 85, 60, 95, 32, 67, 42, 77, 
+        std::size_t list[] = {30, 65, 40, 75, 50, 85, 60, 95, 32, 67, 42, 77, 
             52, 87, 62, 97, 34, 69, 44, 79, 54, 89, 64, 99};
-        std::vector<size_t> shape(3);
+        std::vector<std::size_t> shape(3);
         shape[0] = 3;
         shape[1] = 4;
         shape[2] = 2;
-        std::vector<size_t> strides(3);
+        std::vector<std::size_t> strides(3);
         strides[0] = 2;
         strides[1] = 10;
         strides[2] = 35;
         andres::View<int, constTarget> v(shape.begin(), shape.end(), strides.begin(),
             data100_+30, andres::FirstMajorOrder);
 
-        std::vector<size_t> c(3);
-        size_t index = 0;
+        std::vector<std::size_t> c(3);
+        std::size_t index = 0;
         for(c[0]=0; c[0]<shape[0]; ++c[0])
         for(c[1]=0; c[1]<shape[1]; ++c[1])
         for(c[2]=0; c[2]<shape[2]; ++c[2]) { 
-            size_t offset = 100;
+            std::size_t offset = 100;
             v.coordinatesToOffset(c.begin(), offset);
             test(offset == list[index]-30);
             ++index;
@@ -313,19 +313,19 @@ template<bool constTarget>
 void ViewTest::coordinatesToIndexTest() {
     // internalFirstMajorOrder == false
     {
-        std::vector<size_t> shape(3);
+        std::vector<std::size_t> shape(3);
         shape[0] = 3;
         shape[1] = 2;
         shape[2] = 4;
         andres::View<int, constTarget> v(shape.begin(), shape.end(),
             data_, andres::LastMajorOrder, andres::LastMajorOrder);
 
-        std::vector<size_t> c(3);
-        size_t trueIndex = 0;
+        std::vector<std::size_t> c(3);
+        std::size_t trueIndex = 0;
         for(c[2]=0; c[2]<shape[2]; ++c[2]) 
         for(c[1]=0; c[1]<shape[1]; ++c[1])
         for(c[0]=0; c[0]<shape[0]; ++c[0]) {
-            size_t index = 100;
+            std::size_t index = 100;
             v.coordinatesToIndex(c.begin(), index);
             test(index == trueIndex);
             ++trueIndex;
@@ -333,19 +333,19 @@ void ViewTest::coordinatesToIndexTest() {
     }
     // internalFirstMajorOrder == true
     {
-        std::vector<size_t> shape(3);
+        std::vector<std::size_t> shape(3);
         shape[0] = 3;
         shape[1] = 2;
         shape[2] = 4;
         andres::View<int, constTarget> v(shape.begin(), shape.end(),
             data_, andres::LastMajorOrder, andres::FirstMajorOrder);
 
-        std::vector<size_t> c(3);
-        size_t trueIndex = 0;
+        std::vector<std::size_t> c(3);
+        std::size_t trueIndex = 0;
         for(c[0]=0; c[0]<shape[0]; ++c[0]) 
         for(c[1]=0; c[1]<shape[1]; ++c[1])
         for(c[2]=0; c[2]<shape[2]; ++c[2]) {
-            size_t index = 100;
+            std::size_t index = 100;
             v.coordinatesToIndex(c.begin(), index);
             test(index == trueIndex);
             ++trueIndex;
@@ -357,19 +357,19 @@ template<bool constTarget>
 void ViewTest::indexToCoordinatesTest() {
     // internalFirstMajorOrder == false
     {
-        std::vector<size_t> shape(3);
+        std::vector<std::size_t> shape(3);
         shape[0] = 3;
         shape[1] = 2;
         shape[2] = 4;
         andres::View<int, constTarget> v(shape.begin(), shape.end(),
             data_, andres::LastMajorOrder, andres::LastMajorOrder);
 
-        std::vector<size_t> c(3);
-        size_t index = 0;
+        std::vector<std::size_t> c(3);
+        std::size_t index = 0;
         for(c[2]=0; c[2]<shape[2]; ++c[2]) 
         for(c[1]=0; c[1]<shape[1]; ++c[1])
         for(c[0]=0; c[0]<shape[0]; ++c[0]) {
-            std::vector<size_t> d(3);
+            std::vector<std::size_t> d(3);
             v.indexToCoordinates(index, d.begin());
             test(d[0] == c[0] && d[1] == c[1] && d[2] == c[2]);
             ++index;
@@ -377,19 +377,19 @@ void ViewTest::indexToCoordinatesTest() {
     }
     // internalFirstMajorOrder == true
     {
-        std::vector<size_t> shape(3);
+        std::vector<std::size_t> shape(3);
         shape[0] = 3;
         shape[1] = 2;
         shape[2] = 4;
         andres::View<int, constTarget> v(shape.begin(), shape.end(),
             data_, andres::LastMajorOrder, andres::FirstMajorOrder);
 
-        std::vector<size_t> c(3);
-        size_t index = 0;
+        std::vector<std::size_t> c(3);
+        std::size_t index = 0;
         for(c[0]=0; c[0]<shape[0]; ++c[0]) 
         for(c[1]=0; c[1]<shape[1]; ++c[1])
         for(c[2]=0; c[2]<shape[2]; ++c[2]) {
-            std::vector<size_t> d(3);
+            std::vector<std::size_t> d(3);
             v.indexToCoordinates(index, d.begin());
             test(d[0] == c[0] && d[1] == c[1] && d[2] == c[2]);
             ++index;
@@ -402,16 +402,16 @@ void ViewTest::indexToOffsetTest() {
     // test cases: (externalFirstMajorOrder, internalFirstMajorOrder)
     // (false, false)
     {
-        std::vector<size_t> shape(3);
+        std::vector<std::size_t> shape(3);
         shape[0] = 3;
         shape[1] = 2;
         shape[2] = 4;
         andres::View<int, constTarget> v(shape.begin(), shape.end(),
             data_, andres::LastMajorOrder, andres::LastMajorOrder);
 
-        size_t trueOffset = 0;
-        for(size_t index=0; index<v.size(); ++index) {
-            size_t offset = 0;
+        std::size_t trueOffset = 0;
+        for(std::size_t index=0; index<v.size(); ++index) {
+            std::size_t offset = 0;
             v.indexToOffset(index, offset);
             test(offset == trueOffset);
             ++trueOffset;
@@ -419,7 +419,7 @@ void ViewTest::indexToOffsetTest() {
     }
     // (false, true)
     {
-        std::vector<size_t> shape(3);
+        std::vector<std::size_t> shape(3);
         shape[0] = 3;
         shape[1] = 2;
         shape[2] = 4;
@@ -428,31 +428,31 @@ void ViewTest::indexToOffsetTest() {
         andres::View<int> w(shape.begin(), shape.end(),
             data_, andres::LastMajorOrder, andres::LastMajorOrder);
     
-        std::vector<size_t> c(3);
-        size_t index = 0;
+        std::vector<std::size_t> c(3);
+        std::size_t index = 0;
         for(c[0]=0; c[0]<shape[0]; ++c[0]) 
         for(c[1]=0; c[1]<shape[1]; ++c[1])
         for(c[2]=0; c[2]<shape[2]; ++c[2]) {
-            size_t offset = 0;
+            std::size_t offset = 0;
             v.indexToOffset(index, offset);
-            test(offset == static_cast<size_t>(w(c[0], c[1], c[2])));
+            test(offset == static_cast<std::size_t>(w(c[0], c[1], c[2])));
             ++index;
         }
     
     }
     // (true, false)
     {
-        size_t list[] = {0, 8, 16, 4, 12, 20, 1, 9, 17, 5, 13, 21, 
+        std::size_t list[] = {0, 8, 16, 4, 12, 20, 1, 9, 17, 5, 13, 21, 
             2, 10, 18, 6, 14, 22, 3, 11, 19, 7, 15, 23}; 
-        std::vector<size_t> shape(3);
+        std::vector<std::size_t> shape(3);
         shape[0] = 3;
         shape[1] = 2;
         shape[2] = 4;
         andres::View<int, constTarget> v(shape.begin(), shape.end(),
             data_, andres::FirstMajorOrder, andres::LastMajorOrder);
 
-        for(size_t index=0; index<v.size(); ++index) {
-            size_t offset = 0;
+        for(std::size_t index=0; index<v.size(); ++index) {
+            std::size_t offset = 0;
             v.indexToOffset(index, offset);
             test(offset == list[index]);
         }
@@ -460,16 +460,16 @@ void ViewTest::indexToOffsetTest() {
     
     // (true, true)
     {
-        std::vector<size_t> shape(3);
+        std::vector<std::size_t> shape(3);
         shape[0] = 3;
         shape[1] = 2;
         shape[2] = 4;
         andres::View<int, constTarget> v(shape.begin(), shape.end(),
             data_, andres::FirstMajorOrder, andres::FirstMajorOrder);
 
-        size_t trueOffset = 0;
-        for(size_t index=0; index<v.size(); ++index) {
-            size_t offset = 0;
+        std::size_t trueOffset = 0;
+        for(std::size_t index=0; index<v.size(); ++index) {
+            std::size_t offset = 0;
             v.indexToOffset(index, offset);
             test(offset == trueOffset);
             ++trueOffset;
@@ -479,42 +479,42 @@ void ViewTest::indexToOffsetTest() {
     // test also with non-trivial strides and non-zero offset
     // (false)
     {
-        size_t list[] = {30, 32, 34, 40, 42, 44, 50, 52, 54, 60, 62, 64, 
+        std::size_t list[] = {30, 32, 34, 40, 42, 44, 50, 52, 54, 60, 62, 64, 
             65, 67, 69, 75, 77, 79, 85, 87, 89, 95, 97, 99}; 
-        std::vector<size_t> shape(3);
+        std::vector<std::size_t> shape(3);
         shape[0] = 3;
         shape[1] = 4;
         shape[2] = 2;
-        std::vector<size_t> strides(3);
+        std::vector<std::size_t> strides(3);
         strides[0] = 2;
         strides[1] = 10;
         strides[2] = 35;
         andres::View<int, constTarget> v(shape.begin(), shape.end(), strides.begin(),
             data100_+30, andres::LastMajorOrder);
         
-        for(size_t index=0; index<v.size(); ++index) {
-            size_t offset = 0;
+        for(std::size_t index=0; index<v.size(); ++index) {
+            std::size_t offset = 0;
             v.indexToOffset(index, offset);
             test(offset == list[index]-30);
         }
     }
     // (true)
     {
-        size_t list[] = {30, 65, 40, 75, 50, 85, 60, 95, 32, 67, 42, 77, 
+        std::size_t list[] = {30, 65, 40, 75, 50, 85, 60, 95, 32, 67, 42, 77, 
             52, 87, 62, 97, 34, 69, 44, 79, 54, 89, 64, 99};
-        std::vector<size_t> shape(3);
+        std::vector<std::size_t> shape(3);
         shape[0] = 3;
         shape[1] = 4;
         shape[2] = 2;
-        std::vector<size_t> strides(3);
+        std::vector<std::size_t> strides(3);
         strides[0] = 2;
         strides[1] = 10;
         strides[2] = 35;
         andres::View<int, constTarget> v(shape.begin(), shape.end(), strides.begin(),
             data100_+30, andres::FirstMajorOrder);
         
-        for(size_t index=0; index<v.size(); ++index) {
-            size_t offset = 0;
+        for(std::size_t index=0; index<v.size(); ++index) {
+            std::size_t offset = 0;
             v.indexToOffset(index, offset);
             test(offset == list[index]-30);
         }
@@ -572,7 +572,7 @@ void ViewTest::copyConstructorTest() {
     {
         // false, false
         {
-            std::vector<size_t> shape(1);
+            std::vector<std::size_t> shape(1);
             shape[0] = 24;
             andres::View<int, false> v(shape.begin(), shape.end(), data_);
             andres::View<int, false> w(v);
@@ -584,13 +584,13 @@ void ViewTest::copyConstructorTest() {
             for(unsigned short j=0; j<shape.size(); ++j) {
                 test(w.shape(j) == v.shape(j));
             }
-            for(size_t j=0; j<v.size(); ++j) {
+            for(std::size_t j=0; j<v.size(); ++j) {
                 test(w(j) == v(j));
             }
         }
         // false, true
         {
-            std::vector<size_t> shape(1);
+            std::vector<std::size_t> shape(1);
             shape[0] = 24;
             andres::View<int, false> v(shape.begin(), shape.end(), data_);
             andres::View<int, true> w(v);
@@ -602,13 +602,13 @@ void ViewTest::copyConstructorTest() {
             for(unsigned short j=0; j<shape.size(); ++j) {
                 test(w.shape(j) == v.shape(j));
             }
-            for(size_t j=0; j<v.size(); ++j) {
+            for(std::size_t j=0; j<v.size(); ++j) {
                 test(w(j) == v(j));
             }
         }
         // true, true
         {
-            std::vector<size_t> shape(1);
+            std::vector<std::size_t> shape(1);
             shape[0] = 24;
             andres::View<int, true> v(shape.begin(), shape.end(), data_);
             andres::View<int, true> w(v);
@@ -620,7 +620,7 @@ void ViewTest::copyConstructorTest() {
             for(unsigned short j=0; j<shape.size(); ++j) {
                 test(w.shape(j) == v.shape(j));
             }
-            for(size_t j=0; j<v.size(); ++j) {
+            for(std::size_t j=0; j<v.size(); ++j) {
                 test(w(j) == v(j));
             }
         }
@@ -629,7 +629,7 @@ void ViewTest::copyConstructorTest() {
     {
         // false, false
         {
-            std::vector<size_t> shape(2);
+            std::vector<std::size_t> shape(2);
             shape[0] = 6;
             shape[1] = 4;
             andres::View<int> v(shape.begin(), shape.end(), data_);
@@ -642,18 +642,18 @@ void ViewTest::copyConstructorTest() {
             for(unsigned short j=0; j<shape.size(); ++j) {
                 test(w.shape(j) == v.shape(j));
             }
-            for(size_t j=0; j<v.size(); ++j) {
+            for(std::size_t j=0; j<v.size(); ++j) {
                 test(w(j) == v(j));
             }
-            for(size_t j=0; j<v.shape(0); ++j) {
-                for(size_t k=0; k<v.shape(1); ++k) {
+            for(std::size_t j=0; j<v.shape(0); ++j) {
+                for(std::size_t k=0; k<v.shape(1); ++k) {
                     test(w(j, k) == v(j, k));
                 }
             }
         }
         // false, true
         {
-            std::vector<size_t> shape(2);
+            std::vector<std::size_t> shape(2);
             shape[0] = 6;
             shape[1] = 4;
             andres::View<int, false> v(shape.begin(), shape.end(), data_);
@@ -666,18 +666,18 @@ void ViewTest::copyConstructorTest() {
             for(unsigned short j=0; j<shape.size(); ++j) {
                 test(w.shape(j) == v.shape(j));
             }
-            for(size_t j=0; j<v.size(); ++j) {
+            for(std::size_t j=0; j<v.size(); ++j) {
                 test(w(j) == v(j));
             }
-            for(size_t j=0; j<v.shape(0); ++j) {
-                for(size_t k=0; k<v.shape(1); ++k) {
+            for(std::size_t j=0; j<v.shape(0); ++j) {
+                for(std::size_t k=0; k<v.shape(1); ++k) {
                     test(w(j, k) == v(j, k));
                 }
             }
         }
         // true, true
         {
-            std::vector<size_t> shape(2);
+            std::vector<std::size_t> shape(2);
             shape[0] = 6;
             shape[1] = 4;
             andres::View<int, true> v(shape.begin(), shape.end(), data_);
@@ -690,11 +690,11 @@ void ViewTest::copyConstructorTest() {
             for(unsigned short j=0; j<shape.size(); ++j) {
                 test(w.shape(j) == v.shape(j));
             }
-            for(size_t j=0; j<v.size(); ++j) {
+            for(std::size_t j=0; j<v.size(); ++j) {
                 test(w(j) == v(j));
             }
-            for(size_t j=0; j<v.shape(0); ++j) {
-                for(size_t k=0; k<v.shape(1); ++k) {
+            for(std::size_t j=0; j<v.shape(0); ++j) {
+                for(std::size_t k=0; k<v.shape(1); ++k) {
                     test(w(j, k) == v(j, k));
                 }
             }
@@ -704,7 +704,7 @@ void ViewTest::copyConstructorTest() {
     {
         // false, false
         {
-            std::vector<size_t> shape(3);
+            std::vector<std::size_t> shape(3);
             shape[0] = 3;
             shape[1] = 4;
             shape[2] = 2;
@@ -718,12 +718,12 @@ void ViewTest::copyConstructorTest() {
             for(unsigned short j=0; j<shape.size(); ++j) {
                 test(w.shape(j) == v.shape(j));
             }
-            for(size_t j=0; j<v.size(); ++j) {
+            for(std::size_t j=0; j<v.size(); ++j) {
                 test(w(j) == v(j));
             }
-            for(size_t j=0; j<v.shape(0); ++j) {
-                for(size_t k=0; k<v.shape(1); ++k) {
-                    for(size_t p=0; p<v.shape(2); ++p) {
+            for(std::size_t j=0; j<v.shape(0); ++j) {
+                for(std::size_t k=0; k<v.shape(1); ++k) {
+                    for(std::size_t p=0; p<v.shape(2); ++p) {
                         test(v(j, k, p) == w(j, k, p));
                     }
                 }
@@ -731,7 +731,7 @@ void ViewTest::copyConstructorTest() {
         }
         // false, true
         {
-            std::vector<size_t> shape(3);
+            std::vector<std::size_t> shape(3);
             shape[0] = 3;
             shape[1] = 4;
             shape[2] = 2;
@@ -745,12 +745,12 @@ void ViewTest::copyConstructorTest() {
             for(unsigned short j=0; j<shape.size(); ++j) {
                 test(w.shape(j) == v.shape(j));
             }
-            for(size_t j=0; j<v.size(); ++j) {
+            for(std::size_t j=0; j<v.size(); ++j) {
                 test(w(j) == v(j));
             }
-            for(size_t j=0; j<v.shape(0); ++j) {
-                for(size_t k=0; k<v.shape(1); ++k) {
-                    for(size_t p=0; p<v.shape(2); ++p) {
+            for(std::size_t j=0; j<v.shape(0); ++j) {
+                for(std::size_t k=0; k<v.shape(1); ++k) {
+                    for(std::size_t p=0; p<v.shape(2); ++p) {
                         test(v(j, k, p) == w(j, k, p));
                     }
                 }
@@ -758,7 +758,7 @@ void ViewTest::copyConstructorTest() {
         }
         // true, true
         {
-            std::vector<size_t> shape(3);
+            std::vector<std::size_t> shape(3);
             shape[0] = 3;
             shape[1] = 4;
             shape[2] = 2;
@@ -772,12 +772,12 @@ void ViewTest::copyConstructorTest() {
             for(unsigned short j=0; j<shape.size(); ++j) {
                 test(w.shape(j) == v.shape(j));
             }
-            for(size_t j=0; j<v.size(); ++j) {
+            for(std::size_t j=0; j<v.size(); ++j) {
                 test(w(j) == v(j));
             }
-            for(size_t j=0; j<v.shape(0); ++j) {
-                for(size_t k=0; k<v.shape(1); ++k) {
-                    for(size_t p=0; p<v.shape(2); ++p) {
+            for(std::size_t j=0; j<v.shape(0); ++j) {
+                for(std::size_t k=0; k<v.shape(1); ++k) {
+                    for(std::size_t p=0; p<v.shape(2); ++p) {
                         test(v(j, k, p) == w(j, k, p));
                     }
                 }
@@ -790,7 +790,7 @@ template<bool constTarget>
 void ViewTest::shapeConstructorTest() {
     // 1D
     {
-        std::vector<size_t> shape(1);
+        std::vector<std::size_t> shape(1);
         shape[0] = 24;
         andres::View<int, constTarget> v(shape.begin(), shape.end(), data_);
         
@@ -800,13 +800,13 @@ void ViewTest::shapeConstructorTest() {
         for(unsigned short j=0; j<shape.size(); ++j) {
             test(v.shape(j) == shape[j]);
         }
-        for(size_t j=0; j<v.size(); ++j) {
+        for(std::size_t j=0; j<v.size(); ++j) {
             test(v(j) == data_[j]);
         }
     }
     // 2D
     {
-        std::vector<size_t> shape(2);
+        std::vector<std::size_t> shape(2);
         shape[0] = 6;
         shape[1] = 4;
         andres::View<int, constTarget> v(shape.begin(), shape.end(), data_);
@@ -817,18 +817,18 @@ void ViewTest::shapeConstructorTest() {
         for(unsigned short j=0; j<shape.size(); ++j) {
             test(v.shape(j) == shape[j]);
         }
-        for(size_t j=0; j<v.size(); ++j) {
+        for(std::size_t j=0; j<v.size(); ++j) {
             test(v(j) == data_[j]);
         }
-        for(size_t j=0; j<v.shape(0); ++j) {
-            for(size_t k=0; k<v.shape(1); ++k) {
+        for(std::size_t j=0; j<v.shape(0); ++j) {
+            for(std::size_t k=0; k<v.shape(1); ++k) {
                 test(v(j, k) == data_[j+k*shape[0]]);
             }
         }
     }
     // 3D
     {
-        std::vector<size_t> shape(3);
+        std::vector<std::size_t> shape(3);
         shape[0] = 2;
         shape[1] = 4;
         shape[2] = 3;
@@ -840,12 +840,12 @@ void ViewTest::shapeConstructorTest() {
         for(unsigned short j=0; j<shape.size(); ++j) {
             test(v.shape(j) == shape[j]);
         }
-        for(size_t j=0; j<v.size(); ++j) {
+        for(std::size_t j=0; j<v.size(); ++j) {
             test(v(j) == data_[j]);
         }
-        for(size_t j=0; j<v.shape(0); ++j) {
-            for(size_t k=0; k<v.shape(1); ++k) {
-                for(size_t p=0; p<v.shape(2); ++p) {
+        for(std::size_t j=0; j<v.shape(0); ++j) {
+            for(std::size_t k=0; k<v.shape(1); ++k) {
+                for(std::size_t p=0; p<v.shape(2); ++p) {
                     test(v(j, k, p) == data_[ j + k*shape[0] + p*shape[0]*shape[1] ]);
                 }
             }
@@ -860,7 +860,7 @@ void ViewTest::shapeAssignTest() {
         // to scalar
         {
             andres::View<int, constTarget> v(&scalar_);
-            std::vector<size_t> shape(0);
+            std::vector<std::size_t> shape(0);
             v.assign(shape.begin(), shape.end(), data_);
 
             test(v.dimension() == shape.size() &&
@@ -870,7 +870,7 @@ void ViewTest::shapeAssignTest() {
         // to 1D
         {
             andres::View<int, constTarget> v(&scalar_);
-            std::vector<size_t> shape(1);
+            std::vector<std::size_t> shape(1);
             shape[0] = 24;
             v.assign(shape.begin(), shape.end(), data_);
 
@@ -880,14 +880,14 @@ void ViewTest::shapeAssignTest() {
             for(unsigned short j=0; j<shape.size(); ++j) {
                 test(v.shape(j) == shape[j]);
             }
-            for(size_t j=0; j<v.size(); ++j) {
+            for(std::size_t j=0; j<v.size(); ++j) {
                 test(v(j) == data_[j]);
             }
         }
         // to 2D
         {
             andres::View<int, constTarget> v(&scalar_);
-            std::vector<size_t> shape(2);
+            std::vector<std::size_t> shape(2);
             shape[0] = 6;
             shape[1] = 4;
             v.assign(shape.begin(), shape.end(), data_);
@@ -898,8 +898,8 @@ void ViewTest::shapeAssignTest() {
             for(unsigned short j=0; j<shape.size(); ++j) {
                 test(v.shape(j) == shape[j]);
             }
-            for(size_t j=0; j<v.shape(0); ++j) {
-                for(size_t k=0; k<v.shape(1); ++k) {
+            for(std::size_t j=0; j<v.shape(0); ++j) {
+                for(std::size_t k=0; k<v.shape(1); ++k) {
                     test(v(j, k) == data_[j+k*shape[0]]);
                 }
             }
@@ -907,7 +907,7 @@ void ViewTest::shapeAssignTest() {
         // to 3D
         {
             andres::View<int, constTarget> v(&scalar_);
-            std::vector<size_t> shape(3);
+            std::vector<std::size_t> shape(3);
             shape[0] = 2;
             shape[1] = 4;
             shape[2] = 3;
@@ -919,12 +919,12 @@ void ViewTest::shapeAssignTest() {
             for(unsigned short j=0; j<shape.size(); ++j) {
                 test(v.shape(j) == shape[j]);
             }
-            for(size_t j=0; j<v.size(); ++j) {
+            for(std::size_t j=0; j<v.size(); ++j) {
                 test(v(j) == data2x_[j]);
             }
-            for(size_t j=0; j<v.shape(0); ++j) {
-                for(size_t k=0; k<v.shape(1); ++k) {
-                    for(size_t p=0; p<v.shape(2); ++p) {
+            for(std::size_t j=0; j<v.shape(0); ++j) {
+                for(std::size_t k=0; k<v.shape(1); ++k) {
+                    for(std::size_t p=0; p<v.shape(2); ++p) {
                         test(v(j, k, p) == data2x_[ j + k*shape[0] + p*shape[0]*shape[1] ]);
                     }
                 }
@@ -935,7 +935,7 @@ void ViewTest::shapeAssignTest() {
     {
         // to scalar 
         { 
-            std::vector<size_t> shape(1), shape0(0);
+            std::vector<std::size_t> shape(1), shape0(0);
             shape[0] = 24;
             andres::View<int, constTarget> v(shape.begin(), shape.end(), data_);
             v.assign(shape0.begin(), shape0.end(), data_);
@@ -946,7 +946,7 @@ void ViewTest::shapeAssignTest() {
         }
         // to 1D
         {
-            std::vector<size_t> shape(1);
+            std::vector<std::size_t> shape(1);
             shape[0] = 24;
             andres::View<int, constTarget> v(shape.begin(), shape.end(), data_);
             v.assign(shape.begin(), shape.end(), data2x_);
@@ -957,13 +957,13 @@ void ViewTest::shapeAssignTest() {
             for(unsigned short j=0; j<shape.size(); ++j) {
                 test(v.shape(j) == shape[j]);
             }
-            for(size_t j=0; j<v.size(); ++j) {
+            for(std::size_t j=0; j<v.size(); ++j) {
                 test(v(j) == data2x_[j]);
             }
         }
         // to 2D
         {
-            std::vector<size_t> shape1D(1), shape2D(2);
+            std::vector<std::size_t> shape1D(1), shape2D(2);
             shape1D[0] = 24;
             shape2D[0] = 6;
             shape2D[1] = 4;
@@ -976,18 +976,18 @@ void ViewTest::shapeAssignTest() {
             for(unsigned short j=0; j<shape2D.size(); ++j) {
                 test(v.shape(j) == shape2D[j]);
             }
-            for(size_t j=0; j<v.size(); ++j) {
+            for(std::size_t j=0; j<v.size(); ++j) {
                 test(v(j) == data2x_[j]);
             }
-            for(size_t j=0; j<v.shape(0); ++j) {
-                for(size_t k=0; k<v.shape(1); ++k) {
+            for(std::size_t j=0; j<v.shape(0); ++j) {
+                for(std::size_t k=0; k<v.shape(1); ++k) {
                     test(v(j, k) == data2x_[j+k*shape2D[0]]);
                 }
             }
         }
         // to 3D
         {
-            std::vector<size_t> shape1D(1), shape3D(3);
+            std::vector<std::size_t> shape1D(1), shape3D(3);
             shape1D[0] = 24;
             shape3D[0] = 2;
             shape3D[1] = 4;
@@ -1001,12 +1001,12 @@ void ViewTest::shapeAssignTest() {
             for(unsigned short j=0; j<shape3D.size(); ++j) {
                 test(v.shape(j) == shape3D[j]);
             }
-            for(size_t j=0; j<v.size(); ++j) {
+            for(std::size_t j=0; j<v.size(); ++j) {
                 test(v(j) == data2x_[j]);
             }
-            for(size_t j=0; j<v.shape(0); ++j) {
-                for(size_t k=0; k<v.shape(1); ++k) {
-                    for(size_t p=0; p<v.shape(2); ++p) {
+            for(std::size_t j=0; j<v.shape(0); ++j) {
+                for(std::size_t k=0; k<v.shape(1); ++k) {
+                    for(std::size_t p=0; p<v.shape(2); ++p) {
                         test(v(j, k, p) == data2x_[ j + k*shape3D[0] + p*shape3D[0]*shape3D[1] ]);
                     }
                 }
@@ -1017,7 +1017,7 @@ void ViewTest::shapeAssignTest() {
     {
         // to scalar
         {
-            std::vector<size_t> shape2D(2), shape0(0);
+            std::vector<std::size_t> shape2D(2), shape0(0);
             shape2D[0] = 6;
             shape2D[1] = 4; 
             andres::View<int, constTarget> v(shape2D.begin(), shape2D.end(), data_);
@@ -1029,7 +1029,7 @@ void ViewTest::shapeAssignTest() {
         }
         // to 1D
         {
-            std::vector<size_t> shape2D(2), shape1D(1);
+            std::vector<std::size_t> shape2D(2), shape1D(1);
             shape2D[0] = 6;
             shape2D[1] = 4; 
             shape1D[0] = 24;
@@ -1042,13 +1042,13 @@ void ViewTest::shapeAssignTest() {
             for(unsigned short j=0; j<shape1D.size(); ++j) {
                 test(v.shape(j) == shape1D[j]);
             }
-            for(size_t j=0; j<v.size(); ++j) {
+            for(std::size_t j=0; j<v.size(); ++j) {
                 test(v(j) == data2x_[j]);
             }
         }
         // to 2D
         {
-            std::vector<size_t> shape(2);
+            std::vector<std::size_t> shape(2);
             shape[0] = 6;
             shape[1] = 4;
             andres::View<int, constTarget> v(shape.begin(), shape.end(), data_);
@@ -1060,15 +1060,15 @@ void ViewTest::shapeAssignTest() {
             for(unsigned short j=0; j<shape.size(); ++j) {
                 test(v.shape(j) == shape[j]);
             }
-            for(size_t j=0; j<v.shape(0); ++j) {
-                for(size_t k=0; k<v.shape(1); ++k) {
+            for(std::size_t j=0; j<v.shape(0); ++j) {
+                for(std::size_t k=0; k<v.shape(1); ++k) {
                     test(v(j, k) == data2x_[j+k*shape[0]]);
                 }
             }
         }
         // to 2D with different shape
         {
-            std::vector<size_t> shape(2), shapeBefore(2);
+            std::vector<std::size_t> shape(2), shapeBefore(2);
             shapeBefore[0] = 4;
             shapeBefore[1] = 6;
             shape[0] = 6;
@@ -1082,15 +1082,15 @@ void ViewTest::shapeAssignTest() {
             for(unsigned short j=0; j<shape.size(); ++j) {
                 test(v.shape(j) == shape[j]);
             }
-            for(size_t j=0; j<v.shape(0); ++j) {
-                for(size_t k=0; k<v.shape(1); ++k) {
+            for(std::size_t j=0; j<v.shape(0); ++j) {
+                for(std::size_t k=0; k<v.shape(1); ++k) {
                     test(v(j, k) == data2x_[j+k*shape[0]]);
                 }
             }
         }
         // to 3D
         {
-            std::vector<size_t> shape2D(2), shape3D(3);
+            std::vector<std::size_t> shape2D(2), shape3D(3);
             shape2D[0] = 6;
             shape2D[1] = 4;
             andres::View<int, constTarget> v(shape2D.begin(), shape2D.end(), data_);
@@ -1105,12 +1105,12 @@ void ViewTest::shapeAssignTest() {
             for(unsigned short j=0; j<shape3D.size(); ++j) {
                 test(v.shape(j) == shape3D[j]);
             }
-            for(size_t j=0; j<v.size(); ++j) {
+            for(std::size_t j=0; j<v.size(); ++j) {
                 test(v(j) == data_[j]);
             }
-            for(size_t j=0; j<v.shape(0); ++j) {
-                for(size_t k=0; k<v.shape(1); ++k) {
-                    for(size_t p=0; p<v.shape(2); ++p) {
+            for(std::size_t j=0; j<v.shape(0); ++j) {
+                for(std::size_t k=0; k<v.shape(1); ++k) {
+                    for(std::size_t p=0; p<v.shape(2); ++p) {
                         test(v(j, k, p) == data_[ j + k*shape3D[0] + p*shape3D[0]*shape3D[1] ]);
                     }
                 }
@@ -1121,7 +1121,7 @@ void ViewTest::shapeAssignTest() {
     {
         // to scalar
         {
-            std::vector<size_t> shape3D(3), shape0(0);
+            std::vector<std::size_t> shape3D(3), shape0(0);
             shape3D[0] = 3;
             shape3D[1] = 4;
             shape3D[2] = 2;
@@ -1134,7 +1134,7 @@ void ViewTest::shapeAssignTest() {
         }
         // to 1D
         {
-            std::vector<size_t> shape3D(3), shape1D(1);
+            std::vector<std::size_t> shape3D(3), shape1D(1);
             shape3D[0] = 3;
             shape3D[1] = 4;
             shape3D[2] = 2;
@@ -1148,13 +1148,13 @@ void ViewTest::shapeAssignTest() {
             for(unsigned short j=0; j<shape1D.size(); ++j) {
                 test(v.shape(j) == shape1D[j]);
             }
-            for(size_t j=0; j<v.size(); ++j) {
+            for(std::size_t j=0; j<v.size(); ++j) {
                 test(v(j) == data2x_[j]);
             }
         }
         // to 2D
         {
-            std::vector<size_t> shape3D(3), shape2D(2);
+            std::vector<std::size_t> shape3D(3), shape2D(2);
             shape3D[0] = 2;
             shape3D[1] = 4;
             shape3D[2] = 3;
@@ -1169,18 +1169,18 @@ void ViewTest::shapeAssignTest() {
             for(unsigned short j=0; j<shape2D.size(); ++j) {
                 test(v.shape(j) == shape2D[j]);
             }
-            for(size_t j=0; j<v.size(); ++j) {
+            for(std::size_t j=0; j<v.size(); ++j) {
                 test(v(j) == data_[j]);
             }
-            for(size_t j=0; j<v.shape(0); ++j) {
-                for(size_t k=0; k<v.shape(1); ++k) {
+            for(std::size_t j=0; j<v.shape(0); ++j) {
+                for(std::size_t k=0; k<v.shape(1); ++k) {
                     test(v(j, k) == data_[j+k*shape2D[0]]);
                 }
             }
         }
         // to 3D
         {
-            std::vector<size_t> shape(3);
+            std::vector<std::size_t> shape(3);
             shape[0] = 2;
             shape[1] = 4;
             shape[2] = 3;
@@ -1190,12 +1190,12 @@ void ViewTest::shapeAssignTest() {
             for(unsigned short j=0; j<shape.size(); ++j) {
                 test(v.shape(j) == shape[j]);
             }
-            for(size_t j=0; j<v.size(); ++j) {
+            for(std::size_t j=0; j<v.size(); ++j) {
                 test(v(j) == data2x_[j]);
             }
-            for(size_t j=0; j<v.shape(0); ++j) {
-                for(size_t k=0; k<v.shape(1); ++k) {
-                    for(size_t p=0; p<v.shape(2); ++p) {
+            for(std::size_t j=0; j<v.shape(0); ++j) {
+                for(std::size_t k=0; k<v.shape(1); ++k) {
+                    for(std::size_t p=0; p<v.shape(2); ++p) {
                         test(v(j, k, p) == data2x_[ j + k*shape[0] + p*shape[0]*shape[1] ]);
                     }
                 }
@@ -1203,7 +1203,7 @@ void ViewTest::shapeAssignTest() {
         }
         // to 3D with different shape
         {
-            std::vector<size_t> shape(3), shapeBefore(3);
+            std::vector<std::size_t> shape(3), shapeBefore(3);
             shapeBefore[0] = 3;
             shapeBefore[1] = 2;
             shapeBefore[2] = 4;
@@ -1216,12 +1216,12 @@ void ViewTest::shapeAssignTest() {
             for(unsigned short j=0; j<shape.size(); ++j) {
                 test(v.shape(j) == shape[j]);
             }
-            for(size_t j=0; j<v.size(); ++j) {
+            for(std::size_t j=0; j<v.size(); ++j) {
                 test(v(j) == data2x_[j]);
             }
-            for(size_t j=0; j<v.shape(0); ++j) {
-                for(size_t k=0; k<v.shape(1); ++k) {
-                    for(size_t p=0; p<v.shape(2); ++p) {
+            for(std::size_t j=0; j<v.shape(0); ++j) {
+                for(std::size_t k=0; k<v.shape(1); ++k) {
+                    for(std::size_t p=0; p<v.shape(2); ++p) {
                         test(v(j, k, p) == data2x_[ j + k*shape[0] + p*shape[0]*shape[1] ]);
                     }
                 }
@@ -1236,9 +1236,9 @@ void ViewTest::shapeStrideConstructorTest() {
     {
         // without offset
         {
-            std::vector<size_t> shape(1);
+            std::vector<std::size_t> shape(1);
             shape[0] = 6;
-            std::vector<size_t> strides(1);
+            std::vector<std::size_t> strides(1);
             strides[0] = 4;
             andres::View<int, constTarget> v(shape.begin(), shape.end(),
                 strides.begin(), data_, andres::LastMajorOrder);
@@ -1253,9 +1253,9 @@ void ViewTest::shapeStrideConstructorTest() {
         }
         // with offset
         {
-            std::vector<size_t> shape(1);
+            std::vector<std::size_t> shape(1);
             shape[0] = 6;
-            std::vector<size_t> strides(1);
+            std::vector<std::size_t> strides(1);
             strides[0] = 4;
             andres::View<int, constTarget> v(shape.begin(), shape.end(),
                 strides.begin(), data_+2, andres::LastMajorOrder);
@@ -1273,10 +1273,10 @@ void ViewTest::shapeStrideConstructorTest() {
     {
         // without offset
         {
-            std::vector<size_t> shape(2);
+            std::vector<std::size_t> shape(2);
             shape[0] = 3;
             shape[1] = 2;
-            std::vector<size_t> strides(2);
+            std::vector<std::size_t> strides(2);
             strides[0] = 1;
             strides[1] = 3;
             andres::View<int, constTarget> v(shape.begin(), shape.end(), strides.begin(), data_, andres::LastMajorOrder);
@@ -1293,10 +1293,10 @@ void ViewTest::shapeStrideConstructorTest() {
         }
         // with offset
         {
-            std::vector<size_t> shape(2);
+            std::vector<std::size_t> shape(2);
             shape[0] = 3;
             shape[1] = 2;
-            std::vector<size_t> strides(2);
+            std::vector<std::size_t> strides(2);
             strides[0] = 1;
             strides[1] = 3;
             andres::View<int, constTarget> v(shape.begin(), shape.end(), strides.begin(),
@@ -1319,11 +1319,11 @@ void ViewTest::shapeStrideConstructorTest() {
         {        
             int list[] = {0, 2, 4, 10, 12, 14, 20, 22, 24, 30, 32, 34,
                 35, 37, 39, 45, 47, 49, 55, 57, 59, 65, 67, 69};
-            std::vector<size_t> shape(3);
+            std::vector<std::size_t> shape(3);
             shape[0] = 3;
             shape[1] = 4;
             shape[2] = 2;
-            std::vector<size_t> strides(3);
+            std::vector<std::size_t> strides(3);
             strides[0] = 2;
             strides[1] = 10;
             strides[2] = 35;
@@ -1344,11 +1344,11 @@ void ViewTest::shapeStrideConstructorTest() {
         {       
             int list[] = {30, 32, 34, 40, 42, 44, 50, 52, 54, 60, 62, 64,
                 65, 67, 69, 75, 77, 79, 85, 87, 89, 95, 97, 99};
-            std::vector<size_t> shape(3);
+            std::vector<std::size_t> shape(3);
             shape[0] = 3;
             shape[1] = 4;
             shape[2] = 2;
-            std::vector<size_t> strides(3);
+            std::vector<std::size_t> strides(3);
             strides[0] = 2;
             strides[1] = 10;
             strides[2] = 35;
@@ -1378,8 +1378,8 @@ void ViewTest::shapeStrideAssignTest()
             // without offset
             {
                 andres::View<int, constTarget> v(&scalar_);
-                std::vector<size_t> shape(0);
-                std::vector<size_t> strides(1);
+                std::vector<std::size_t> shape(0);
+                std::vector<std::size_t> strides(1);
                 strides[0] = 2;
                 v.assign(shape.begin(), shape.end(), strides.begin(),
                     data_, andres::LastMajorOrder);
@@ -1392,8 +1392,8 @@ void ViewTest::shapeStrideAssignTest()
             // to with offset 
             {
                 andres::View<int, constTarget> v(&scalar_);
-                std::vector<size_t> shape(0);
-                std::vector<size_t> strides(1);
+                std::vector<std::size_t> shape(0);
+                std::vector<std::size_t> strides(1);
                 strides[0] = 2;
 
                 v.assign(shape.begin(), shape.end(), strides.begin(),
@@ -1409,9 +1409,9 @@ void ViewTest::shapeStrideAssignTest()
             // without offset
             {
                 andres::View<int, constTarget> v(&scalar_);
-                std::vector<size_t> shape(1);
+                std::vector<std::size_t> shape(1);
                 shape[0] = 6;
-                std::vector<size_t> strides(1);
+                std::vector<std::size_t> strides(1);
                 strides[0] = 2;
 
                 v.assign(shape.begin(), shape.end(), strides.begin(),
@@ -1428,9 +1428,9 @@ void ViewTest::shapeStrideAssignTest()
             // with offset 
             {
                 andres::View<int, constTarget> v(&scalar_);
-                std::vector<size_t> shape(1);
+                std::vector<std::size_t> shape(1);
                 shape[0] = 6;
-                std::vector<size_t> strides(1);
+                std::vector<std::size_t> strides(1);
                 strides[0] = 2;
                 v.assign(shape.begin(), shape.end(), strides.begin(),
                     data100_+1, andres::LastMajorOrder);
@@ -1451,10 +1451,10 @@ void ViewTest::shapeStrideAssignTest()
             {
                 int list[] = {0, 2, 4, 4, 6, 8};
                 andres::View<int, constTarget> v(&scalar_);
-                std::vector<size_t> shape(2);
+                std::vector<std::size_t> shape(2);
                 shape[0] = 3;
                 shape[1] = 2;
-                std::vector<size_t> strides(2);
+                std::vector<std::size_t> strides(2);
                 strides[0] = 2;
                 strides[1] = 4;
                 v.assign(shape.begin(), shape.end(), strides.begin(),
@@ -1474,10 +1474,10 @@ void ViewTest::shapeStrideAssignTest()
             {
                 int list[] = {50, 52, 54, 54, 56, 58};
                 andres::View<int, constTarget> v(&scalar_);
-                std::vector<size_t> shape(2);
+                std::vector<std::size_t> shape(2);
                 shape[0] = 3;
                 shape[1] = 2;
-                std::vector<size_t> strides(2);
+                std::vector<std::size_t> strides(2);
                 strides[0] = 2;
                 strides[1] = 4;
                 v.assign(shape.begin(), shape.end(), strides.begin(),
@@ -1501,11 +1501,11 @@ void ViewTest::shapeStrideAssignTest()
                 int list[] = {0, 2, 4, 10, 12, 14, 20, 22, 24, 30, 32, 34,
                     35, 37, 39, 45, 47, 49, 55, 57, 59, 65, 67, 69};
                 andres::View<int, constTarget> v(&scalar_);
-                std::vector<size_t> shape(3);
+                std::vector<std::size_t> shape(3);
                 shape[0] = 3;
                 shape[1] = 4;
                 shape[2] = 2;
-                std::vector<size_t> strides(3);
+                std::vector<std::size_t> strides(3);
                 strides[0] = 2;
                 strides[1] = 10;
                 strides[2] = 35;
@@ -1528,11 +1528,11 @@ void ViewTest::shapeStrideAssignTest()
                 int list[] = {30, 32, 34, 40, 42, 44, 50, 52, 54, 60, 62, 64,
                     65, 67, 69, 75, 77, 79, 85, 87, 89, 95, 97, 99};
                 andres::View<int, constTarget> v(&scalar_);
-                std::vector<size_t> shape(3);
+                std::vector<std::size_t> shape(3);
                 shape[0] = 3;
                 shape[1] = 4;
                 shape[2] = 2;
-                std::vector<size_t> strides(3);
+                std::vector<std::size_t> strides(3);
 
                 strides[0] = 2;
                 strides[1] = 10;
@@ -1557,9 +1557,9 @@ void ViewTest::shapeStrideAssignTest()
     {
         // to scalar
         {
-            std::vector<size_t> shape(1), shape0(0);
+            std::vector<std::size_t> shape(1), shape0(0);
             shape[0] = 6;
-            std::vector<size_t> strides(1);
+            std::vector<std::size_t> strides(1);
             strides[0] = 1;
             andres::View<int, constTarget> v(shape.begin(), shape.end(),
                 strides.begin(), data_, andres::LastMajorOrder);
@@ -1574,9 +1574,9 @@ void ViewTest::shapeStrideAssignTest()
         {
             // without offset
             {
-                std::vector<size_t> shape(1);
+                std::vector<std::size_t> shape(1);
                 shape[0] = 6;
-                std::vector<size_t> strides(1);
+                std::vector<std::size_t> strides(1);
                 strides[0] = 1;
                 andres::View<int, constTarget> v(shape.begin(), shape.end(),
                     strides.begin(), data_, andres::LastMajorOrder);
@@ -1595,9 +1595,9 @@ void ViewTest::shapeStrideAssignTest()
             }
             // with offset
             {
-                std::vector<size_t> shape(1);
+                std::vector<std::size_t> shape(1);
                 shape[0] = 6;
-                std::vector<size_t> strides(1);
+                std::vector<std::size_t> strides(1);
                 strides[0] = 1;
                 andres::View<int, constTarget> v(shape.begin(), shape.end(), strides.begin(),
                     data_+5, andres::LastMajorOrder);
@@ -1616,9 +1616,9 @@ void ViewTest::shapeStrideAssignTest()
             }
             {
                 int list[] = {1, 3, 5, 7, 9, 11};
-                std::vector<size_t> shape(1);
+                std::vector<std::size_t> shape(1);
                 shape[0] = 6;
-                std::vector<size_t> strides(1);
+                std::vector<std::size_t> strides(1);
                 strides[0] = 1;
                 andres::View<int, constTarget> v(shape.begin(), shape.end(),
                     strides.begin(), data_, andres::LastMajorOrder);
@@ -1634,9 +1634,9 @@ void ViewTest::shapeStrideAssignTest()
             }
             {
                 int list[] = {0, 2, 4, 6, 8, 10};
-                std::vector<size_t> shape(1);
+                std::vector<std::size_t> shape(1);
                 shape[0] = 6;
-                std::vector<size_t> strides(1);
+                std::vector<std::size_t> strides(1);
                 strides[0] = 1;
                 andres::View<int, constTarget> v(shape.begin(), shape.end(), strides.begin(),
                     data_+5, andres::LastMajorOrder);
@@ -1656,9 +1656,9 @@ void ViewTest::shapeStrideAssignTest()
             // without offset and resize
             {
                 int list[] = {0, 2, 4, 4, 6, 8};
-                std::vector<size_t> shape(1);
+                std::vector<std::size_t> shape(1);
                 shape[0] = 24;
-                std::vector<size_t> strides(1);
+                std::vector<std::size_t> strides(1);
                 strides[0] = 3; 
                 andres::View<int, constTarget> v(shape.begin(), shape.end(),
                     strides.begin(), data100_, andres::LastMajorOrder);
@@ -1684,9 +1684,9 @@ void ViewTest::shapeStrideAssignTest()
             // with offset and resize
             {
                 int list[] = {50, 52, 54, 54, 56, 58};
-                std::vector<size_t> shape(1);
+                std::vector<std::size_t> shape(1);
                 shape[0] = 24;
-                std::vector<size_t> strides(1);
+                std::vector<std::size_t> strides(1);
                 strides[0] = 4;
                 andres::View<int, constTarget> v(shape.begin(), shape.end(), strides.begin(),
                     data100_+1, andres::LastMajorOrder);
@@ -1711,9 +1711,9 @@ void ViewTest::shapeStrideAssignTest()
             }
             {
                 int list[] = {50, 52, 54, 54, 56, 58};
-                std::vector<size_t> shape(1);
+                std::vector<std::size_t> shape(1);
                 shape[0] = 24;
-                std::vector<size_t> strides(1);
+                std::vector<std::size_t> strides(1);
                 strides[0] = 3;
                 andres::View<int, constTarget> v(shape.begin(), shape.end(), strides.begin(),
                     data100_, andres::LastMajorOrder);
@@ -1738,9 +1738,9 @@ void ViewTest::shapeStrideAssignTest()
             }
             {
                 int list[] = {0, 2, 4, 4, 6, 8};
-                std::vector<size_t> shape(1);
+                std::vector<std::size_t> shape(1);
                 shape[0] = 24;
-                std::vector<size_t> strides(1);
+                std::vector<std::size_t> strides(1);
                 strides[0] = 3;
                 andres::View<int, constTarget> v(shape.begin(), shape.end(), strides.begin(),
                     data100_+1, andres::LastMajorOrder);
@@ -1770,9 +1770,9 @@ void ViewTest::shapeStrideAssignTest()
             {
                 int list[] = {0, 2, 4, 10, 12, 14, 20, 22, 24, 30, 32, 34,
                     35, 37, 39, 45, 47, 49, 55, 57, 59, 65, 67, 69};
-                std::vector<size_t> shape(1);
+                std::vector<std::size_t> shape(1);
                 shape[0] = 24;
-                std::vector<size_t> strides(1);
+                std::vector<std::size_t> strides(1);
                 strides[0] = 3;
                 andres::View<int, constTarget> v(shape.begin(), shape.end(),
                     strides.begin(), data100_, andres::LastMajorOrder);
@@ -1802,9 +1802,9 @@ void ViewTest::shapeStrideAssignTest()
             {
                 int list[] = {30, 32, 34, 40, 42, 44, 50, 52, 54, 60, 62, 64,
                     65, 67, 69, 75, 77, 79, 85, 87, 89, 95, 97, 99};
-                std::vector<size_t> shape(1);
+                std::vector<std::size_t> shape(1);
                 shape[0] = 24;
-                std::vector<size_t> strides(1);
+                std::vector<std::size_t> strides(1);
                 strides[0] = 3;
                 andres::View<int, constTarget> v(shape.begin(), shape.end(),
                     strides.begin(), data100_+1, andres::LastMajorOrder);
@@ -1833,9 +1833,9 @@ void ViewTest::shapeStrideAssignTest()
             {
                 int list[] = {30, 32, 34, 40, 42, 44, 50, 52, 54, 60, 62, 64,
                     65, 67, 69, 75, 77, 79, 85, 87, 89, 95, 97, 99};
-                std::vector<size_t> shape(1);
+                std::vector<std::size_t> shape(1);
                 shape[0] = 24;
-                std::vector<size_t> strides(1);
+                std::vector<std::size_t> strides(1);
                 strides[0] = 3;
                 andres::View<int, constTarget> v(shape.begin(), shape.end(),
                     strides.begin(), data100_, andres::LastMajorOrder);
@@ -1864,9 +1864,9 @@ void ViewTest::shapeStrideAssignTest()
             {
                 int list[] = {0, 2, 4, 10, 12, 14, 20, 22, 24, 30, 32, 34,
                     35, 37, 39, 45, 47, 49, 55, 57, 59, 65, 67, 69};
-                std::vector<size_t> shape(1);
+                std::vector<std::size_t> shape(1);
                 shape[0] = 24;
-                std::vector<size_t> strides(1);
+                std::vector<std::size_t> strides(1);
                 strides[0] = 3;
                 andres::View<int, constTarget> v(shape.begin(), shape.end(),
                     strides.begin(), data100_+2, andres::LastMajorOrder);
@@ -1900,10 +1900,10 @@ void ViewTest::shapeStrideAssignTest()
         {
             // without offset abd resize
             {
-                std::vector<size_t> shape(2);
+                std::vector<std::size_t> shape(2);
                 shape[0] = 6;
                 shape[1] = 4; 
-                std::vector<size_t> strides(2);
+                std::vector<std::size_t> strides(2);
                 strides[0] = 1;
                 strides[1] = 3; 
                 andres::View<int, constTarget> v(shape.begin(), shape.end(),
@@ -1926,10 +1926,10 @@ void ViewTest::shapeStrideAssignTest()
             }
             // with offset and resize
             {
-                std::vector<size_t> shape(2);
+                std::vector<std::size_t> shape(2);
                 shape[0] = 6;
                 shape[1] = 4; 
-                std::vector<size_t> strides(2);
+                std::vector<std::size_t> strides(2);
                 strides[0] = 1;
                 strides[1] = 3;
                 andres::View<int, constTarget> v(shape.begin(), shape.end(),
@@ -1952,10 +1952,10 @@ void ViewTest::shapeStrideAssignTest()
             }
             {
                 int list[] = {1, 3, 5, 7, 9, 11};
-                std::vector<size_t> shape(2);
+                std::vector<std::size_t> shape(2);
                 shape[0] = 6;
                 shape[1] = 4; 
-                std::vector<size_t> strides(2);
+                std::vector<std::size_t> strides(2);
                 strides[0] = 1;
                 strides[1] = 3;
                 andres::View<int, constTarget> v(shape.begin(), shape.end(),
@@ -1974,10 +1974,10 @@ void ViewTest::shapeStrideAssignTest()
                     test(v(x) == list[x]);
             }
             {
-                std::vector<size_t> shape(2);
+                std::vector<std::size_t> shape(2);
                 shape[0] = 6;
                 shape[1] = 4; 
-                std::vector<size_t> strides(2);
+                std::vector<std::size_t> strides(2);
                 strides[0] = 1;
                 strides[1] = 3;
                 andres::View<int, constTarget> v(shape.begin(), shape.end(),
@@ -2004,10 +2004,10 @@ void ViewTest::shapeStrideAssignTest()
             // without offset
             {
                 int list[] = {0, 2, 4, 4, 6, 8};
-                std::vector<size_t> shape(2);
+                std::vector<std::size_t> shape(2);
                 shape[0] = 3;
                 shape[1] = 2;
-                std::vector<size_t> strides(2);
+                std::vector<std::size_t> strides(2);
                 strides[0] = 1;
                 strides[1] = 3;
                 andres::View<int, constTarget> v(shape.begin(), shape.end(),
@@ -2030,10 +2030,10 @@ void ViewTest::shapeStrideAssignTest()
             // without offset and different shapes
             {
                 int list[] = {0, 2, 4, 4, 6, 8};
-                std::vector<size_t> shape(2);
+                std::vector<std::size_t> shape(2);
                 shape[0] = 2;
                 shape[1] = 3;
-                std::vector<size_t> strides(2);
+                std::vector<std::size_t> strides(2);
                 strides[0] = 1;
                 strides[1] = 3;
                 andres::View<int, constTarget> v(shape.begin(), shape.end(),
@@ -2058,10 +2058,10 @@ void ViewTest::shapeStrideAssignTest()
             // with offset
             {
                 int list[] = {50, 52, 54, 54, 56, 58}; 
-                std::vector<size_t> shape(2);
+                std::vector<std::size_t> shape(2);
                 shape[0] = 3;
                 shape[1] = 2;
-                std::vector<size_t> strides(2);
+                std::vector<std::size_t> strides(2);
                 strides[0] = 1;
                 strides[1] = 3;
                 andres::View<int, constTarget> v(shape.begin(), shape.end(),
@@ -2083,10 +2083,10 @@ void ViewTest::shapeStrideAssignTest()
             }
             {
                 int list[] = {50, 52, 54, 54, 56, 58}; 
-                std::vector<size_t> shape(2);
+                std::vector<std::size_t> shape(2);
                 shape[0] = 3;
                 shape[1] = 2;
-                std::vector<size_t> strides(2);
+                std::vector<std::size_t> strides(2);
                 strides[0] = 1;
                 strides[1] = 3;
                 andres::View<int, constTarget> v(shape.begin(), shape.end(),
@@ -2108,10 +2108,10 @@ void ViewTest::shapeStrideAssignTest()
             }
             {
                 int list[] = {0, 2, 4, 4, 6, 8};
-                std::vector<size_t> shape(2);
+                std::vector<std::size_t> shape(2);
                 shape[0] = 3;
                 shape[1] = 2;
-                std::vector<size_t> strides(2);
+                std::vector<std::size_t> strides(2);
                 strides[0] = 1;
                 strides[1] = 3;
                 andres::View<int, constTarget> v(shape.begin(), shape.end(),
@@ -2134,10 +2134,10 @@ void ViewTest::shapeStrideAssignTest()
             // with offset and different shapes
             {
                 int list[] = {50, 52, 54, 54, 56, 58};
-                std::vector<size_t> shape(2);
+                std::vector<std::size_t> shape(2);
                 shape[0] = 2;
                 shape[1] = 3;
-                std::vector<size_t> strides(2);
+                std::vector<std::size_t> strides(2);
                 strides[0] = 1;
                 strides[1] = 3;
                 andres::View<int, constTarget> v(shape.begin(), shape.end(),
@@ -2161,10 +2161,10 @@ void ViewTest::shapeStrideAssignTest()
             }
             {
                 int list[] = {50, 52, 54, 54, 56, 58};
-                std::vector<size_t> shape(2);
+                std::vector<std::size_t> shape(2);
                 shape[0] = 2;
                 shape[1] = 3;
-                std::vector<size_t> strides(2);
+                std::vector<std::size_t> strides(2);
                 strides[0] = 1;
                 strides[1] = 3;
                 andres::View<int, constTarget> v(shape.begin(), shape.end(),
@@ -2188,10 +2188,10 @@ void ViewTest::shapeStrideAssignTest()
             }
             {
                 int list[] = {0, 2, 4, 4, 6, 8};
-                std::vector<size_t> shape(2);
+                std::vector<std::size_t> shape(2);
                 shape[0] = 2;
                 shape[1] = 3;
-                std::vector<size_t> strides(2);
+                std::vector<std::size_t> strides(2);
                 strides[0] = 1;
                 strides[1] = 3;
                 andres::View<int, constTarget> v(shape.begin(), shape.end(),
@@ -2220,10 +2220,10 @@ void ViewTest::shapeStrideAssignTest()
             {
                 int list[] = {0, 2, 4, 10, 12, 14, 20, 22, 24, 30, 32, 34,
                     35, 37, 39, 45, 47, 49, 55, 57, 59, 65, 67, 69};
-                std::vector<size_t> shape(2);
+                std::vector<std::size_t> shape(2);
                 shape[0] = 3;
                 shape[1] = 2;
-                std::vector<size_t> strides(2);
+                std::vector<std::size_t> strides(2);
                 strides[0] = 1;
                 strides[1] = 3;
                 andres::View<int, constTarget> v(shape.begin(), shape.end(),
@@ -2254,10 +2254,10 @@ void ViewTest::shapeStrideAssignTest()
             {
                 int list[] = {30, 32, 34, 40, 42, 44, 50, 52, 54, 60, 62, 64,
                     65, 67, 69, 75, 77, 79, 85, 87, 89, 95, 97, 99};
-                std::vector<size_t> shape(2);
+                std::vector<std::size_t> shape(2);
                 shape[0] = 3;
                 shape[1] = 2;
-                std::vector<size_t> strides(2);
+                std::vector<std::size_t> strides(2);
                 strides[0] = 1;
                 strides[1] = 3;
                 andres::View<int, constTarget> v(shape.begin(), shape.end(),
@@ -2287,10 +2287,10 @@ void ViewTest::shapeStrideAssignTest()
             {
                 int list[] = {30, 32, 34, 40, 42, 44, 50, 52, 54, 60, 62, 64,
                     65, 67, 69, 75, 77, 79, 85, 87, 89, 95, 97, 99};
-                std::vector<size_t> shape(2);
+                std::vector<std::size_t> shape(2);
                 shape[0] = 3;
                 shape[1] = 2;
-                std::vector<size_t> strides(2);
+                std::vector<std::size_t> strides(2);
                 strides[0] = 1;
                 strides[1] = 3;
                 andres::View<int, constTarget> v(shape.begin(), shape.end(),
@@ -2320,10 +2320,10 @@ void ViewTest::shapeStrideAssignTest()
             {
                 int list[] = {0, 2, 4, 10, 12, 14, 20, 22, 24, 30, 32, 34,
                     35, 37, 39, 45, 47, 49, 55, 57, 59, 65, 67, 69};
-                std::vector<size_t> shape(2);
+                std::vector<std::size_t> shape(2);
                 shape[0] = 3;
                 shape[1] = 2;
-                std::vector<size_t> strides(2);
+                std::vector<std::size_t> strides(2);
                 strides[0] = 1;
                 strides[1] = 3;
                 andres::View<int, constTarget> v(shape.begin(), shape.end(),
@@ -2358,11 +2358,11 @@ void ViewTest::shapeStrideAssignTest()
         {
             // without offset abd resize
             {
-                std::vector<size_t> shape(3);
+                std::vector<std::size_t> shape(3);
                 shape[0] = 3;
                 shape[1] = 2;
                 shape[2] = 4;
-                std::vector<size_t> strides(3);
+                std::vector<std::size_t> strides(3);
                 strides[0] = 1;
                 strides[1] = 3; 
                 strides[2] = 8; 
@@ -2386,11 +2386,11 @@ void ViewTest::shapeStrideAssignTest()
             }
             // with offset and resize
             {
-                std::vector<size_t> shape(3);
+                std::vector<std::size_t> shape(3);
                 shape[0] = 3;
                 shape[1] = 2;
                 shape[2] = 4;
-                std::vector<size_t> strides(3);
+                std::vector<std::size_t> strides(3);
                 strides[0] = 1;
                 strides[1] = 3; 
                 strides[2] = 8;
@@ -2413,11 +2413,11 @@ void ViewTest::shapeStrideAssignTest()
                 }
             }
             {
-                std::vector<size_t> shape(3);
+                std::vector<std::size_t> shape(3);
                 shape[0] = 3;
                 shape[1] = 2;
                 shape[2] = 4;
-                std::vector<size_t> strides(3);
+                std::vector<std::size_t> strides(3);
                 strides[0] = 1;
                 strides[1] = 3; 
                 strides[2] = 8;
@@ -2440,11 +2440,11 @@ void ViewTest::shapeStrideAssignTest()
                 }
             }
             {
-                std::vector<size_t> shape(3);
+                std::vector<std::size_t> shape(3);
                 shape[0] = 3;
                 shape[1] = 2;
                 shape[2] = 4;
-                std::vector<size_t> strides(3);
+                std::vector<std::size_t> strides(3);
                 strides[0] = 1;
                 strides[1] = 3; 
                 strides[2] = 8;
@@ -2471,11 +2471,11 @@ void ViewTest::shapeStrideAssignTest()
         {
             // without offset and resize
             {
-                std::vector<size_t> shape(3);
+                std::vector<std::size_t> shape(3);
                 shape[0] = 3;
                 shape[1] = 4;
                 shape[2] = 2;
-                std::vector<size_t> strides(3);
+                std::vector<std::size_t> strides(3);
                 strides[0] = 1;
                 strides[1] = 4;
                 strides[2] = 2;
@@ -2503,11 +2503,11 @@ void ViewTest::shapeStrideAssignTest()
             }
             // with offset and resize
             {
-                std::vector<size_t> shape(3);
+                std::vector<std::size_t> shape(3);
                 shape[0] = 3;
                 shape[1] = 4;
                 shape[2] = 2;
-                std::vector<size_t> strides(3);
+                std::vector<std::size_t> strides(3);
                 strides[0] = 1;
                 strides[1] = 4;
                 strides[2] = 2;
@@ -2534,11 +2534,11 @@ void ViewTest::shapeStrideAssignTest()
                 }
             }
             {
-                std::vector<size_t> shape(3);
+                std::vector<std::size_t> shape(3);
                 shape[0] = 3;
                 shape[1] = 4;
                 shape[2] = 2;
-                std::vector<size_t> strides(3);
+                std::vector<std::size_t> strides(3);
                 strides[0] = 1;
                 strides[1] = 4;
                 strides[2] = 2;
@@ -2565,11 +2565,11 @@ void ViewTest::shapeStrideAssignTest()
                 }
             }
             {
-                std::vector<size_t> shape(3);
+                std::vector<std::size_t> shape(3);
                 shape[0] = 3;
                 shape[1] = 4;
                 shape[2] = 2;
-                std::vector<size_t> strides(3);
+                std::vector<std::size_t> strides(3);
                 strides[0] = 1;
                 strides[1] = 4;
                 strides[2] = 2;
@@ -2602,11 +2602,11 @@ void ViewTest::shapeStrideAssignTest()
             {
                 int list[] = {0, 2, 4, 10, 12, 14, 20, 22, 24, 30, 32, 34,
                     35, 37, 39, 45, 47, 49, 55, 57, 59, 65, 67, 69};
-                std::vector<size_t> shape(3);
+                std::vector<std::size_t> shape(3);
                 shape[0] = 3;
                 shape[1] = 4;
                 shape[2] = 2;
-                std::vector<size_t> strides(3);
+                std::vector<std::size_t> strides(3);
                 strides[0] = 1;
                 strides[1] = 3;
                 strides[2] = 7;
@@ -2633,11 +2633,11 @@ void ViewTest::shapeStrideAssignTest()
             {
                 int list[] = {0, 2, 4, 10, 12, 14, 20, 22, 24, 30, 32, 34,
                     35, 37, 39, 45, 47, 49, 55, 57, 59, 65, 67, 69};
-                std::vector<size_t> shape(3);
+                std::vector<std::size_t> shape(3);
                 shape[0] = 2;
                 shape[1] = 3;
                 shape[2] = 4;
-                std::vector<size_t> strides(3);
+                std::vector<std::size_t> strides(3);
                 strides[0] = 1;
                 strides[1] = 3;
                 strides[2] = 7;
@@ -2667,11 +2667,11 @@ void ViewTest::shapeStrideAssignTest()
             {
                 int list[] = {30, 32, 34, 40, 42, 44, 50, 52, 54, 60, 62, 64,
                     65, 67, 69, 75, 77, 79, 85, 87, 89, 95, 97, 99};
-                std::vector<size_t> shape(3);
+                std::vector<std::size_t> shape(3);
                 shape[0] = 3;
                 shape[1] = 4;
                 shape[2] = 2;
-                std::vector<size_t> strides(3);
+                std::vector<std::size_t> strides(3);
                 strides[0] = 1;
                 strides[1] = 3;
                 strides[2] = 7;
@@ -2697,11 +2697,11 @@ void ViewTest::shapeStrideAssignTest()
             {
                 int list[] = {30, 32, 34, 40, 42, 44, 50, 52, 54, 60, 62, 64,
                     65, 67, 69, 75, 77, 79, 85, 87, 89, 95, 97, 99};
-                std::vector<size_t> shape(3);
+                std::vector<std::size_t> shape(3);
                 shape[0] = 3;
                 shape[1] = 4;
                 shape[2] = 2;
-                std::vector<size_t> strides(3);
+                std::vector<std::size_t> strides(3);
                 strides[0] = 1;
                 strides[1] = 3;
                 strides[2] = 7;
@@ -2727,11 +2727,11 @@ void ViewTest::shapeStrideAssignTest()
             {
                 int list[] = {0, 2, 4, 10, 12, 14, 20, 22, 24, 30, 32, 34,
                     35, 37, 39, 45, 47, 49, 55, 57, 59, 65, 67, 69};
-                std::vector<size_t> shape(3);
+                std::vector<std::size_t> shape(3);
                 shape[0] = 3;
                 shape[1] = 4;
                 shape[2] = 2;
-                std::vector<size_t> strides(3);
+                std::vector<std::size_t> strides(3);
                 strides[0] = 1;
                 strides[1] = 3;
                 strides[2] = 7;
@@ -2758,11 +2758,11 @@ void ViewTest::shapeStrideAssignTest()
             {
                 int list[] = {30, 32, 34, 40, 42, 44, 50, 52, 54, 60, 62, 64,
                     65, 67, 69, 75, 77, 79, 85, 87, 89, 95, 97, 99};
-                std::vector<size_t> shape(3);
+                std::vector<std::size_t> shape(3);
                 shape[0] = 2;
                 shape[1] = 3;
                 shape[2] = 4;
-                std::vector<size_t> strides(3);
+                std::vector<std::size_t> strides(3);
                 strides[0] = 1;
                 strides[1] = 3;
                 strides[2] = 7;
@@ -2791,11 +2791,11 @@ void ViewTest::shapeStrideAssignTest()
             {
                 int list[] = {30, 32, 34, 40, 42, 44, 50, 52, 54, 60, 62, 64,
                     65, 67, 69, 75, 77, 79, 85, 87, 89, 95, 97, 99};
-                std::vector<size_t> shape(3);
+                std::vector<std::size_t> shape(3);
                 shape[0] = 2;
                 shape[1] = 3;
                 shape[2] = 4;
-                std::vector<size_t> strides(3);
+                std::vector<std::size_t> strides(3);
                 strides[0] = 1;
                 strides[1] = 3;
                 strides[2] = 7;
@@ -2824,11 +2824,11 @@ void ViewTest::shapeStrideAssignTest()
             {
                 int list[] = {0, 2, 4, 10, 12, 14, 20, 22, 24, 30, 32, 34,
                     35, 37, 39, 45, 47, 49, 55, 57, 59, 65, 67, 69};
-                std::vector<size_t> shape(3);
+                std::vector<std::size_t> shape(3);
                 shape[0] = 2;
                 shape[1] = 3;
                 shape[2] = 4;
-                std::vector<size_t> strides(3);
+                std::vector<std::size_t> strides(3);
                 strides[0] = 1;
                 strides[1] = 3;
                 strides[2] = 7;
@@ -2882,13 +2882,13 @@ void ViewTest::assignmentOperatorTest()
                 datav[j] = j;
                 dataw[j] = j*2;
             }
-            std::vector<size_t> shape(1);
+            std::vector<std::size_t> shape(1);
             shape[0] = 24;
             andres::View<int, false> v(shape.begin(), shape.end(), datav, internalFirstMajorOrder),
                                      w(shape.begin(), shape.end(), dataw, internalFirstMajorOrder);
             v.operator=(w);
             
-            for(size_t j=0; j<v.size(); ++j) {
+            for(std::size_t j=0; j<v.size(); ++j) {
                 test(v(j) == w(j));
             }
         }
@@ -2899,13 +2899,13 @@ void ViewTest::assignmentOperatorTest()
                 datav[j] = j;
                 dataw[j] = j*2;
             }
-            std::vector<size_t> shape(1);
+            std::vector<std::size_t> shape(1);
             shape[0] = 24;
             andres::View<int, false> v(shape.begin(), shape.end(), datav, andres::FirstMajorOrder),
                                      w(shape.begin(), shape.end(), dataw, andres::LastMajorOrder);
             v.operator=(w);
             
-            for(size_t j=0; j<v.size(); ++j) {
+            for(std::size_t j=0; j<v.size(); ++j) {
                 test(v(j) == w(j));
             }
         }
@@ -2916,13 +2916,13 @@ void ViewTest::assignmentOperatorTest()
                 datav[j] = j;
                 dataw[j] = j*2;
             }
-            std::vector<size_t> shape(1);
+            std::vector<std::size_t> shape(1);
             shape[0] = 24;
             andres::View<int, false> v(shape.begin(), shape.end(), datav, andres::LastMajorOrder),
                                      w(shape.begin(), shape.end(), dataw, andres::FirstMajorOrder);
             v.operator=(w);
             
-            for(size_t j=0; j<v.size(); ++j) {
+            for(std::size_t j=0; j<v.size(); ++j) {
                 test(v(j) == w(j));
             }
         }
@@ -2934,15 +2934,15 @@ void ViewTest::assignmentOperatorTest()
                 datav[j] = j;
                 dataw[j] = j*2;
             }
-            std::vector<size_t> shape(1);
+            std::vector<std::size_t> shape(1);
             shape[0] = 6;
-            std::vector<size_t> strides(1);
+            std::vector<std::size_t> strides(1);
             strides[0] = 4;
             andres::View<int, false> v(shape.begin(), shape.end(), datav, andres::LastMajorOrder);
             andres::View<int, false> w(shape.begin(), shape.end(), strides.begin(), dataw, andres::FirstMajorOrder);
             v.operator=(w);
             
-            for(size_t j=0; j<v.size(); ++j) {
+            for(std::size_t j=0; j<v.size(); ++j) {
                 test(v(j) == w(j));
                 }
         }
@@ -2954,15 +2954,15 @@ void ViewTest::assignmentOperatorTest()
                 datav[j] = j;
                 dataw[j] = j*2;
             }
-            std::vector<size_t> shape(1);
+            std::vector<std::size_t> shape(1);
             shape[0] = 6;
-            std::vector<size_t> strides(1);
+            std::vector<std::size_t> strides(1);
             strides[0] = 4;
             andres::View<int, false> v(shape.begin(), shape.end(), strides.begin(), datav, andres::FirstMajorOrder);
             andres::View<int, false> w(shape.begin(), shape.end(), dataw, andres::LastMajorOrder);
             v.operator=(w);
             
-            for(size_t j=0; j<v.size(); ++j) {
+            for(std::size_t j=0; j<v.size(); ++j) {
                 test(v(j) == w(j));
                 }
         }
@@ -2974,15 +2974,15 @@ void ViewTest::assignmentOperatorTest()
                 datav[j] = j;
                 dataw[j] = j*2;
             }
-            std::vector<size_t> shape(1);
+            std::vector<std::size_t> shape(1);
             shape[0] = 6;
-            std::vector<size_t> strides(1);
+            std::vector<std::size_t> strides(1);
             strides[0] = 4;
             andres::View<int, false> v(shape.begin(), shape.end(), strides.begin(), datav, andres::LastMajorOrder);
             andres::View<int, false> w(shape.begin(), shape.end(), strides.begin(), dataw, andres::FirstMajorOrder);
             v.operator=(w);
             
-            for(size_t j=0; j<v.size(); ++j) {
+            for(std::size_t j=0; j<v.size(); ++j) {
                 test(v(j) == w(j));
                 }
         }
@@ -2994,7 +2994,7 @@ void ViewTest::assignmentOperatorTest()
                 datav[j] = j;
                 dataw[j] = j*2;
             }
-            std::vector<size_t> shape(2);
+            std::vector<std::size_t> shape(2);
             shape[0] = 6; 
             shape[1] = 4;
             andres::View<int, false> v(shape.begin(), shape.end(), datav, internalFirstMajorOrder),
@@ -3002,11 +3002,11 @@ void ViewTest::assignmentOperatorTest()
 
             v.operator=(w);
 
-            for(size_t j=0; j<v.size(); ++j) {
+            for(std::size_t j=0; j<v.size(); ++j) {
                 test(v(j) == w(j));
             }
-            for(size_t j=0; j<v.shape(0); ++j) {
-                for(size_t k=0; k<v.shape(1); ++k) {
+            for(std::size_t j=0; j<v.shape(0); ++j) {
+                for(std::size_t k=0; k<v.shape(1); ++k) {
                     test(v(j, k) == w(j, k));
                 }
             }
@@ -3018,7 +3018,7 @@ void ViewTest::assignmentOperatorTest()
                 datav[j] = j;
                 dataw[j] = j*2;
             }
-            std::vector<size_t> shape(2);
+            std::vector<std::size_t> shape(2);
             shape[0] = 6; 
             shape[1] = 4;
             andres::View<int, false> v(shape.begin(), shape.end(), datav, andres::FirstMajorOrder),
@@ -3026,11 +3026,11 @@ void ViewTest::assignmentOperatorTest()
 
             v.operator=(w);
 
-            for(size_t j=0; j<v.size(); ++j) {
+            for(std::size_t j=0; j<v.size(); ++j) {
                 test(v(j) == w(j));
             }
-            for(size_t j=0; j<v.shape(0); ++j) {
-                for(size_t k=0; k<v.shape(1); ++k) {
+            for(std::size_t j=0; j<v.shape(0); ++j) {
+                for(std::size_t k=0; k<v.shape(1); ++k) {
                     test(v(j, k) == w(j, k));
                 }
             }
@@ -3042,7 +3042,7 @@ void ViewTest::assignmentOperatorTest()
                 datav[j] = j;
                 dataw[j] = j*2;
             }
-            std::vector<size_t> shape(2);
+            std::vector<std::size_t> shape(2);
             shape[0] = 6; 
             shape[1] = 4;
             andres::View<int, false> v(shape.begin(), shape.end(), datav, andres::LastMajorOrder),
@@ -3050,11 +3050,11 @@ void ViewTest::assignmentOperatorTest()
 
             v.operator=(w);
 
-            for(size_t j=0; j<v.size(); ++j) {
+            for(std::size_t j=0; j<v.size(); ++j) {
                 test(v(j) == w(j));
             }
-            for(size_t j=0; j<v.shape(0); ++j) {
-                for(size_t k=0; k<v.shape(1); ++k) {
+            for(std::size_t j=0; j<v.shape(0); ++j) {
+                for(std::size_t k=0; k<v.shape(1); ++k) {
                     test(v(j, k) == w(j, k));
                 }
             }
@@ -3067,7 +3067,7 @@ void ViewTest::assignmentOperatorTest()
                 datav[j] = j;
                 dataw[j] = j*2;
             }
-            std::vector<size_t> shape(3);
+            std::vector<std::size_t> shape(3);
             shape[0] = 3;
             shape[1] = 2;
             shape[2] = 4; 
@@ -3076,12 +3076,12 @@ void ViewTest::assignmentOperatorTest()
 
             v.operator=(w);
 
-            for(size_t j=0; j<v.size(); ++j) {
+            for(std::size_t j=0; j<v.size(); ++j) {
                 test(v(j) == w(j));
             }
-            for(size_t j=0; j<v.shape(0); ++j) {
-                for(size_t k=0; k<v.shape(1); ++k) {
-                    for(size_t p=0; p<v.shape(2); ++p) {
+            for(std::size_t j=0; j<v.shape(0); ++j) {
+                for(std::size_t k=0; k<v.shape(1); ++k) {
+                    for(std::size_t p=0; p<v.shape(2); ++p) {
                         test(v(j, k, p) == w(j, k, p));
                     }
                 }
@@ -3094,7 +3094,7 @@ void ViewTest::assignmentOperatorTest()
                 datav[j] = j;
                 dataw[j] = j*2;
             }
-            std::vector<size_t> shape(3);
+            std::vector<std::size_t> shape(3);
             shape[0] = 3;
             shape[1] = 2;
             shape[2] = 4; 
@@ -3103,12 +3103,12 @@ void ViewTest::assignmentOperatorTest()
 
             v.operator=(w);
 
-            for(size_t j=0; j<v.size(); ++j) {
+            for(std::size_t j=0; j<v.size(); ++j) {
                 test(v(j) == w(j));
             }
-            for(size_t j=0; j<v.shape(0); ++j) {
-                for(size_t k=0; k<v.shape(1); ++k) {
-                    for(size_t p=0; p<v.shape(2); ++p) {
+            for(std::size_t j=0; j<v.shape(0); ++j) {
+                for(std::size_t k=0; k<v.shape(1); ++k) {
+                    for(std::size_t p=0; p<v.shape(2); ++p) {
                         test(v(j, k, p) == w(j, k, p));
                     }
                 }
@@ -3121,7 +3121,7 @@ void ViewTest::assignmentOperatorTest()
                 datav[j] = j;
                 dataw[j] = j*2;
             }
-            std::vector<size_t> shape(3);
+            std::vector<std::size_t> shape(3);
             shape[0] = 3;
             shape[1] = 2;
             shape[2] = 4; 
@@ -3130,12 +3130,12 @@ void ViewTest::assignmentOperatorTest()
 
             v.operator=(w);
 
-            for(size_t j=0; j<v.size(); ++j) {
+            for(std::size_t j=0; j<v.size(); ++j) {
                 test(v(j) == w(j));
             }
-            for(size_t j=0; j<v.shape(0); ++j) {
-                for(size_t k=0; k<v.shape(1); ++k) {
-                    for(size_t p=0; p<v.shape(2); ++p) {
+            for(std::size_t j=0; j<v.shape(0); ++j) {
+                for(std::size_t k=0; k<v.shape(1); ++k) {
+                    for(std::size_t p=0; p<v.shape(2); ++p) {
                         test(v(j, k, p) == w(j, k, p));
                     }
                 }
@@ -3151,7 +3151,7 @@ void ViewTest::assignmentOperatorTest()
             for(int j=0; j<24; ++j) {
                 data[j] = j;
             }
-            std::vector<size_t> shape(1);
+            std::vector<std::size_t> shape(1);
             shape[0] = 24; 
             andres::View<int, false> v, w(shape.begin(), shape.end(), data, internalFirstMajorOrder);
             v.operator=(w);
@@ -3159,7 +3159,7 @@ void ViewTest::assignmentOperatorTest()
             test(v.dimension() == w.dimension() &&
                    v.size() == w.size()
             );
-            for(size_t j=0; j<v.size(); ++j) {
+            for(std::size_t j=0; j<v.size(); ++j) {
                 test(&v(j) == &w(j));
             }
         }
@@ -3169,7 +3169,7 @@ void ViewTest::assignmentOperatorTest()
             for(int j=0; j<24; ++j) {
                 data[j] = j;
             }
-            std::vector<size_t> shape(2);
+            std::vector<std::size_t> shape(2);
             shape[0] = 6; 
             shape[1] = 4;
             andres::View<int, false> v, w(shape.begin(), shape.end(), data, internalFirstMajorOrder);
@@ -3178,11 +3178,11 @@ void ViewTest::assignmentOperatorTest()
             test(v.dimension() == w.dimension() &&
                    v.size() == w.size()
             );
-            for(size_t j=0; j<v.size(); ++j) {
+            for(std::size_t j=0; j<v.size(); ++j) {
                 test(&v(j) == &w(j));
             }
-            for(size_t j=0; j<v.shape(0); ++j) {
-                for(size_t k=0; k<v.shape(1); ++k) {
+            for(std::size_t j=0; j<v.shape(0); ++j) {
+                for(std::size_t k=0; k<v.shape(1); ++k) {
                     test(&v(j, k) == &w(j, k));
                 }
             }
@@ -3193,19 +3193,19 @@ void ViewTest::assignmentOperatorTest()
             for(int j=0; j<24; ++j) {
                 data[j] = j;
             }
-            std::vector<size_t> shape(3);
+            std::vector<std::size_t> shape(3);
             shape[0] = 3;
             shape[1] = 2;
             shape[2] = 4; 
             andres::View<int, false> v, w(shape.begin(), shape.end(), data, internalFirstMajorOrder);
             v.operator=(w);
 
-            for(size_t j=0; j<v.size(); ++j) {
+            for(std::size_t j=0; j<v.size(); ++j) {
                 test(&v(j) == &w(j));
             }
-            for(size_t j=0; j<v.shape(0); ++j) {
-                for(size_t k=0; k<v.shape(1); ++k) {
-                    for(size_t p=0; p<v.shape(2); ++p) {
+            for(std::size_t j=0; j<v.shape(0); ++j) {
+                for(std::size_t k=0; k<v.shape(1); ++k) {
+                    for(std::size_t p=0; p<v.shape(2); ++p) {
                         test(&v(j, k, p) == &w(j, k, p));
                     }
                 }
@@ -3225,13 +3225,13 @@ void ViewTest::assignmentOperatorTest()
                     datav[j] = j;
                     dataw[j] = j*2;
                 }
-                std::vector<size_t> shape(1);
+                std::vector<std::size_t> shape(1);
                 shape[0] = 24;
                 andres::View<int, false> v(shape.begin(), shape.end(), datav, internalFirstMajorOrder);
                 andres::View<int, true> w(shape.begin(), shape.end(), dataw, internalFirstMajorOrder);
                 v.operator=(w);
                 
-                for(size_t j=0; j<v.size(); ++j) {
+                for(std::size_t j=0; j<v.size(); ++j) {
                     test(v(j) == w(j));
                 }
             }
@@ -3242,13 +3242,13 @@ void ViewTest::assignmentOperatorTest()
                     datav[j] = j;
                     dataw[j] = j*2;
                 }
-                std::vector<size_t> shape(1);
+                std::vector<std::size_t> shape(1);
                 shape[0] = 24;
                 andres::View<int, false> v(shape.begin(), shape.end(), datav, andres::FirstMajorOrder);
                 andres::View<int, true> w(shape.begin(), shape.end(), dataw, andres::LastMajorOrder);
                 v.operator=(w);
                 
-                for(size_t j=0; j<v.size(); ++j) {
+                for(std::size_t j=0; j<v.size(); ++j) {
                     test(v(j) == w(j));
                 }
             }
@@ -3259,13 +3259,13 @@ void ViewTest::assignmentOperatorTest()
                     datav[j] = j;
                     dataw[j] = j*2;
                 }
-                std::vector<size_t> shape(1);
+                std::vector<std::size_t> shape(1);
                 shape[0] = 24;
                 andres::View<int, false> v(shape.begin(), shape.end(), datav, andres::LastMajorOrder);
                 andres::View<int, true> w(shape.begin(), shape.end(), dataw, andres::FirstMajorOrder);
                 v.operator=(w);
                 
-                for(size_t j=0; j<v.size(); ++j) {
+                for(std::size_t j=0; j<v.size(); ++j) {
                     test(v(j) == w(j));
                 }
             }
@@ -3277,15 +3277,15 @@ void ViewTest::assignmentOperatorTest()
                     datav[j] = j;
                     dataw[j] = j*2;
                 }
-                std::vector<size_t> shape(1);
+                std::vector<std::size_t> shape(1);
                 shape[0] = 6;
-                std::vector<size_t> strides(1);
+                std::vector<std::size_t> strides(1);
                 strides[0] = 4;
                 andres::View<int, false> v(shape.begin(), shape.end(), datav, andres::LastMajorOrder);
                 andres::View<int, true> w(shape.begin(), shape.end(), strides.begin(), dataw, andres::FirstMajorOrder);
                 v.operator=(w);
                 
-                for(size_t j=0; j<v.size(); ++j) {
+                for(std::size_t j=0; j<v.size(); ++j) {
                     test(v(j) == w(j));
                 }
             }
@@ -3297,15 +3297,15 @@ void ViewTest::assignmentOperatorTest()
                     datav[j] = j;
                     dataw[j] = j*2;
                 }
-                std::vector<size_t> shape(1);
+                std::vector<std::size_t> shape(1);
                 shape[0] = 6;
-                std::vector<size_t> strides(1);
+                std::vector<std::size_t> strides(1);
                 strides[0] = 4;
                 andres::View<int, false> v(shape.begin(), shape.end(), strides.begin(), datav, andres::FirstMajorOrder);
                 andres::View<int, true> w(shape.begin(), shape.end(), dataw, andres::LastMajorOrder);
                 v.operator=(w);
                 
-                for(size_t j=0; j<v.size(); ++j) {
+                for(std::size_t j=0; j<v.size(); ++j) {
                     test(v(j) == w(j));
                 }
             }
@@ -3317,15 +3317,15 @@ void ViewTest::assignmentOperatorTest()
                     datav[j] = j;
                     dataw[j] = j*2;
                 }
-                std::vector<size_t> shape(1);
+                std::vector<std::size_t> shape(1);
                 shape[0] = 6;
-                std::vector<size_t> strides(1);
+                std::vector<std::size_t> strides(1);
                 strides[0] = 4;
                 andres::View<int, false> v(shape.begin(), shape.end(), strides.begin(), datav, andres::LastMajorOrder);
                 andres::View<int, true> w(shape.begin(), shape.end(), strides.begin(), dataw, andres::FirstMajorOrder);
                 v.operator=(w);
                 
-                for(size_t j=0; j<v.size(); ++j) {
+                for(std::size_t j=0; j<v.size(); ++j) {
                     test(v(j) == w(j));
                 }
             }
@@ -3340,18 +3340,18 @@ void ViewTest::assignmentOperatorTest()
                     datav[j] = j;
                     dataw[j] = j*2;
                 }
-                std::vector<size_t> shape(2);
+                std::vector<std::size_t> shape(2);
                 shape[0] = 6; 
                 shape[1] = 4;
                 andres::View<int, false> v(shape.begin(), shape.end(), datav, internalFirstMajorOrder);
                 andres::View<int, true> w(shape.begin(), shape.end(), dataw, internalFirstMajorOrder);
                 v.operator=(w);
 
-                for(size_t j=0; j<v.size(); ++j) {
+                for(std::size_t j=0; j<v.size(); ++j) {
                     test(v(j) == w(j));
                 }
-                for(size_t j=0; j<v.shape(0); ++j) {
-                    for(size_t k=0; k<v.shape(1); ++k) {
+                for(std::size_t j=0; j<v.shape(0); ++j) {
+                    for(std::size_t k=0; k<v.shape(1); ++k) {
                         test(v(j, k) == w(j, k));
                     }
                 }
@@ -3363,18 +3363,18 @@ void ViewTest::assignmentOperatorTest()
                     datav[j] = j;
                     dataw[j] = j*2;
                 }
-                std::vector<size_t> shape(2);
+                std::vector<std::size_t> shape(2);
                 shape[0] = 6; 
                 shape[1] = 4;
                 andres::View<int, false> v(shape.begin(), shape.end(), datav, andres::FirstMajorOrder);
                 andres::View<int, true> w(shape.begin(), shape.end(), dataw, andres::LastMajorOrder);
                 v.operator=(w);
 
-                for(size_t j=0; j<v.size(); ++j) {
+                for(std::size_t j=0; j<v.size(); ++j) {
                     test(v(j) == w(j));
                 }
-                for(size_t j=0; j<v.shape(0); ++j) {
-                    for(size_t k=0; k<v.shape(1); ++k) {
+                for(std::size_t j=0; j<v.shape(0); ++j) {
+                    for(std::size_t k=0; k<v.shape(1); ++k) {
                         test(v(j, k) == w(j, k));
                     }
                 }
@@ -3386,18 +3386,18 @@ void ViewTest::assignmentOperatorTest()
                     datav[j] = j;
                     dataw[j] = j*2;
                 }
-                std::vector<size_t> shape(2);
+                std::vector<std::size_t> shape(2);
                 shape[0] = 6; 
                 shape[1] = 4;
                 andres::View<int, false> v(shape.begin(), shape.end(), datav, andres::LastMajorOrder);
                 andres::View<int, true> w(shape.begin(), shape.end(), dataw, andres::FirstMajorOrder);
                 v.operator=(w);
 
-                for(size_t j=0; j<v.size(); ++j) {
+                for(std::size_t j=0; j<v.size(); ++j) {
                     test(v(j) == w(j));
                 }
-                for(size_t j=0; j<v.shape(0); ++j) {
-                    for(size_t k=0; k<v.shape(1); ++k) {
+                for(std::size_t j=0; j<v.shape(0); ++j) {
+                    for(std::size_t k=0; k<v.shape(1); ++k) {
                         test(v(j, k) == w(j, k));
                     }
                 }
@@ -3413,7 +3413,7 @@ void ViewTest::assignmentOperatorTest()
                     datav[j] = j;
                     dataw[j] = j*2;
                 }
-                std::vector<size_t> shape(3);
+                std::vector<std::size_t> shape(3);
                 shape[0] = 3;
                 shape[1] = 2;
                 shape[2] = 4; 
@@ -3421,12 +3421,12 @@ void ViewTest::assignmentOperatorTest()
                 andres::View<int, true> w(shape.begin(), shape.end(), dataw, internalFirstMajorOrder);
                 v.operator=(w);
 
-                for(size_t j=0; j<v.size(); ++j) {
+                for(std::size_t j=0; j<v.size(); ++j) {
                     test(v(j) == w(j));
                 }
-                for(size_t j=0; j<v.shape(0); ++j) {
-                    for(size_t k=0; k<v.shape(1); ++k) {
-                        for(size_t p=0; p<v.shape(2); ++p) {
+                for(std::size_t j=0; j<v.shape(0); ++j) {
+                    for(std::size_t k=0; k<v.shape(1); ++k) {
+                        for(std::size_t p=0; p<v.shape(2); ++p) {
                             test(v(j, k, p) == w(j, k, p));
                         }
                     }
@@ -3439,7 +3439,7 @@ void ViewTest::assignmentOperatorTest()
                     datav[j] = j;
                     dataw[j] = j*2;
                 }
-                std::vector<size_t> shape(3);
+                std::vector<std::size_t> shape(3);
                 shape[0] = 3;
                 shape[1] = 2;
                 shape[2] = 4; 
@@ -3447,12 +3447,12 @@ void ViewTest::assignmentOperatorTest()
                 andres::View<int, true> w(shape.begin(), shape.end(), dataw, andres::LastMajorOrder);
                 v.operator=(w);
 
-                for(size_t j=0; j<v.size(); ++j) {
+                for(std::size_t j=0; j<v.size(); ++j) {
                     test(v(j) == w(j));
                 }
-                for(size_t j=0; j<v.shape(0); ++j) {
-                    for(size_t k=0; k<v.shape(1); ++k) {
-                        for(size_t p=0; p<v.shape(2); ++p) {
+                for(std::size_t j=0; j<v.shape(0); ++j) {
+                    for(std::size_t k=0; k<v.shape(1); ++k) {
+                        for(std::size_t p=0; p<v.shape(2); ++p) {
                             test(v(j, k, p) == w(j, k, p));
                         }
                     }
@@ -3465,7 +3465,7 @@ void ViewTest::assignmentOperatorTest()
                     datav[j] = j;
                     dataw[j] = j*2;
                 }
-                std::vector<size_t> shape(3);
+                std::vector<std::size_t> shape(3);
                 shape[0] = 3;
                 shape[1] = 2;
                 shape[2] = 4; 
@@ -3473,12 +3473,12 @@ void ViewTest::assignmentOperatorTest()
                 andres::View<int, true> w(shape.begin(), shape.end(), dataw, andres::FirstMajorOrder);
                 v.operator=(w);
 
-                for(size_t j=0; j<v.size(); ++j) {
+                for(std::size_t j=0; j<v.size(); ++j) {
                     test(v(j) == w(j));
                 }
-                for(size_t j=0; j<v.shape(0); ++j) {
-                    for(size_t k=0; k<v.shape(1); ++k) {
-                        for(size_t p=0; p<v.shape(2); ++p) {
+                for(std::size_t j=0; j<v.shape(0); ++j) {
+                    for(std::size_t k=0; k<v.shape(1); ++k) {
+                        for(std::size_t p=0; p<v.shape(2); ++p) {
                             test(v(j, k, p) == w(j, k, p));
                         }
                     }
@@ -3507,7 +3507,7 @@ void ViewTest::assignmentOperatorTest()
             for(int j=0; j<24; ++j) {
                 data[j] = j;
             }
-            std::vector<size_t> shape(1);
+            std::vector<std::size_t> shape(1);
             shape[0] = 24; 
             andres::View<int, true> v; 
             andres::View<int, false> w(shape.begin(), shape.end(), data, internalFirstMajorOrder);
@@ -3516,7 +3516,7 @@ void ViewTest::assignmentOperatorTest()
             test(v.dimension() == w.dimension() &&
                    v.size() == w.size()
             );
-            for(size_t j=0; j<v.size(); ++j) {
+            for(std::size_t j=0; j<v.size(); ++j) {
                 test(&v(j) == &w(j));
             }
         }
@@ -3526,7 +3526,7 @@ void ViewTest::assignmentOperatorTest()
             for(int j=0; j<24; ++j) {
                 data[j] = j;
             }
-            std::vector<size_t> shape(2);
+            std::vector<std::size_t> shape(2);
             shape[0] = 6; 
             shape[1] = 4;
             andres::View<int, true> v; 
@@ -3536,11 +3536,11 @@ void ViewTest::assignmentOperatorTest()
             test(v.dimension() == w.dimension() &&
                    v.size() == w.size()
             );
-            for(size_t j=0; j<v.size(); ++j) {
+            for(std::size_t j=0; j<v.size(); ++j) {
                 test(&v(j) == &w(j));
             }
-            for(size_t j=0; j<v.shape(0); ++j) {
-                for(size_t k=0; k<v.shape(1); ++k) {
+            for(std::size_t j=0; j<v.shape(0); ++j) {
+                for(std::size_t k=0; k<v.shape(1); ++k) {
                     test(&v(j, k) == &w(j, k));
                 }
             }
@@ -3551,7 +3551,7 @@ void ViewTest::assignmentOperatorTest()
             for(int j=0; j<24; ++j) {
                 data[j] = j;
             }
-            std::vector<size_t> shape(3);
+            std::vector<std::size_t> shape(3);
             shape[0] = 3;
             shape[1] = 2;
             shape[2] = 4; 
@@ -3559,12 +3559,12 @@ void ViewTest::assignmentOperatorTest()
             andres::View<int, false> w(shape.begin(), shape.end(), data, internalFirstMajorOrder);
             v.operator=(w);
 
-            for(size_t j=0; j<v.size(); ++j) {
+            for(std::size_t j=0; j<v.size(); ++j) {
                 test(&v(j) == &w(j));
             }
-            for(size_t j=0; j<v.shape(0); ++j) {
-                for(size_t k=0; k<v.shape(1); ++k) {
-                    for(size_t p=0; p<v.shape(2); ++p) {
+            for(std::size_t j=0; j<v.shape(0); ++j) {
+                for(std::size_t k=0; k<v.shape(1); ++k) {
+                    for(std::size_t p=0; p<v.shape(2); ++p) {
                         test(&v(j, k, p) == &w(j, k, p));
                     }
                 }
@@ -3592,7 +3592,7 @@ void ViewTest::assignmentOperatorTest()
             for(int j=0; j<24; ++j) {
                 data[j] = j;
             }
-            std::vector<size_t> shape(1);
+            std::vector<std::size_t> shape(1);
             shape[0] = 24; 
             andres::View<int, true> v; 
             andres::View<int, true> w(shape.begin(), shape.end(), data, internalFirstMajorOrder);
@@ -3601,7 +3601,7 @@ void ViewTest::assignmentOperatorTest()
             test(v.dimension() == w.dimension() &&
                    v.size() == w.size()
             );
-            for(size_t j=0; j<v.size(); ++j) {
+            for(std::size_t j=0; j<v.size(); ++j) {
                 test(&v(j) == &w(j));
             }
         }
@@ -3611,7 +3611,7 @@ void ViewTest::assignmentOperatorTest()
             for(int j=0; j<24; ++j) {
                 data[j] = j;
             }
-            std::vector<size_t> shape(2);
+            std::vector<std::size_t> shape(2);
             shape[0] = 6; 
             shape[1] = 4;
             andres::View<int, true> v; 
@@ -3621,11 +3621,11 @@ void ViewTest::assignmentOperatorTest()
             test(v.dimension() == w.dimension() &&
                    v.size() == w.size()
             );
-            for(size_t j=0; j<v.size(); ++j) {
+            for(std::size_t j=0; j<v.size(); ++j) {
                 test(&v(j) == &w(j));
             }
-            for(size_t j=0; j<v.shape(0); ++j) {
-                for(size_t k=0; k<v.shape(1); ++k) {
+            for(std::size_t j=0; j<v.shape(0); ++j) {
+                for(std::size_t k=0; k<v.shape(1); ++k) {
                     test(&v(j, k) == &w(j, k));
                 }
             }
@@ -3636,7 +3636,7 @@ void ViewTest::assignmentOperatorTest()
             for(int j=0; j<24; ++j) {
                 data[j] = j;
             }
-            std::vector<size_t> shape(3);
+            std::vector<std::size_t> shape(3);
             shape[0] = 3;
             shape[1] = 2;
             shape[2] = 4; 
@@ -3647,12 +3647,12 @@ void ViewTest::assignmentOperatorTest()
             test(v.dimension() == w.dimension() &&
                    v.size() == w.size()
             );
-            for(size_t j=0; j<v.size(); ++j) {
+            for(std::size_t j=0; j<v.size(); ++j) {
                 test(&v(j) == &w(j));
             }
-            for(size_t j=0; j<v.shape(0); ++j) {
-                for(size_t k=0; k<v.shape(1); ++k) {
-                    for(size_t p=0; p<v.shape(2); ++p) {
+            for(std::size_t j=0; j<v.shape(0); ++j) {
+                for(std::size_t k=0; k<v.shape(1); ++k) {
+                    for(std::size_t p=0; p<v.shape(2); ++p) {
                         test(&v(j, k, p) == &w(j, k, p));
                     }
                 }
@@ -3681,13 +3681,13 @@ void ViewTest::assignmentOperatorTest()
                 for(int j=0; j<24; ++j) {
                     data[j] = j;
                 }
-                std::vector<size_t> shape(1);
+                std::vector<std::size_t> shape(1);
                 shape[0] = 24;
                 andres::View<int, true> v(&scalar);
                 andres::View<int, false> w(shape.begin(), shape.end(), data, internalFirstMajorOrder);
                 v.operator=(w);
                 
-                for(size_t j=0; j<v.size(); ++j) {
+                for(std::size_t j=0; j<v.size(); ++j) {
                     test(&v(j) == &w(j));
                 }
             }
@@ -3700,7 +3700,7 @@ void ViewTest::assignmentOperatorTest()
                 for(int j=0; j<24; ++j) {
                     data[j] = j;
                 }
-                std::vector<size_t> shape(2); 
+                std::vector<std::size_t> shape(2); 
                 shape[0] = 6;
                 shape[1] = 4;
                 andres::View<int, true> v(&scalar);
@@ -3710,11 +3710,11 @@ void ViewTest::assignmentOperatorTest()
                 test(v.dimension() == w.dimension() &&
                        v.size() == w.size()
                 );
-                for(size_t j=0; j<v.size(); ++j) {
+                for(std::size_t j=0; j<v.size(); ++j) {
                     test(&v(j) == &w(j));
                 }
-                for(size_t k=0; k<w.shape(1); ++k) {
-                    for(size_t j=0; j<w.shape(0); ++j) {
+                for(std::size_t k=0; k<w.shape(1); ++k) {
+                    for(std::size_t j=0; j<w.shape(0); ++j) {
                         test(&v(j, k) == &w(j, k));
                     }
                 }
@@ -3726,7 +3726,7 @@ void ViewTest::assignmentOperatorTest()
                 for(int j=0; j<24; ++j) {
                     data[j] = j;
                 }
-                std::vector<size_t> shape(3);
+                std::vector<std::size_t> shape(3);
                 shape[0] = 2;
                 shape[1] = 3; 
                 shape[2] = 4;
@@ -3737,12 +3737,12 @@ void ViewTest::assignmentOperatorTest()
                 test(v.dimension() == w.dimension() &&
                        v.size() == w.size()
                 );
-                for(size_t j=0; j<v.size(); ++j) {
+                for(std::size_t j=0; j<v.size(); ++j) {
                     test(&v(j) == &w(j));
                 }
-                for(size_t p=0; p<w.shape(2); ++p) {
-                    for(size_t k=0; k<w.shape(1); ++k) {
-                        for(size_t j=0; j<w.shape(0); ++j) {
+                for(std::size_t p=0; p<w.shape(2); ++p) {
+                    for(std::size_t k=0; k<w.shape(1); ++k) {
+                        for(std::size_t j=0; j<w.shape(0); ++j) {
                             test(&v(j, k, p) == &w(j, k, p));
                         }
                     }
@@ -3758,7 +3758,7 @@ void ViewTest::assignmentOperatorTest()
                 for(int j=0; j<24; ++j) {
                     data[j] = j;
                 }
-                std::vector<size_t> shape(1);
+                std::vector<std::size_t> shape(1);
                 shape[0] = 24;
                 andres::View<int, true> v(shape.begin(), shape.end(), data, internalFirstMajorOrder);
                 andres::View<int, false> w(&scalar);
@@ -3777,13 +3777,13 @@ void ViewTest::assignmentOperatorTest()
                     datav[j] = j;
                     dataw[j] = j*2;
                 }
-                std::vector<size_t> shape(1);
+                std::vector<std::size_t> shape(1);
                 shape[0] = 24;
                 andres::View<int, true> v(shape.begin(), shape.end(), datav, internalFirstMajorOrder);
                 andres::View<int, false> w(shape.begin(), shape.end(), dataw, internalFirstMajorOrder);
                 v.operator=(w);
                 
-                for(size_t j=0; j<v.size(); ++j) {
+                for(std::size_t j=0; j<v.size(); ++j) {
                     test(v(j) == w(j)
                 );
                 }
@@ -3795,13 +3795,13 @@ void ViewTest::assignmentOperatorTest()
                     datav[j] = j;
                     dataw[j] = j*2;
                 }
-                std::vector<size_t> shape(1);
+                std::vector<std::size_t> shape(1);
                 shape[0] = 24;
                 andres::View<int, true> v(shape.begin(), shape.end(), datav, andres::FirstMajorOrder);
                 andres::View<int, false> w(shape.begin(), shape.end(), dataw, andres::LastMajorOrder);
                 v.operator=(w);
                 
-                for(size_t j=0; j<v.size(); ++j) {
+                for(std::size_t j=0; j<v.size(); ++j) {
                     test(v(j) == w(j)
                 );
                 }
@@ -3813,13 +3813,13 @@ void ViewTest::assignmentOperatorTest()
                     datav[j] = j;
                     dataw[j] = j*2;
                 }
-                std::vector<size_t> shape(1);
+                std::vector<std::size_t> shape(1);
                 shape[0] = 24;
                 andres::View<int, true> v(shape.begin(), shape.end(), datav, andres::LastMajorOrder);
                 andres::View<int, false> w(shape.begin(), shape.end(), dataw, andres::FirstMajorOrder);
                 v.operator=(w);
                 
-                for(size_t j=0; j<v.size(); ++j) {
+                for(std::size_t j=0; j<v.size(); ++j) {
                     test(v(j) == w(j)
                 );
                 }
@@ -3832,7 +3832,7 @@ void ViewTest::assignmentOperatorTest()
                     datav[j] = j;
                     dataw[j] = j*2;
                 }
-                std::vector<size_t> shapev(1), shapew(2); 
+                std::vector<std::size_t> shapev(1), shapew(2); 
                 shapev[0] = 24;
                 shapew[0] = 6;
                 shapew[1] = 4;
@@ -3843,11 +3843,11 @@ void ViewTest::assignmentOperatorTest()
                 test(v.dimension() == w.dimension() &&
                        v.size() == w.size()
                 );
-                for(size_t j=0; j<v.size(); ++j) {
+                for(std::size_t j=0; j<v.size(); ++j) {
                     test(&v(j) == &w(j));
                 }
-                for(size_t k=0; k<w.shape(1); ++k) {
-                    for(size_t j=0; j<w.shape(0); ++j) {
+                for(std::size_t k=0; k<w.shape(1); ++k) {
+                    for(std::size_t j=0; j<w.shape(0); ++j) {
                         test(&v(j, k) == &w(j, k));
                     }
                 }
@@ -3859,7 +3859,7 @@ void ViewTest::assignmentOperatorTest()
                     datav[j] = j;
                     dataw[j] = j*2;
                 }
-                std::vector<size_t> shapev(1), shapew(2); 
+                std::vector<std::size_t> shapev(1), shapew(2); 
                 shapev[0] = 24;
                 shapew[0] = 6;
                 shapew[1] = 4;
@@ -3870,11 +3870,11 @@ void ViewTest::assignmentOperatorTest()
                 test(v.dimension() == w.dimension() &&
                        v.size() == w.size()
                 );
-                for(size_t j=0; j<v.size(); ++j) {
+                for(std::size_t j=0; j<v.size(); ++j) {
                     test(&v(j) == &w(j));
                 }
-                for(size_t k=0; k<w.shape(1); ++k) {
-                    for(size_t j=0; j<w.shape(0); ++j) {
+                for(std::size_t k=0; k<w.shape(1); ++k) {
+                    for(std::size_t j=0; j<w.shape(0); ++j) {
                         test(&v(j, k) == &w(j, k));
                     }
                 }
@@ -3886,7 +3886,7 @@ void ViewTest::assignmentOperatorTest()
                     datav[j] = j;
                     dataw[j] = j*2;
                 }
-                std::vector<size_t> shapev(1), shapew(2); 
+                std::vector<std::size_t> shapev(1), shapew(2); 
                 shapev[0] = 24;
                 shapew[0] = 6;
                 shapew[1] = 4;
@@ -3897,11 +3897,11 @@ void ViewTest::assignmentOperatorTest()
                 test(v.dimension() == w.dimension() &&
                        v.size() == w.size()
                 );
-                for(size_t j=0; j<v.size(); ++j) {
+                for(std::size_t j=0; j<v.size(); ++j) {
                     test(&v(j) == &w(j));
                 }
-                for(size_t k=0; k<w.shape(1); ++k) {
-                    for(size_t j=0; j<w.shape(0); ++j) {
+                for(std::size_t k=0; k<w.shape(1); ++k) {
+                    for(std::size_t j=0; j<w.shape(0); ++j) {
                         test(&v(j, k) == &w(j, k));
                     }
                 }
@@ -3914,7 +3914,7 @@ void ViewTest::assignmentOperatorTest()
                     datav[j] = j;
                     dataw[j] = j*2;
                 }
-                std::vector<size_t> shapev(1), shapew(3);
+                std::vector<std::size_t> shapev(1), shapew(3);
                 shapev[0] = 24;
                 shapew[0] = 2;
                 shapew[1] = 3; 
@@ -3926,12 +3926,12 @@ void ViewTest::assignmentOperatorTest()
                 test(v.dimension() == w.dimension() &&
                        v.size() == w.size()
                 );
-                for(size_t j=0; j<v.size(); ++j) {
+                for(std::size_t j=0; j<v.size(); ++j) {
                     test(&v(j) == &w(j));
                 }
-                for(size_t p=0; p<w.shape(2); ++p) {
-                    for(size_t k=0; k<w.shape(1); ++k) {
-                        for(size_t j=0; j<w.shape(0); ++j) {
+                for(std::size_t p=0; p<w.shape(2); ++p) {
+                    for(std::size_t k=0; k<w.shape(1); ++k) {
+                        for(std::size_t j=0; j<w.shape(0); ++j) {
                             test(&v(j, k, p) == &w(j, k, p));
                         }
                     }
@@ -3944,7 +3944,7 @@ void ViewTest::assignmentOperatorTest()
                     datav[j] = j;
                     dataw[j] = j*2;
                 }
-                std::vector<size_t> shapev(1), shapew(3);
+                std::vector<std::size_t> shapev(1), shapew(3);
                 shapev[0] = 24;
                 shapew[0] = 2;
                 shapew[1] = 3; 
@@ -3956,12 +3956,12 @@ void ViewTest::assignmentOperatorTest()
                 test(v.dimension() == w.dimension() &&
                        v.size() == w.size()
                 );
-                for(size_t j=0; j<v.size(); ++j) {
+                for(std::size_t j=0; j<v.size(); ++j) {
                     test(&v(j) == &w(j));
                 }
-                for(size_t p=0; p<w.shape(2); ++p) {
-                    for(size_t k=0; k<w.shape(1); ++k) {
-                        for(size_t j=0; j<w.shape(0); ++j) {
+                for(std::size_t p=0; p<w.shape(2); ++p) {
+                    for(std::size_t k=0; k<w.shape(1); ++k) {
+                        for(std::size_t j=0; j<w.shape(0); ++j) {
                             test(&v(j, k, p) == &w(j, k, p));
                         }
                     }
@@ -3974,7 +3974,7 @@ void ViewTest::assignmentOperatorTest()
                     datav[j] = j;
                     dataw[j] = j*2;
                 }
-                std::vector<size_t> shapev(1), shapew(3);
+                std::vector<std::size_t> shapev(1), shapew(3);
                 shapev[0] = 24;
                 shapew[0] = 2;
                 shapew[1] = 3; 
@@ -3986,12 +3986,12 @@ void ViewTest::assignmentOperatorTest()
                 test(v.dimension() == w.dimension() &&
                        v.size() == w.size()
                 );
-                for(size_t j=0; j<v.size(); ++j) {
+                for(std::size_t j=0; j<v.size(); ++j) {
                     test(&v(j) == &w(j));
                 }
-                for(size_t p=0; p<w.shape(2); ++p) {
-                    for(size_t k=0; k<w.shape(1); ++k) {
-                        for(size_t j=0; j<w.shape(0); ++j) {
+                for(std::size_t p=0; p<w.shape(2); ++p) {
+                    for(std::size_t k=0; k<w.shape(1); ++k) {
+                        for(std::size_t j=0; j<w.shape(0); ++j) {
                             test(&v(j, k, p) == &w(j, k, p));
                         }
                     }
@@ -4007,7 +4007,7 @@ void ViewTest::assignmentOperatorTest()
                 for(int j=0; j<24; ++j) {
                     data[j] = j;
                 }
-                std::vector<size_t> shape(2);
+                std::vector<std::size_t> shape(2);
                 shape[0] = 6;
                 shape[1] = 4;
                 andres::View<int, true> v(shape.begin(), shape.end(), data, internalFirstMajorOrder);
@@ -4026,7 +4026,7 @@ void ViewTest::assignmentOperatorTest()
                     datav[j] = j;
                     dataw[j] = j*2;
                 }
-                std::vector<size_t> shapev(2), shapew(1);
+                std::vector<std::size_t> shapev(2), shapew(1);
                 shapev[0] = 6;
                 shapev[1] = 4;
                 shapew[0] = 24;
@@ -4037,7 +4037,7 @@ void ViewTest::assignmentOperatorTest()
                 test(v.dimension() == w.dimension() &&
                        v.size() == w.size()
                 );
-                for(size_t j=0; j<v.size(); ++j) {
+                for(std::size_t j=0; j<v.size(); ++j) {
                     test(&v(j) == &w(j));
                 }
             }
@@ -4048,7 +4048,7 @@ void ViewTest::assignmentOperatorTest()
                     datav[j] = j;
                     dataw[j] = j*2;
                 }
-                std::vector<size_t> shapev(2), shapew(1);
+                std::vector<std::size_t> shapev(2), shapew(1);
                 shapev[0] = 6;
                 shapev[1] = 4;
                 shapew[0] = 24;
@@ -4059,7 +4059,7 @@ void ViewTest::assignmentOperatorTest()
                 test(v.dimension() == w.dimension() &&
                        v.size() == w.size()
                 );
-                for(size_t j=0; j<v.size(); ++j) {
+                for(std::size_t j=0; j<v.size(); ++j) {
                     test(&v(j) == &w(j));
                 }
             }
@@ -4070,7 +4070,7 @@ void ViewTest::assignmentOperatorTest()
                     datav[j] = j;
                     dataw[j] = j*2;
                 }
-                std::vector<size_t> shapev(2), shapew(1);
+                std::vector<std::size_t> shapev(2), shapew(1);
                 shapev[0] = 6;
                 shapev[1] = 4;
                 shapew[0] = 24;
@@ -4081,7 +4081,7 @@ void ViewTest::assignmentOperatorTest()
                 test(v.dimension() == w.dimension() &&
                        v.size() == w.size()
                 );
-                for(size_t j=0; j<v.size(); ++j) {
+                for(std::size_t j=0; j<v.size(); ++j) {
                     test(&v(j) == &w(j));
                 }
             }
@@ -4093,18 +4093,18 @@ void ViewTest::assignmentOperatorTest()
                     datav[j] = j;
                     dataw[j] = j*2;
                 }
-                std::vector<size_t> shape(2);
+                std::vector<std::size_t> shape(2);
                 shape[0] = 6; 
                 shape[1] = 4;
                 andres::View<int, true> v(shape.begin(), shape.end(), datav, internalFirstMajorOrder);
                 andres::View<int, false> w(shape.begin(), shape.end(), dataw, internalFirstMajorOrder);
                 v.operator=(w);
 
-                for(size_t j=0; j<v.size(); ++j) {
+                for(std::size_t j=0; j<v.size(); ++j) {
                     test(&v(j) == &w(j));
                 }
-                for(size_t j=0; j<v.shape(0); ++j) {
-                    for(size_t k=0; k<v.shape(1); ++k) {
+                for(std::size_t j=0; j<v.shape(0); ++j) {
+                    for(std::size_t k=0; k<v.shape(1); ++k) {
                         test(&v(j, k) == &w(j, k));
                     }
                 }
@@ -4116,18 +4116,18 @@ void ViewTest::assignmentOperatorTest()
                     datav[j] = j;
                     dataw[j] = j*2;
                 }
-                std::vector<size_t> shape(2);
+                std::vector<std::size_t> shape(2);
                 shape[0] = 6; 
                 shape[1] = 4;
                 andres::View<int, true> v(shape.begin(), shape.end(), datav, andres::FirstMajorOrder);
                 andres::View<int, false> w(shape.begin(), shape.end(), dataw, andres::LastMajorOrder);
                 v.operator=(w);
 
-                for(size_t j=0; j<v.size(); ++j) {
+                for(std::size_t j=0; j<v.size(); ++j) {
                     test(&v(j) == &w(j));
                 }
-                for(size_t j=0; j<v.shape(0); ++j) {
-                    for(size_t k=0; k<v.shape(1); ++k) {
+                for(std::size_t j=0; j<v.shape(0); ++j) {
+                    for(std::size_t k=0; k<v.shape(1); ++k) {
                         test(&v(j, k) == &w(j, k));
                     }
                 }
@@ -4139,18 +4139,18 @@ void ViewTest::assignmentOperatorTest()
                     datav[j] = j;
                     dataw[j] = j*2;
                 }
-                std::vector<size_t> shape(2);
+                std::vector<std::size_t> shape(2);
                 shape[0] = 6; 
                 shape[1] = 4;
                 andres::View<int, true> v(shape.begin(), shape.end(), datav, andres::LastMajorOrder);
                 andres::View<int, false> w(shape.begin(), shape.end(), dataw, andres::FirstMajorOrder);
                 v.operator=(w);
 
-                for(size_t j=0; j<v.size(); ++j) {
+                for(std::size_t j=0; j<v.size(); ++j) {
                     test(&v(j) == &w(j));
                 }
-                for(size_t j=0; j<v.shape(0); ++j) {
-                    for(size_t k=0; k<v.shape(1); ++k) {
+                for(std::size_t j=0; j<v.shape(0); ++j) {
+                    for(std::size_t k=0; k<v.shape(1); ++k) {
                         test(&v(j, k) == &w(j, k));
                     }
                 }
@@ -4163,7 +4163,7 @@ void ViewTest::assignmentOperatorTest()
                     datav[j] = j;
                     dataw[j] = j*2;
                 }
-                std::vector<size_t> shapev(2), shapew(2);
+                std::vector<std::size_t> shapev(2), shapew(2);
                 shapev[0] = 6; 
                 shapev[1] = 4;
                 shapew[0] = 4;
@@ -4172,11 +4172,11 @@ void ViewTest::assignmentOperatorTest()
                 andres::View<int, false> w(shapew.begin(), shapew.end(), dataw, internalFirstMajorOrder);
                 v.operator=(w);
 
-                for(size_t j=0; j<v.size(); ++j) {
+                for(std::size_t j=0; j<v.size(); ++j) {
                     test(&v(j) == &w(j));
                 }
-                for(size_t j=0; j<v.shape(0); ++j) {
-                    for(size_t k=0; k<v.shape(1); ++k) {
+                for(std::size_t j=0; j<v.shape(0); ++j) {
+                    for(std::size_t k=0; k<v.shape(1); ++k) {
                         test(&v(j, k) == &w(j, k));
                     }
                 }
@@ -4188,7 +4188,7 @@ void ViewTest::assignmentOperatorTest()
                     datav[j] = j;
                     dataw[j] = j*2;
                 }
-                std::vector<size_t> shapev(2), shapew(2);
+                std::vector<std::size_t> shapev(2), shapew(2);
                 shapev[0] = 6; 
                 shapev[1] = 4;
                 shapew[0] = 4;
@@ -4197,11 +4197,11 @@ void ViewTest::assignmentOperatorTest()
                 andres::View<int, false> w(shapew.begin(), shapew.end(), dataw, andres::LastMajorOrder);
                 v.operator=(w);
 
-                for(size_t j=0; j<v.size(); ++j) {
+                for(std::size_t j=0; j<v.size(); ++j) {
                     test(&v(j) == &w(j));
                 }
-                for(size_t j=0; j<v.shape(0); ++j) {
-                    for(size_t k=0; k<v.shape(1); ++k) {
+                for(std::size_t j=0; j<v.shape(0); ++j) {
+                    for(std::size_t k=0; k<v.shape(1); ++k) {
                         test(&v(j, k) == &w(j, k));
                     }
                 }
@@ -4213,7 +4213,7 @@ void ViewTest::assignmentOperatorTest()
                     datav[j] = j;
                     dataw[j] = j*2;
                 }
-                std::vector<size_t> shapev(2), shapew(2);
+                std::vector<std::size_t> shapev(2), shapew(2);
                 shapev[0] = 6; 
                 shapev[1] = 4;
                 shapew[0] = 4;
@@ -4222,11 +4222,11 @@ void ViewTest::assignmentOperatorTest()
                 andres::View<int, false> w(shapew.begin(), shapew.end(), dataw, andres::FirstMajorOrder);
                 v.operator=(w);
 
-                for(size_t j=0; j<v.size(); ++j) {
+                for(std::size_t j=0; j<v.size(); ++j) {
                     test(&v(j) == &w(j));
                 }
-                for(size_t j=0; j<v.shape(0); ++j) {
-                    for(size_t k=0; k<v.shape(1); ++k) {
+                for(std::size_t j=0; j<v.shape(0); ++j) {
+                    for(std::size_t k=0; k<v.shape(1); ++k) {
                         test(&v(j, k) == &w(j, k));
                     }
                 }
@@ -4239,7 +4239,7 @@ void ViewTest::assignmentOperatorTest()
                     datav[j] = j;
                     dataw[j] = j*2;
                 }
-                std::vector<size_t> shapev(2), shapew(3);
+                std::vector<std::size_t> shapev(2), shapew(3);
                 shapev[0] = 6;
                 shapev[1] = 4; 
                 shapew[0] = 2;
@@ -4252,12 +4252,12 @@ void ViewTest::assignmentOperatorTest()
                 test(v.dimension() == w.dimension() &&
                        v.size() == w.size()
                 );
-                for(size_t j=0; j<v.size(); ++j) {
+                for(std::size_t j=0; j<v.size(); ++j) {
                     test(&v(j) == &w(j));
                 }
-                for(size_t p=0; p<w.shape(2); ++p) {
-                    for(size_t k=0; k<w.shape(1); ++k) {
-                        for(size_t j=0; j<w.shape(0); ++j) {
+                for(std::size_t p=0; p<w.shape(2); ++p) {
+                    for(std::size_t k=0; k<w.shape(1); ++k) {
+                        for(std::size_t j=0; j<w.shape(0); ++j) {
                             test(&v(j, k, p) == &w(j, k, p));
                         }
                     }
@@ -4270,7 +4270,7 @@ void ViewTest::assignmentOperatorTest()
                     datav[j] = j;
                     dataw[j] = j*2;
                 }
-                std::vector<size_t> shapev(2), shapew(3);
+                std::vector<std::size_t> shapev(2), shapew(3);
                 shapev[0] = 6;
                 shapev[1] = 4; 
                 shapew[0] = 2;
@@ -4283,12 +4283,12 @@ void ViewTest::assignmentOperatorTest()
                 test(v.dimension() == w.dimension() &&
                        v.size() == w.size()
                 );
-                for(size_t j=0; j<v.size(); ++j) {
+                for(std::size_t j=0; j<v.size(); ++j) {
                     test(&v(j) == &w(j));
                 }
-                for(size_t p=0; p<w.shape(2); ++p) {
-                    for(size_t k=0; k<w.shape(1); ++k) {
-                        for(size_t j=0; j<w.shape(0); ++j) {
+                for(std::size_t p=0; p<w.shape(2); ++p) {
+                    for(std::size_t k=0; k<w.shape(1); ++k) {
+                        for(std::size_t j=0; j<w.shape(0); ++j) {
                             test(&v(j, k, p) == &w(j, k, p));
                         }
                     }
@@ -4301,7 +4301,7 @@ void ViewTest::assignmentOperatorTest()
                     datav[j] = j;
                     dataw[j] = j*2;
                 }
-                std::vector<size_t> shapev(2), shapew(3);
+                std::vector<std::size_t> shapev(2), shapew(3);
                 shapev[0] = 6;
                 shapev[1] = 4; 
                 shapew[0] = 2;
@@ -4314,12 +4314,12 @@ void ViewTest::assignmentOperatorTest()
                 test(v.dimension() == w.dimension() &&
                        v.size() == w.size()
                 );
-                for(size_t j=0; j<v.size(); ++j) {
+                for(std::size_t j=0; j<v.size(); ++j) {
                     test(&v(j) == &w(j));
                 }
-                for(size_t p=0; p<w.shape(2); ++p) {
-                    for(size_t k=0; k<w.shape(1); ++k) {
-                        for(size_t j=0; j<w.shape(0); ++j) {
+                for(std::size_t p=0; p<w.shape(2); ++p) {
+                    for(std::size_t k=0; k<w.shape(1); ++k) {
+                        for(std::size_t j=0; j<w.shape(0); ++j) {
                             test(&v(j, k, p) == &w(j, k, p));
                         }
                     }
@@ -4336,7 +4336,7 @@ void ViewTest::assignmentOperatorTest()
                     datav[j] = j;
                     dataw[j] = j*2;
                 }
-                std::vector<size_t> shapev(3), shapew(1);
+                std::vector<std::size_t> shapev(3), shapew(1);
                 shapev[0] = 2;
                 shapev[1] = 3; 
                 shapev[2] = 4; 
@@ -4348,7 +4348,7 @@ void ViewTest::assignmentOperatorTest()
                 test(v.dimension() == w.dimension() &&
                        v.size() == w.size()
                 );
-                for(size_t j=0; j<v.size(); ++j) {
+                for(std::size_t j=0; j<v.size(); ++j) {
                     test(&v(j) == &w(j));
                 }       
             }
@@ -4359,7 +4359,7 @@ void ViewTest::assignmentOperatorTest()
                     datav[j] = j;
                     dataw[j] = j*2;
                 }
-                std::vector<size_t> shapev(3), shapew(1);
+                std::vector<std::size_t> shapev(3), shapew(1);
                 shapev[0] = 2;
                 shapev[1] = 3; 
                 shapev[2] = 4; 
@@ -4371,7 +4371,7 @@ void ViewTest::assignmentOperatorTest()
                 test(v.dimension() == w.dimension() &&
                        v.size() == w.size()
                 );
-                for(size_t j=0; j<v.size(); ++j) {
+                for(std::size_t j=0; j<v.size(); ++j) {
                     test(&v(j) == &w(j));
                 }       
             }
@@ -4382,7 +4382,7 @@ void ViewTest::assignmentOperatorTest()
                     datav[j] = j;
                     dataw[j] = j*2;
                 }
-                std::vector<size_t> shapev(3), shapew(1);
+                std::vector<std::size_t> shapev(3), shapew(1);
                 shapev[0] = 2;
                 shapev[1] = 3; 
                 shapev[2] = 4; 
@@ -4394,7 +4394,7 @@ void ViewTest::assignmentOperatorTest()
                 test(v.dimension() == w.dimension() &&
                        v.size() == w.size()
                 );
-                for(size_t j=0; j<v.size(); ++j) {
+                for(std::size_t j=0; j<v.size(); ++j) {
                     test(&v(j) == &w(j));
                 }       
             }
@@ -4406,7 +4406,7 @@ void ViewTest::assignmentOperatorTest()
                     datav[j] = j;
                     dataw[j] = j*2;
                 }
-                std::vector<size_t> shapev(3), shapew(2);
+                std::vector<std::size_t> shapev(3), shapew(2);
                 shapev[0] = 2;
                 shapev[1] = 3;
                 shapev[2] = 4; 
@@ -4419,11 +4419,11 @@ void ViewTest::assignmentOperatorTest()
                 test(v.dimension() == w.dimension() &&
                        v.size() == w.size()
                 );
-                for(size_t j=0; j<v.size(); ++j) {
+                for(std::size_t j=0; j<v.size(); ++j) {
                     test(&v(j) == &w(j));
                 }
-                for(size_t k=0; k<w.shape(1); ++k) {
-                    for(size_t j=0; j<w.shape(0); ++j) {
+                for(std::size_t k=0; k<w.shape(1); ++k) {
+                    for(std::size_t j=0; j<w.shape(0); ++j) {
                         test(&v(j, k) == &w(j, k));
                     }
                 }
@@ -4435,7 +4435,7 @@ void ViewTest::assignmentOperatorTest()
                     datav[j] = j;
                     dataw[j] = j*2;
                 }
-                std::vector<size_t> shapev(3), shapew(2);
+                std::vector<std::size_t> shapev(3), shapew(2);
                 shapev[0] = 2;
                 shapev[1] = 3;
                 shapev[2] = 4; 
@@ -4448,11 +4448,11 @@ void ViewTest::assignmentOperatorTest()
                 test(v.dimension() == w.dimension() &&
                        v.size() == w.size()
                 );
-                for(size_t j=0; j<v.size(); ++j) {
+                for(std::size_t j=0; j<v.size(); ++j) {
                     test(&v(j) == &w(j));
                 }
-                for(size_t k=0; k<w.shape(1); ++k) {
-                    for(size_t j=0; j<w.shape(0); ++j) {
+                for(std::size_t k=0; k<w.shape(1); ++k) {
+                    for(std::size_t j=0; j<w.shape(0); ++j) {
                         test(&v(j, k) == &w(j, k));
                     }
                 }
@@ -4464,7 +4464,7 @@ void ViewTest::assignmentOperatorTest()
                     datav[j] = j;
                     dataw[j] = j*2;
                 }
-                std::vector<size_t> shapev(3), shapew(2);
+                std::vector<std::size_t> shapev(3), shapew(2);
                 shapev[0] = 2;
                 shapev[1] = 3;
                 shapev[2] = 4; 
@@ -4477,11 +4477,11 @@ void ViewTest::assignmentOperatorTest()
                 test(v.dimension() == w.dimension() &&
                        v.size() == w.size()
                 );
-                for(size_t j=0; j<v.size(); ++j) {
+                for(std::size_t j=0; j<v.size(); ++j) {
                     test(&v(j) == &w(j));
                 }
-                for(size_t k=0; k<w.shape(1); ++k) {
-                    for(size_t j=0; j<w.shape(0); ++j) {
+                for(std::size_t k=0; k<w.shape(1); ++k) {
+                    for(std::size_t j=0; j<w.shape(0); ++j) {
                         test(&v(j, k) == &w(j, k));
                     }
                 }
@@ -4494,7 +4494,7 @@ void ViewTest::assignmentOperatorTest()
                     datav[j] = j;
                     dataw[j] = j*2;
                 }
-                std::vector<size_t> shape(3);
+                std::vector<std::size_t> shape(3);
                 shape[0] = 3;
                 shape[1] = 2;
                 shape[2] = 4; 
@@ -4502,12 +4502,12 @@ void ViewTest::assignmentOperatorTest()
                 andres::View<int, false> w(shape.begin(), shape.end(), dataw, internalFirstMajorOrder);
                 v.operator=(w);
 
-                for(size_t j=0; j<v.size(); ++j) {
+                for(std::size_t j=0; j<v.size(); ++j) {
                     test(&v(j) == &w(j));
                 }
-                for(size_t j=0; j<v.shape(0); ++j) {
-                    for(size_t k=0; k<v.shape(1); ++k) {
-                        for(size_t p=0; p<v.shape(2); ++p) {
+                for(std::size_t j=0; j<v.shape(0); ++j) {
+                    for(std::size_t k=0; k<v.shape(1); ++k) {
+                        for(std::size_t p=0; p<v.shape(2); ++p) {
                             test(&v(j, k, p) == &w(j, k, p));
                         }
                     }
@@ -4520,7 +4520,7 @@ void ViewTest::assignmentOperatorTest()
                     datav[j] = j;
                     dataw[j] = j*2;
                 }
-                std::vector<size_t> shape(3);
+                std::vector<std::size_t> shape(3);
                 shape[0] = 3;
                 shape[1] = 2;
                 shape[2] = 4; 
@@ -4528,12 +4528,12 @@ void ViewTest::assignmentOperatorTest()
                 andres::View<int, false> w(shape.begin(), shape.end(), dataw, andres::LastMajorOrder);
                 v.operator=(w);
 
-                for(size_t j=0; j<v.size(); ++j) {
+                for(std::size_t j=0; j<v.size(); ++j) {
                     test(&v(j) == &w(j));
                 }
-                for(size_t j=0; j<v.shape(0); ++j) {
-                    for(size_t k=0; k<v.shape(1); ++k) {
-                        for(size_t p=0; p<v.shape(2); ++p) {
+                for(std::size_t j=0; j<v.shape(0); ++j) {
+                    for(std::size_t k=0; k<v.shape(1); ++k) {
+                        for(std::size_t p=0; p<v.shape(2); ++p) {
                             test(&v(j, k, p) == &w(j, k, p));
                         }
                     }
@@ -4546,7 +4546,7 @@ void ViewTest::assignmentOperatorTest()
                     datav[j] = j;
                     dataw[j] = j*2;
                 }
-                std::vector<size_t> shape(3);
+                std::vector<std::size_t> shape(3);
                 shape[0] = 3;
                 shape[1] = 2;
                 shape[2] = 4; 
@@ -4554,12 +4554,12 @@ void ViewTest::assignmentOperatorTest()
                 andres::View<int, false> w(shape.begin(), shape.end(), dataw, andres::FirstMajorOrder);
                 v.operator=(w);
 
-                for(size_t j=0; j<v.size(); ++j) {
+                for(std::size_t j=0; j<v.size(); ++j) {
                     test(&v(j) == &w(j));
                 }
-                for(size_t j=0; j<v.shape(0); ++j) {
-                    for(size_t k=0; k<v.shape(1); ++k) {
-                        for(size_t p=0; p<v.shape(2); ++p) {
+                for(std::size_t j=0; j<v.shape(0); ++j) {
+                    for(std::size_t k=0; k<v.shape(1); ++k) {
+                        for(std::size_t p=0; p<v.shape(2); ++p) {
                             test(&v(j, k, p) == &w(j, k, p));
                         }
                     }
@@ -4573,7 +4573,7 @@ void ViewTest::assignmentOperatorTest()
                     datav[j] = j;
                     dataw[j] = j*2;
                 }
-                std::vector<size_t> shapev(3), shapew(3);
+                std::vector<std::size_t> shapev(3), shapew(3);
                 shapev[0] = 3;
                 shapev[1] = 2;
                 shapev[2] = 4;
@@ -4584,12 +4584,12 @@ void ViewTest::assignmentOperatorTest()
                 andres::View<int, false> w(shapew.begin(), shapew.end(), dataw, internalFirstMajorOrder);
                 v.operator=(w);
 
-                for(size_t j=0; j<v.size(); ++j) {
+                for(std::size_t j=0; j<v.size(); ++j) {
                     test(&v(j) == &w(j));
                 }
-                for(size_t j=0; j<v.shape(0); ++j) {
-                    for(size_t k=0; k<v.shape(1); ++k) {
-                        for(size_t p=0; p<v.shape(2); ++p) {
+                for(std::size_t j=0; j<v.shape(0); ++j) {
+                    for(std::size_t k=0; k<v.shape(1); ++k) {
+                        for(std::size_t p=0; p<v.shape(2); ++p) {
                             test(&v(j, k, p) == &w(j, k, p));
                         }
                     }
@@ -4602,7 +4602,7 @@ void ViewTest::assignmentOperatorTest()
                     datav[j] = j;
                     dataw[j] = j*2;
                 }
-                std::vector<size_t> shapev(3), shapew(3);
+                std::vector<std::size_t> shapev(3), shapew(3);
                 shapev[0] = 3;
                 shapev[1] = 2;
                 shapev[2] = 4;
@@ -4614,12 +4614,12 @@ void ViewTest::assignmentOperatorTest()
                 andres::View<int, false> w(shapew.begin(), shapew.end(), dataw, andres::LastMajorOrder);
                 v.operator=(w);
 
-                for(size_t j=0; j<v.size(); ++j) {
+                for(std::size_t j=0; j<v.size(); ++j) {
                     test(&v(j) == &w(j));
                 }
-                for(size_t j=0; j<v.shape(0); ++j) {
-                    for(size_t k=0; k<v.shape(1); ++k) {
-                        for(size_t p=0; p<v.shape(2); ++p) {
+                for(std::size_t j=0; j<v.shape(0); ++j) {
+                    for(std::size_t k=0; k<v.shape(1); ++k) {
+                        for(std::size_t p=0; p<v.shape(2); ++p) {
                             test(&v(j, k, p) == &w(j, k, p));
                         }
                     }
@@ -4632,7 +4632,7 @@ void ViewTest::assignmentOperatorTest()
                     datav[j] = j;
                     dataw[j] = j*2;
                 }
-                std::vector<size_t> shapev(3), shapew(3);
+                std::vector<std::size_t> shapev(3), shapew(3);
                 shapev[0] = 3;
                 shapev[1] = 2;
                 shapev[2] = 4;
@@ -4643,12 +4643,12 @@ void ViewTest::assignmentOperatorTest()
                 andres::View<int, false> w(shapew.begin(), shapew.end(), dataw, andres::FirstMajorOrder);
                 v.operator=(w);
 
-                for(size_t j=0; j<v.size(); ++j) {
+                for(std::size_t j=0; j<v.size(); ++j) {
                     test(&v(j) == &w(j));
                 }
-                for(size_t j=0; j<v.shape(0); ++j) {
-                    for(size_t k=0; k<v.shape(1); ++k) {
-                        for(size_t p=0; p<v.shape(2); ++p) {
+                for(std::size_t j=0; j<v.shape(0); ++j) {
+                    for(std::size_t k=0; k<v.shape(1); ++k) {
+                        for(std::size_t p=0; p<v.shape(2); ++p) {
                             test(&v(j, k, p) == &w(j, k, p));
                         }
                     }
@@ -4677,7 +4677,7 @@ void ViewTest::assignmentOperatorTest()
                 for(int j=0; j<24; ++j) {
                     data[j] = j;
                 }
-                std::vector<size_t> shape(1);
+                std::vector<std::size_t> shape(1);
                 shape[0] = 24;
                 andres::View<int, true> v(&scalar), 
                                         w(shape.begin(), shape.end(), data, internalFirstMajorOrder);
@@ -4686,7 +4686,7 @@ void ViewTest::assignmentOperatorTest()
                 test(v.dimension() == w.dimension() &&
                        v.size() == w.size()
                 );
-                for(size_t j=0; j<v.size(); ++j) {
+                for(std::size_t j=0; j<v.size(); ++j) {
                     test(&v(j) == &w(j));
                 }
             }
@@ -4697,7 +4697,7 @@ void ViewTest::assignmentOperatorTest()
                 for(int j=0; j<24; ++j) {
                     data[j] = j;
                 }
-                std::vector<size_t> shape(2); 
+                std::vector<std::size_t> shape(2); 
                 shape[0] = 6;
                 shape[1] = 4;
                 andres::View<int, true> v(&scalar), w(shape.begin(), shape.end(), data, internalFirstMajorOrder);
@@ -4706,11 +4706,11 @@ void ViewTest::assignmentOperatorTest()
                 test(v.dimension() == w.dimension() &&
                        v.size() == w.size()
                 );
-                for(size_t j=0; j<v.size(); ++j) {
+                for(std::size_t j=0; j<v.size(); ++j) {
                     test(&v(j) == &w(j));
                 }
-                for(size_t k=0; k<w.shape(1); ++k) {
-                    for(size_t j=0; j<w.shape(0); ++j) {
+                for(std::size_t k=0; k<w.shape(1); ++k) {
+                    for(std::size_t j=0; j<w.shape(0); ++j) {
                         test(&v(j, k) == &w(j, k));
                     }
                 }
@@ -4722,7 +4722,7 @@ void ViewTest::assignmentOperatorTest()
                 for(int j=0; j<24; ++j) {
                     data[j] = j;
                 }
-                std::vector<size_t> shape(3);
+                std::vector<std::size_t> shape(3);
                 shape[0] = 2;
                 shape[1] = 3; 
                 shape[2] = 4;
@@ -4732,12 +4732,12 @@ void ViewTest::assignmentOperatorTest()
                 test(v.dimension() == w.dimension() &&
                        v.size() == w.size()
                 );
-                for(size_t j=0; j<v.size(); ++j) {
+                for(std::size_t j=0; j<v.size(); ++j) {
                     test(&v(j) == &w(j));
                 }
-                for(size_t p=0; p<w.shape(2); ++p) {
-                    for(size_t k=0; k<w.shape(1); ++k) {
-                        for(size_t j=0; j<w.shape(0); ++j) {
+                for(std::size_t p=0; p<w.shape(2); ++p) {
+                    for(std::size_t k=0; k<w.shape(1); ++k) {
+                        for(std::size_t j=0; j<w.shape(0); ++j) {
                             test(&v(j, k, p) == &w(j, k, p));
                         }
                     }
@@ -4753,7 +4753,7 @@ void ViewTest::assignmentOperatorTest()
                 for(int j=0; j<24; ++j) {
                     data[j] = j;
                 }
-                std::vector<size_t> shape(1);
+                std::vector<std::size_t> shape(1);
                 shape[0] = 24;
                 andres::View<int, true> v(shape.begin(), shape.end(), data, internalFirstMajorOrder);
                 andres::View<int, true> w(&scalar);
@@ -4771,13 +4771,13 @@ void ViewTest::assignmentOperatorTest()
                     datav[j] = j;
                     dataw[j] = j*2;
                 }
-                std::vector<size_t> shape(1);
+                std::vector<std::size_t> shape(1);
                 shape[0] = 24;
                 andres::View<int, true> v(shape.begin(), shape.end(), datav, internalFirstMajorOrder);
                 andres::View<int, true> w(shape.begin(), shape.end(), dataw, internalFirstMajorOrder);
                 v.operator=(w);
                 
-                for(size_t j=0; j<v.size(); ++j) {
+                for(std::size_t j=0; j<v.size(); ++j) {
                     test(&v(j) == &w(j));
                 }
             }
@@ -4788,13 +4788,13 @@ void ViewTest::assignmentOperatorTest()
                     datav[j] = j;
                     dataw[j] = j*2;
                 }
-                std::vector<size_t> shape(1);
+                std::vector<std::size_t> shape(1);
                 shape[0] = 24;
                 andres::View<int, true> v(shape.begin(), shape.end(), datav, andres::FirstMajorOrder);
                 andres::View<int, true> w(shape.begin(), shape.end(), dataw, andres::LastMajorOrder);
                 v.operator=(w);
                 
-                for(size_t j=0; j<v.size(); ++j) {
+                for(std::size_t j=0; j<v.size(); ++j) {
                     test(&v(j) == &w(j));
                 }
             }
@@ -4805,13 +4805,13 @@ void ViewTest::assignmentOperatorTest()
                     datav[j] = j;
                     dataw[j] = j*2;
                 }
-                std::vector<size_t> shape(1);
+                std::vector<std::size_t> shape(1);
                 shape[0] = 24;
                 andres::View<int, true> v(shape.begin(), shape.end(), datav, andres::LastMajorOrder);
                 andres::View<int, true> w(shape.begin(), shape.end(), dataw, andres::FirstMajorOrder);
                 v.operator=(w);
                 
-                for(size_t j=0; j<v.size(); ++j) {
+                for(std::size_t j=0; j<v.size(); ++j) {
                     test(&v(j) == &w(j));
                 }
             }
@@ -4823,7 +4823,7 @@ void ViewTest::assignmentOperatorTest()
                     datav[j] = j;
                     dataw[j] = j*2;
                 }
-                std::vector<size_t> shapev(1), shapew(2); 
+                std::vector<std::size_t> shapev(1), shapew(2); 
                 shapev[0] = 24;
                 shapew[0] = 6;
                 shapew[1] = 4;
@@ -4834,11 +4834,11 @@ void ViewTest::assignmentOperatorTest()
                 test(v.dimension() == w.dimension() &&
                        v.size() == w.size()
                 );
-                for(size_t j=0; j<v.size(); ++j) {
+                for(std::size_t j=0; j<v.size(); ++j) {
                     test(&v(j) == &w(j));
                 }
-                for(size_t k=0; k<w.shape(1); ++k) {
-                    for(size_t j=0; j<w.shape(0); ++j) {
+                for(std::size_t k=0; k<w.shape(1); ++k) {
+                    for(std::size_t j=0; j<w.shape(0); ++j) {
                         test(&v(j, k) == &w(j, k));
                     }
                 }
@@ -4850,7 +4850,7 @@ void ViewTest::assignmentOperatorTest()
                     datav[j] = j;
                     dataw[j] = j*2;
                 }
-                std::vector<size_t> shapev(1), shapew(2); 
+                std::vector<std::size_t> shapev(1), shapew(2); 
                 shapev[0] = 24;
                 shapew[0] = 6;
                 shapew[1] = 4;
@@ -4861,11 +4861,11 @@ void ViewTest::assignmentOperatorTest()
                 test(v.dimension() == w.dimension() &&
                        v.size() == w.size()
                 );
-                for(size_t j=0; j<v.size(); ++j) {
+                for(std::size_t j=0; j<v.size(); ++j) {
                     test(&v(j) == &w(j));
                 }
-                for(size_t k=0; k<w.shape(1); ++k) {
-                    for(size_t j=0; j<w.shape(0); ++j) {
+                for(std::size_t k=0; k<w.shape(1); ++k) {
+                    for(std::size_t j=0; j<w.shape(0); ++j) {
                         test(&v(j, k) == &w(j, k));
                     }
                 }
@@ -4877,7 +4877,7 @@ void ViewTest::assignmentOperatorTest()
                     datav[j] = j;
                     dataw[j] = j*2;
                 }
-                std::vector<size_t> shapev(1), shapew(2); 
+                std::vector<std::size_t> shapev(1), shapew(2); 
                 shapev[0] = 24;
                 shapew[0] = 6;
                 shapew[1] = 4;
@@ -4888,11 +4888,11 @@ void ViewTest::assignmentOperatorTest()
                 test(v.dimension() == w.dimension() &&
                        v.size() == w.size()
                 );
-                for(size_t j=0; j<v.size(); ++j) {
+                for(std::size_t j=0; j<v.size(); ++j) {
                     test(&v(j) == &w(j));
                 }
-                for(size_t k=0; k<w.shape(1); ++k) {
-                    for(size_t j=0; j<w.shape(0); ++j) {
+                for(std::size_t k=0; k<w.shape(1); ++k) {
+                    for(std::size_t j=0; j<w.shape(0); ++j) {
                         test(&v(j, k) == &w(j, k));
                     }
                 }
@@ -4905,7 +4905,7 @@ void ViewTest::assignmentOperatorTest()
                     datav[j] = j;
                     dataw[j] = j*2;
                 }
-                std::vector<size_t> shapev(1), shapew(3);
+                std::vector<std::size_t> shapev(1), shapew(3);
                 shapev[0] = 24;
                 shapew[0] = 2;
                 shapew[1] = 3; 
@@ -4917,13 +4917,13 @@ void ViewTest::assignmentOperatorTest()
                 test(v.dimension() == w.dimension() &&
                        v.size() == w.size()
                 );
-                for(size_t j=0; j<v.size(); ++j) {
+                for(std::size_t j=0; j<v.size(); ++j) {
                     test(&v(j) == &w(j));
                 }
 
-                for(size_t p=0; p<w.shape(2); ++p) {
-                    for(size_t k=0; k<w.shape(1); ++k) {
-                        for(size_t j=0; j<w.shape(0); ++j) {
+                for(std::size_t p=0; p<w.shape(2); ++p) {
+                    for(std::size_t k=0; k<w.shape(1); ++k) {
+                        for(std::size_t j=0; j<w.shape(0); ++j) {
                             test(&v(j, k, p) == &w(j, k, p));
                         }
                     }
@@ -4937,7 +4937,7 @@ void ViewTest::assignmentOperatorTest()
                     datav[j] = j;
                     dataw[j] = j*2;
                 }
-                std::vector<size_t> shapev(1), shapew(3);
+                std::vector<std::size_t> shapev(1), shapew(3);
                 shapev[0] = 24;
                 shapew[0] = 2;
                 shapew[1] = 3; 
@@ -4949,12 +4949,12 @@ void ViewTest::assignmentOperatorTest()
                 test(v.dimension() == w.dimension() &&
                        v.size() == w.size()
                 );
-                for(size_t j=0; j<v.size(); ++j) {
+                for(std::size_t j=0; j<v.size(); ++j) {
                     test(&v(j) == &w(j));
                 }
-                for(size_t p=0; p<w.shape(2); ++p) {
-                    for(size_t k=0; k<w.shape(1); ++k) {
-                        for(size_t j=0; j<w.shape(0); ++j) {
+                for(std::size_t p=0; p<w.shape(2); ++p) {
+                    for(std::size_t k=0; k<w.shape(1); ++k) {
+                        for(std::size_t j=0; j<w.shape(0); ++j) {
                             test(&v(j, k, p) == &w(j, k, p));
                         }
                     }
@@ -4967,7 +4967,7 @@ void ViewTest::assignmentOperatorTest()
                     datav[j] = j;
                     dataw[j] = j*2;
                 }
-                std::vector<size_t> shapev(1), shapew(3);
+                std::vector<std::size_t> shapev(1), shapew(3);
                 shapev[0] = 24;
                 shapew[0] = 2;
                 shapew[1] = 3; 
@@ -4979,12 +4979,12 @@ void ViewTest::assignmentOperatorTest()
                 test(v.dimension() == w.dimension() &&
                        v.size() == w.size()
                 );
-                for(size_t j=0; j<v.size(); ++j) {
+                for(std::size_t j=0; j<v.size(); ++j) {
                     test(&v(j) == &w(j));
                 }
-                for(size_t p=0; p<w.shape(2); ++p) {
-                    for(size_t k=0; k<w.shape(1); ++k) {
-                        for(size_t j=0; j<w.shape(0); ++j) {
+                for(std::size_t p=0; p<w.shape(2); ++p) {
+                    for(std::size_t k=0; k<w.shape(1); ++k) {
+                        for(std::size_t j=0; j<w.shape(0); ++j) {
                             test(&v(j, k, p) == &w(j, k, p));
                         }
                     }
@@ -5000,7 +5000,7 @@ void ViewTest::assignmentOperatorTest()
                 for(int j=0; j<24; ++j) {
                     data[j] = j;
                 }
-                std::vector<size_t> shape(2);
+                std::vector<std::size_t> shape(2);
                 shape[0] = 6;
                 shape[1] = 4;
                 andres::View<int, true> v(shape.begin(), shape.end(), data, internalFirstMajorOrder);
@@ -5019,7 +5019,7 @@ void ViewTest::assignmentOperatorTest()
                     datav[j] = j;
                     dataw[j] = j*2;
                 }
-                std::vector<size_t> shapev(2), shapew(1);
+                std::vector<std::size_t> shapev(2), shapew(1);
                 shapev[0] = 6;
                 shapev[1] = 4;
                 shapew[0] = 24;
@@ -5030,7 +5030,7 @@ void ViewTest::assignmentOperatorTest()
                 test(v.dimension() == w.dimension() &&
                        v.size() == w.size()
                 );
-                for(size_t j=0; j<v.size(); ++j) {
+                for(std::size_t j=0; j<v.size(); ++j) {
                     test(&v(j) == &w(j));
                 }
             }
@@ -5041,7 +5041,7 @@ void ViewTest::assignmentOperatorTest()
                     datav[j] = j;
                     dataw[j] = j*2;
                 }
-                std::vector<size_t> shapev(2), shapew(1);
+                std::vector<std::size_t> shapev(2), shapew(1);
                 shapev[0] = 6;
                 shapev[1] = 4;
                 shapew[0] = 24;
@@ -5052,7 +5052,7 @@ void ViewTest::assignmentOperatorTest()
                 test(v.dimension() == w.dimension() &&
                        v.size() == w.size()
                 );
-                for(size_t j=0; j<v.size(); ++j) {
+                for(std::size_t j=0; j<v.size(); ++j) {
                     test(&v(j) == &w(j));
                 }
             }
@@ -5063,7 +5063,7 @@ void ViewTest::assignmentOperatorTest()
                     datav[j] = j;
                     dataw[j] = j*2;
                 }
-                std::vector<size_t> shapev(2), shapew(1);
+                std::vector<std::size_t> shapev(2), shapew(1);
                 shapev[0] = 6;
                 shapev[1] = 4;
                 shapew[0] = 24;
@@ -5074,7 +5074,7 @@ void ViewTest::assignmentOperatorTest()
                 test(v.dimension() == w.dimension() &&
                        v.size() == w.size()
                 );
-                for(size_t j=0; j<v.size(); ++j) {
+                for(std::size_t j=0; j<v.size(); ++j) {
                     test(&v(j) == &w(j));
                 }
             }
@@ -5086,18 +5086,18 @@ void ViewTest::assignmentOperatorTest()
                     datav[j] = j;
                     dataw[j] = j*2;
                 }
-                std::vector<size_t> shape(2);
+                std::vector<std::size_t> shape(2);
                 shape[0] = 6; 
                 shape[1] = 4;
                 andres::View<int, true> v(shape.begin(), shape.end(), datav, internalFirstMajorOrder);
                 andres::View<int, true> w(shape.begin(), shape.end(), dataw, internalFirstMajorOrder);
                 v.operator=(w);
 
-                for(size_t j=0; j<v.size(); ++j) {
+                for(std::size_t j=0; j<v.size(); ++j) {
                     test(&v(j) == &w(j));
                 }
-                for(size_t j=0; j<v.shape(0); ++j) {
-                    for(size_t k=0; k<v.shape(1); ++k) {
+                for(std::size_t j=0; j<v.shape(0); ++j) {
+                    for(std::size_t k=0; k<v.shape(1); ++k) {
                         test(&v(j, k) == &w(j, k));
                     }
                 }
@@ -5109,18 +5109,18 @@ void ViewTest::assignmentOperatorTest()
                     datav[j] = j;
                     dataw[j] = j*2;
                 }
-                std::vector<size_t> shape(2);
+                std::vector<std::size_t> shape(2);
                 shape[0] = 6; 
                 shape[1] = 4;
                 andres::View<int, true> v(shape.begin(), shape.end(), datav, andres::FirstMajorOrder);
                 andres::View<int, true> w(shape.begin(), shape.end(), dataw, andres::LastMajorOrder);
                 v.operator=(w);
 
-                for(size_t j=0; j<v.size(); ++j) {
+                for(std::size_t j=0; j<v.size(); ++j) {
                     test(&v(j) == &w(j));
                 }
-                for(size_t j=0; j<v.shape(0); ++j) {
-                    for(size_t k=0; k<v.shape(1); ++k) {
+                for(std::size_t j=0; j<v.shape(0); ++j) {
+                    for(std::size_t k=0; k<v.shape(1); ++k) {
                         test(&v(j, k) == &w(j, k));
                     }
                 }
@@ -5132,18 +5132,18 @@ void ViewTest::assignmentOperatorTest()
                     datav[j] = j;
                     dataw[j] = j*2;
                 }
-                std::vector<size_t> shape(2);
+                std::vector<std::size_t> shape(2);
                 shape[0] = 6; 
                 shape[1] = 4;
                 andres::View<int, true> v(shape.begin(), shape.end(), datav, andres::LastMajorOrder);
                 andres::View<int, true> w(shape.begin(), shape.end(), dataw, andres::FirstMajorOrder);
                 v.operator=(w);
 
-                for(size_t j=0; j<v.size(); ++j) {
+                for(std::size_t j=0; j<v.size(); ++j) {
                     test(&v(j) == &w(j));
                 }
-                for(size_t j=0; j<v.shape(0); ++j) {
-                    for(size_t k=0; k<v.shape(1); ++k) {
+                for(std::size_t j=0; j<v.shape(0); ++j) {
+                    for(std::size_t k=0; k<v.shape(1); ++k) {
                         test(&v(j, k) == &w(j, k));
                     }
                 }
@@ -5156,7 +5156,7 @@ void ViewTest::assignmentOperatorTest()
                     datav[j] = j;
                     dataw[j] = j*2;
                 }
-                std::vector<size_t> shapev(2), shapew(2);
+                std::vector<std::size_t> shapev(2), shapew(2);
                 shapev[0] = 6; 
                 shapev[1] = 4;
                 shapew[0] = 4; 
@@ -5165,11 +5165,11 @@ void ViewTest::assignmentOperatorTest()
                 andres::View<int, true> w(shapew.begin(), shapew.end(), dataw, internalFirstMajorOrder);
                 v.operator=(w);
 
-                for(size_t j=0; j<v.size(); ++j) {
+                for(std::size_t j=0; j<v.size(); ++j) {
                     test(&v(j) == &w(j));
                 }
-                for(size_t j=0; j<v.shape(0); ++j) {
-                    for(size_t k=0; k<v.shape(1); ++k) {
+                for(std::size_t j=0; j<v.shape(0); ++j) {
+                    for(std::size_t k=0; k<v.shape(1); ++k) {
                         test(&v(j, k) == &w(j, k));
                     }
                 }
@@ -5181,7 +5181,7 @@ void ViewTest::assignmentOperatorTest()
                     datav[j] = j;
                     dataw[j] = j*2;
                 }
-                std::vector<size_t> shapev(2), shapew(2);
+                std::vector<std::size_t> shapev(2), shapew(2);
                 shapev[0] = 6; 
                 shapev[1] = 4;
                 shapew[0] = 4; 
@@ -5190,11 +5190,11 @@ void ViewTest::assignmentOperatorTest()
                 andres::View<int, true> w(shapew.begin(), shapew.end(), dataw, andres::LastMajorOrder);
                 v.operator=(w);
 
-                for(size_t j=0; j<v.size(); ++j) {
+                for(std::size_t j=0; j<v.size(); ++j) {
                     test(&v(j) == &w(j));
                 }
-                for(size_t j=0; j<v.shape(0); ++j) {
-                    for(size_t k=0; k<v.shape(1); ++k) {
+                for(std::size_t j=0; j<v.shape(0); ++j) {
+                    for(std::size_t k=0; k<v.shape(1); ++k) {
                         test(&v(j, k) == &w(j, k));
                     }
                 }
@@ -5206,7 +5206,7 @@ void ViewTest::assignmentOperatorTest()
                     datav[j] = j;
                     dataw[j] = j*2;
                 }
-                std::vector<size_t> shapev(2), shapew(2);
+                std::vector<std::size_t> shapev(2), shapew(2);
                 shapev[0] = 6; 
                 shapev[1] = 4;
                 shapew[0] = 4; 
@@ -5215,11 +5215,11 @@ void ViewTest::assignmentOperatorTest()
                 andres::View<int, true> w(shapew.begin(), shapew.end(), dataw, andres::FirstMajorOrder);
                 v.operator=(w);
 
-                for(size_t j=0; j<v.size(); ++j) {
+                for(std::size_t j=0; j<v.size(); ++j) {
                     test(&v(j) == &w(j));
                 }
-                for(size_t j=0; j<v.shape(0); ++j) {
-                    for(size_t k=0; k<v.shape(1); ++k) {
+                for(std::size_t j=0; j<v.shape(0); ++j) {
+                    for(std::size_t k=0; k<v.shape(1); ++k) {
                         test(&v(j, k) == &w(j, k));
                     }
                 }
@@ -5232,7 +5232,7 @@ void ViewTest::assignmentOperatorTest()
                     datav[j] = j;
                     dataw[j] = j*2;
                 }
-                std::vector<size_t> shapev(2), shapew(3);
+                std::vector<std::size_t> shapev(2), shapew(3);
                 shapev[0] = 6;
                 shapev[1] = 4; 
                 shapew[0] = 2;
@@ -5245,12 +5245,12 @@ void ViewTest::assignmentOperatorTest()
                 test(v.dimension() == w.dimension() &&
                        v.size() == w.size()
                 );
-                for(size_t j=0; j<v.size(); ++j) {
+                for(std::size_t j=0; j<v.size(); ++j) {
                     test(&v(j) == &w(j));
                 }
-                for(size_t p=0; p<w.shape(2); ++p) {
-                    for(size_t k=0; k<w.shape(1); ++k) {
-                        for(size_t j=0; j<w.shape(0); ++j) {
+                for(std::size_t p=0; p<w.shape(2); ++p) {
+                    for(std::size_t k=0; k<w.shape(1); ++k) {
+                        for(std::size_t j=0; j<w.shape(0); ++j) {
                             test(&v(j, k, p) == &w(j, k, p));
                         }
                     }
@@ -5263,7 +5263,7 @@ void ViewTest::assignmentOperatorTest()
                     datav[j] = j;
                     dataw[j] = j*2;
                 }
-                std::vector<size_t> shapev(2), shapew(3);
+                std::vector<std::size_t> shapev(2), shapew(3);
                 shapev[0] = 6;
                 shapev[1] = 4; 
                 shapew[0] = 2;
@@ -5276,12 +5276,12 @@ void ViewTest::assignmentOperatorTest()
                 test(v.dimension() == w.dimension() &&
                        v.size() == w.size()
                 );
-                for(size_t j=0; j<v.size(); ++j) {
+                for(std::size_t j=0; j<v.size(); ++j) {
                     test(&v(j) == &w(j));
                 }
-                for(size_t p=0; p<w.shape(2); ++p) {
-                    for(size_t k=0; k<w.shape(1); ++k) {
-                        for(size_t j=0; j<w.shape(0); ++j) {
+                for(std::size_t p=0; p<w.shape(2); ++p) {
+                    for(std::size_t k=0; k<w.shape(1); ++k) {
+                        for(std::size_t j=0; j<w.shape(0); ++j) {
                             test(&v(j, k, p) == &w(j, k, p));
                         }
                     }
@@ -5294,7 +5294,7 @@ void ViewTest::assignmentOperatorTest()
                     datav[j] = j;
                     dataw[j] = j*2;
                 }
-                std::vector<size_t> shapev(2), shapew(3);
+                std::vector<std::size_t> shapev(2), shapew(3);
                 shapev[0] = 6;
                 shapev[1] = 4; 
                 shapew[0] = 2;
@@ -5307,12 +5307,12 @@ void ViewTest::assignmentOperatorTest()
                 test(v.dimension() == w.dimension() &&
                        v.size() == w.size()
                 );
-                for(size_t j=0; j<v.size(); ++j) {
+                for(std::size_t j=0; j<v.size(); ++j) {
                     test(&v(j) == &w(j));
                 }
-                for(size_t p=0; p<w.shape(2); ++p) {
-                    for(size_t k=0; k<w.shape(1); ++k) {
-                        for(size_t j=0; j<w.shape(0); ++j) {
+                for(std::size_t p=0; p<w.shape(2); ++p) {
+                    for(std::size_t k=0; k<w.shape(1); ++k) {
+                        for(std::size_t j=0; j<w.shape(0); ++j) {
                             test(&v(j, k, p) == &w(j, k, p));
                         }
                     }
@@ -5328,7 +5328,7 @@ void ViewTest::assignmentOperatorTest()
                 for(int j=0; j<24; ++j) {
                     data[j] = j;
                 }
-                std::vector<size_t> shape(3);
+                std::vector<std::size_t> shape(3);
                 shape[0] = 2;
                 shape[1] = 3; 
                 shape[2] = 4; 
@@ -5348,7 +5348,7 @@ void ViewTest::assignmentOperatorTest()
                     datav[j] = j;
                     dataw[j] = j*2;
                 }
-                std::vector<size_t> shapev(3), shapew(1);
+                std::vector<std::size_t> shapev(3), shapew(1);
                 shapev[0] = 2;
                 shapev[1] = 3; 
                 shapev[2] = 4; 
@@ -5360,7 +5360,7 @@ void ViewTest::assignmentOperatorTest()
                 test(v.dimension() == w.dimension() &&
                        v.size() == w.size()
                 );
-                for(size_t j=0; j<v.size(); ++j) {
+                for(std::size_t j=0; j<v.size(); ++j) {
                     test(&v(j) == &w(j));
                 }       
             }
@@ -5371,7 +5371,7 @@ void ViewTest::assignmentOperatorTest()
                     datav[j] = j;
                     dataw[j] = j*2;
                 }
-                std::vector<size_t> shapev(3), shapew(1);
+                std::vector<std::size_t> shapev(3), shapew(1);
                 shapev[0] = 2;
                 shapev[1] = 3; 
                 shapev[2] = 4; 
@@ -5383,7 +5383,7 @@ void ViewTest::assignmentOperatorTest()
                 test(v.dimension() == w.dimension() &&
                        v.size() == w.size()
                 );
-                for(size_t j=0; j<v.size(); ++j) {
+                for(std::size_t j=0; j<v.size(); ++j) {
                     test(&v(j) == &w(j));
                 }       
             }
@@ -5394,7 +5394,7 @@ void ViewTest::assignmentOperatorTest()
                     datav[j] = j;
                     dataw[j] = j*2;
                 }
-                std::vector<size_t> shapev(3), shapew(1);
+                std::vector<std::size_t> shapev(3), shapew(1);
                 shapev[0] = 2;
                 shapev[1] = 3; 
                 shapev[2] = 4; 
@@ -5406,7 +5406,7 @@ void ViewTest::assignmentOperatorTest()
                 test(v.dimension() == w.dimension() &&
                        v.size() == w.size()
                 );
-                for(size_t j=0; j<v.size(); ++j) {
+                for(std::size_t j=0; j<v.size(); ++j) {
                     test(&v(j) == &w(j));
                 }       
             }
@@ -5418,7 +5418,7 @@ void ViewTest::assignmentOperatorTest()
                     datav[j] = j;
                     dataw[j] = j*2;
                 }
-                std::vector<size_t> shapev(3), shapew(2);
+                std::vector<std::size_t> shapev(3), shapew(2);
                 shapev[0] = 2;
                 shapev[1] = 3;
                 shapev[2] = 4; 
@@ -5431,11 +5431,11 @@ void ViewTest::assignmentOperatorTest()
                 test(v.dimension() == w.dimension() &&
                        v.size() == w.size()
                 );
-                for(size_t j=0; j<v.size(); ++j) {
+                for(std::size_t j=0; j<v.size(); ++j) {
                     test(&v(j) == &w(j));
                 }
-                for(size_t k=0; k<w.shape(1); ++k) {
-                    for(size_t j=0; j<w.shape(0); ++j) {
+                for(std::size_t k=0; k<w.shape(1); ++k) {
+                    for(std::size_t j=0; j<w.shape(0); ++j) {
                         test(&v(j, k) == &w(j, k));
                     }
                 }
@@ -5447,7 +5447,7 @@ void ViewTest::assignmentOperatorTest()
                     datav[j] = j;
                     dataw[j] = j*2;
                 }
-                std::vector<size_t> shapev(3), shapew(2);
+                std::vector<std::size_t> shapev(3), shapew(2);
                 shapev[0] = 2;
                 shapev[1] = 3;
                 shapev[2] = 4; 
@@ -5460,11 +5460,11 @@ void ViewTest::assignmentOperatorTest()
                 test(v.dimension() == w.dimension() &&
                        v.size() == w.size()
                 );
-                for(size_t j=0; j<v.size(); ++j) {
+                for(std::size_t j=0; j<v.size(); ++j) {
                     test(&v(j) == &w(j));
                 }
-                for(size_t k=0; k<w.shape(1); ++k) {
-                    for(size_t j=0; j<w.shape(0); ++j) {
+                for(std::size_t k=0; k<w.shape(1); ++k) {
+                    for(std::size_t j=0; j<w.shape(0); ++j) {
                         test(&v(j, k) == &w(j, k));
                     }
                 }
@@ -5476,7 +5476,7 @@ void ViewTest::assignmentOperatorTest()
                     datav[j] = j;
                     dataw[j] = j*2;
                 }
-                std::vector<size_t> shapev(3), shapew(2);
+                std::vector<std::size_t> shapev(3), shapew(2);
                 shapev[0] = 2;
                 shapev[1] = 3;
                 shapev[2] = 4; 
@@ -5489,11 +5489,11 @@ void ViewTest::assignmentOperatorTest()
                 test(v.dimension() == w.dimension() &&
                        v.size() == w.size()
                 );
-                for(size_t j=0; j<v.size(); ++j) {
+                for(std::size_t j=0; j<v.size(); ++j) {
                     test(&v(j) == &w(j));
                 }
-                for(size_t k=0; k<w.shape(1); ++k) {
-                    for(size_t j=0; j<w.shape(0); ++j) {
+                for(std::size_t k=0; k<w.shape(1); ++k) {
+                    for(std::size_t j=0; j<w.shape(0); ++j) {
                         test(&v(j, k) == &w(j, k));
                     }
                 }
@@ -5506,7 +5506,7 @@ void ViewTest::assignmentOperatorTest()
                     datav[j] = j;
                     dataw[j] = j*2;
                 }
-                std::vector<size_t> shape(3);
+                std::vector<std::size_t> shape(3);
                 shape[0] = 3;
                 shape[1] = 2;
                 shape[2] = 4; 
@@ -5514,12 +5514,12 @@ void ViewTest::assignmentOperatorTest()
                 andres::View<int, true> w(shape.begin(), shape.end(), dataw, internalFirstMajorOrder);
                 v.operator=(w);
 
-                for(size_t j=0; j<v.size(); ++j) {
+                for(std::size_t j=0; j<v.size(); ++j) {
                     test(&v(j) == &w(j));
                 }
-                for(size_t j=0; j<v.shape(0); ++j) {
-                    for(size_t k=0; k<v.shape(1); ++k) {
-                        for(size_t p=0; p<v.shape(2); ++p) {
+                for(std::size_t j=0; j<v.shape(0); ++j) {
+                    for(std::size_t k=0; k<v.shape(1); ++k) {
+                        for(std::size_t p=0; p<v.shape(2); ++p) {
                             test(&v(j, k, p) == &w(j, k, p));
                         }
                     }
@@ -5532,7 +5532,7 @@ void ViewTest::assignmentOperatorTest()
                     datav[j] = j;
                     dataw[j] = j*2;
                 }
-                std::vector<size_t> shape(3);
+                std::vector<std::size_t> shape(3);
                 shape[0] = 3;
                 shape[1] = 2;
                 shape[2] = 4; 
@@ -5540,12 +5540,12 @@ void ViewTest::assignmentOperatorTest()
                 andres::View<int, true> w(shape.begin(), shape.end(), dataw, andres::LastMajorOrder);
                 v.operator=(w);
 
-                for(size_t j=0; j<v.size(); ++j) {
+                for(std::size_t j=0; j<v.size(); ++j) {
                     test(&v(j) == &w(j));
                 }
-                for(size_t j=0; j<v.shape(0); ++j) {
-                    for(size_t k=0; k<v.shape(1); ++k) {
-                        for(size_t p=0; p<v.shape(2); ++p) {
+                for(std::size_t j=0; j<v.shape(0); ++j) {
+                    for(std::size_t k=0; k<v.shape(1); ++k) {
+                        for(std::size_t p=0; p<v.shape(2); ++p) {
                             test(&v(j, k, p) == &w(j, k, p));
                         }
                     }
@@ -5558,7 +5558,7 @@ void ViewTest::assignmentOperatorTest()
                     datav[j] = j;
                     dataw[j] = j*2;
                 }
-                std::vector<size_t> shape(3);
+                std::vector<std::size_t> shape(3);
                 shape[0] = 3;
                 shape[1] = 2;
                 shape[2] = 4; 
@@ -5566,12 +5566,12 @@ void ViewTest::assignmentOperatorTest()
                 andres::View<int, true> w(shape.begin(), shape.end(), dataw, andres::FirstMajorOrder);
                 v.operator=(w);
 
-                for(size_t j=0; j<v.size(); ++j) {
+                for(std::size_t j=0; j<v.size(); ++j) {
                     test(&v(j) == &w(j));
                 }
-                for(size_t j=0; j<v.shape(0); ++j) {
-                    for(size_t k=0; k<v.shape(1); ++k) {
-                        for(size_t p=0; p<v.shape(2); ++p) {
+                for(std::size_t j=0; j<v.shape(0); ++j) {
+                    for(std::size_t k=0; k<v.shape(1); ++k) {
+                        for(std::size_t p=0; p<v.shape(2); ++p) {
                             test(&v(j, k, p) == &w(j, k, p));
                         }
                     }
@@ -5585,7 +5585,7 @@ void ViewTest::assignmentOperatorTest()
                     datav[j] = j;
                     dataw[j] = j*2;
                 }
-                std::vector<size_t> shapev(3), shapew(3);
+                std::vector<std::size_t> shapev(3), shapew(3);
                 shapev[0] = 3;
                 shapev[1] = 2;
                 shapev[2] = 4;
@@ -5596,12 +5596,12 @@ void ViewTest::assignmentOperatorTest()
                 andres::View<int, true> w(shapew.begin(), shapew.end(), dataw, internalFirstMajorOrder);
                 v.operator=(w);
 
-                for(size_t j=0; j<v.size(); ++j) {
+                for(std::size_t j=0; j<v.size(); ++j) {
                     test(&v(j) == &w(j));
                 }
-                for(size_t j=0; j<v.shape(0); ++j) {
-                    for(size_t k=0; k<v.shape(1); ++k) {
-                        for(size_t p=0; p<v.shape(2); ++p) {
+                for(std::size_t j=0; j<v.shape(0); ++j) {
+                    for(std::size_t k=0; k<v.shape(1); ++k) {
+                        for(std::size_t p=0; p<v.shape(2); ++p) {
                             test(&v(j, k, p) == &w(j, k, p));
                         }
                     }
@@ -5614,7 +5614,7 @@ void ViewTest::assignmentOperatorTest()
                     datav[j] = j;
                     dataw[j] = j*2;
                 }
-                std::vector<size_t> shapev(3), shapew(3);
+                std::vector<std::size_t> shapev(3), shapew(3);
                 shapev[0] = 3;
                 shapev[1] = 2;
                 shapev[2] = 4;
@@ -5625,12 +5625,12 @@ void ViewTest::assignmentOperatorTest()
                 andres::View<int, true> w(shapew.begin(), shapew.end(), dataw, andres::LastMajorOrder);
                 v.operator=(w);
 
-                for(size_t j=0; j<v.size(); ++j) {
+                for(std::size_t j=0; j<v.size(); ++j) {
                     test(&v(j) == &w(j));
                 }
-                for(size_t j=0; j<v.shape(0); ++j) {
-                    for(size_t k=0; k<v.shape(1); ++k) {
-                        for(size_t p=0; p<v.shape(2); ++p) {
+                for(std::size_t j=0; j<v.shape(0); ++j) {
+                    for(std::size_t k=0; k<v.shape(1); ++k) {
+                        for(std::size_t p=0; p<v.shape(2); ++p) {
                             test(&v(j, k, p) == &w(j, k, p));
                         }
                     }
@@ -5643,7 +5643,7 @@ void ViewTest::assignmentOperatorTest()
                     datav[j] = j;
                     dataw[j] = j*2;
                 }
-                std::vector<size_t> shapev(3), shapew(3);
+                std::vector<std::size_t> shapev(3), shapew(3);
                 shapev[0] = 3;
                 shapev[1] = 2;
                 shapev[2] = 4;
@@ -5654,12 +5654,12 @@ void ViewTest::assignmentOperatorTest()
                 andres::View<int, true> w(shapew.begin(), shapew.end(), dataw, andres::FirstMajorOrder);
                 v.operator=(w);
 
-                for(size_t j=0; j<v.size(); ++j) {
+                for(std::size_t j=0; j<v.size(); ++j) {
                     test(&v(j) == &w(j));
                 }
-                for(size_t j=0; j<v.shape(0); ++j) {
-                    for(size_t k=0; k<v.shape(1); ++k) {
-                        for(size_t p=0; p<v.shape(2); ++p) {
+                for(std::size_t j=0; j<v.shape(0); ++j) {
+                    for(std::size_t k=0; k<v.shape(1); ++k) {
+                        for(std::size_t p=0; p<v.shape(2); ++p) {
                             test(&v(j, k, p) == &w(j, k, p));
                         }
                     }
@@ -5674,7 +5674,7 @@ void ViewTest::assignmentOperatorTest()
             for(int j=0; j<24; ++j) {
                 data[j] = 3;
             }
-            std::vector<size_t> shape(3);
+            std::vector<std::size_t> shape(3);
             shape[0] = 3;
             shape[1] = 2;
             shape[2] = 4;
@@ -5682,19 +5682,19 @@ void ViewTest::assignmentOperatorTest()
 
             v = 4;
 
-            for(size_t j=0; j<24; ++j) {
+            for(std::size_t j=0; j<24; ++j) {
                 test(data[j] == 4);
             }
         }
         { // strided view
             int data[24];
-            for(size_t j=0; j<24; ++j) {
+            for(std::size_t j=0; j<24; ++j) {
                 data[j] = 3;
             }
-            std::vector<size_t> shape(2);
+            std::vector<std::size_t> shape(2);
             shape[0] = 3;
             shape[1] = 2;
-            std::vector<size_t> strides(2);
+            std::vector<std::size_t> strides(2);
             strides[0] = 2;
             strides[1] = 8;
             andres::View<int, false> v(shape.begin(), shape.end(), 
@@ -5715,7 +5715,7 @@ void ViewTest::assignmentOperatorTest()
             test(data[10] == 4);
             test(data[11] == 3);
             test(data[12] == 4);
-            for(size_t j=13; j<24; ++j) {
+            for(std::size_t j=13; j<24; ++j) {
                 test(data[j] == 3);
             }
         }
@@ -5732,7 +5732,7 @@ void ViewTest::queryTest(){
     }
     // 1D
     {
-        std::vector<size_t> shape(1);
+        std::vector<std::size_t> shape(1);
         shape[0] = 24;
         andres::View<int, constTarget> v(shape.begin(), shape.end(), data_);
 
@@ -5742,7 +5742,7 @@ void ViewTest::queryTest(){
     }
     // 2D 
     {
-        std::vector<size_t> shape(2);
+        std::vector<std::size_t> shape(2);
         shape[0] = 4;
         shape[1] = 6; 
         andres::View<int, constTarget> v(shape.begin(), shape.end(), data_);
@@ -5754,7 +5754,7 @@ void ViewTest::queryTest(){
     }
     // 3D
     {
-        std::vector<size_t> shape(3);
+        std::vector<std::size_t> shape(3);
         shape[0] = 3;
         shape[1] = 4;
         shape[2] = 2;
@@ -5774,14 +5774,14 @@ void ViewTest::elementAccessTest(){
     {
         // 2D
         {
-            std::vector<size_t> shape(2);
+            std::vector<std::size_t> shape(2);
             shape[0] = 6;
             shape[1] = 4;
             andres::View<int, constTarget> v(shape.begin(), shape.end(), data_);
-            std::vector<size_t> w(2);
+            std::vector<std::size_t> w(2);
         
-            for(size_t x=0; x<6; ++x) {
-                for(size_t y=0; y<4; ++y) {
+            for(std::size_t x=0; x<6; ++x) {
+                for(std::size_t y=0; y<4; ++y) {
                     w[0] = x;
                     w[1] = y;
                     test(v(x, y) == v(w.begin()));
@@ -5790,16 +5790,16 @@ void ViewTest::elementAccessTest(){
         }
         // 3D 
         {
-            std::vector<size_t> shape(3);
+            std::vector<std::size_t> shape(3);
             shape[0] = 3;
             shape[1] = 4;
             shape[2] = 2; 
             andres::View<int, constTarget> v(shape.begin(), shape.end(), data_);
-            std::vector<size_t> w(3);
+            std::vector<std::size_t> w(3);
         
-            for(size_t x=0; x<3; ++x) {
-                for(size_t y=0; y<4; ++y) {
-                    for(size_t z=0; z<2; ++z) {
+            for(std::size_t x=0; x<3; ++x) {
+                for(std::size_t y=0; y<4; ++y) {
+                    for(std::size_t z=0; z<2; ++z) {
                         w[0] = x;
                         w[1] = y;
                         w[2] = z; 
@@ -5826,21 +5826,21 @@ void ViewTest::elementAccessTest(){
     // 1D 
     {
         {
-            std::vector<size_t> shape(1);
+            std::vector<std::size_t> shape(1);
             shape[0] = 24;
             andres::View<int, constTarget> v(shape.begin(), shape.end(), data_);
 
-            for(size_t j=0; j<24; ++j) {
+            for(std::size_t j=0; j<24; ++j) {
                 test(v(j) == data_[j]); 
             }
         }
         // const 
         {
-            std::vector<size_t> shape(1);
+            std::vector<std::size_t> shape(1);
             shape[0] = 24;
             andres::View<int, constTarget> const v(shape.begin(), shape.end(), data_);
 
-            for(size_t j=0; j<24; ++j) {
+            for(std::size_t j=0; j<24; ++j) {
                 test(v(j) == data_[j]); 
             }
         }
@@ -5848,7 +5848,7 @@ void ViewTest::elementAccessTest(){
     // 2D
     {
         {
-            std::vector<size_t> shape(2);
+            std::vector<std::size_t> shape(2);
             shape[0] = 4;
             shape[1] = 6;
             andres::View<int, constTarget> v(shape.begin(), shape.end(), data_);
@@ -5863,7 +5863,7 @@ void ViewTest::elementAccessTest(){
         }
         // const 
         {
-            std::vector<size_t> shape(2);
+            std::vector<std::size_t> shape(2);
             shape[0] = 4;
             shape[1] = 6;
             andres::View<int, constTarget> const v(shape.begin(), shape.end(), data_);
@@ -5880,7 +5880,7 @@ void ViewTest::elementAccessTest(){
     // 3D 
     {
         {
-            std::vector<size_t> shape(3);
+            std::vector<std::size_t> shape(3);
             shape[0] = 3;
             shape[1] = 4;
             shape[2] = 2; 
@@ -5898,7 +5898,7 @@ void ViewTest::elementAccessTest(){
         }
         // const
         {
-            std::vector<size_t> shape(3);
+            std::vector<std::size_t> shape(3);
             shape[0] = 3;
             shape[1] = 4;
             shape[2] = 2; 
@@ -5918,7 +5918,7 @@ void ViewTest::elementAccessTest(){
     // 4D 
     {
         {
-            std::vector<size_t> shape(4);
+            std::vector<std::size_t> shape(4);
             shape[0] = 3;
             shape[1] = 4;
             shape[2] = 2;
@@ -5939,7 +5939,7 @@ void ViewTest::elementAccessTest(){
         }
         // const 
         {
-            std::vector<size_t> shape(4);
+            std::vector<std::size_t> shape(4);
             shape[0] = 3;
             shape[1] = 4;
             shape[2] = 2;
@@ -5967,10 +5967,10 @@ void ViewTest::subViewsTest(){
     {
         // scalar sub-view
         {
-            std::vector<size_t> shape(1);
+            std::vector<std::size_t> shape(1);
             shape[0] = 24; 
             andres::View<int, constTarget> v(shape.begin(), shape.end(), data_);
-            std::vector<size_t> base(1);
+            std::vector<std::size_t> base(1);
             base[0] = 4;
             shape[0] = 1;
             andres::View<int, constTarget> s;
@@ -5981,10 +5981,10 @@ void ViewTest::subViewsTest(){
             test(s(0)==4);
         }
         {
-            std::vector<size_t> shape(1);
+            std::vector<std::size_t> shape(1);
             shape[0] = 24; 
             andres::View<int, constTarget> v(shape.begin(), shape.end(), data_, andres::FirstMajorOrder);
-            std::vector<size_t> base(1);
+            std::vector<std::size_t> base(1);
             base[0] = 4;
             shape[0] = 1;
             andres::View<int, constTarget> s;
@@ -5997,10 +5997,10 @@ void ViewTest::subViewsTest(){
         }
         // 1D sub-view
         {
-            std::vector<size_t> shape(1);
+            std::vector<std::size_t> shape(1);
             shape[0] = 24; 
             andres::View<int, constTarget> v(shape.begin(), shape.end(), data_);
-            std::vector<size_t> base(1);
+            std::vector<std::size_t> base(1);
             base[0] = 4;
             shape[0] = 3;
             andres::View<int, constTarget> s;
@@ -6011,10 +6011,10 @@ void ViewTest::subViewsTest(){
             test(s(0)==4 && s(1)==5 && s(2)==6);
         }
         {
-            std::vector<size_t> shape(1);
+            std::vector<std::size_t> shape(1);
             shape[0] = 24; 
             andres::View<int, constTarget> v(shape.begin(), shape.end(), data_, andres::FirstMajorOrder);
-            std::vector<size_t> base(1);
+            std::vector<std::size_t> base(1);
             base[0] = 4;
             shape[0] = 3;
             andres::View<int, constTarget> s;
@@ -6029,11 +6029,11 @@ void ViewTest::subViewsTest(){
     {
         // scalar sub-view
         {
-            std::vector<size_t> shape(2);
+            std::vector<std::size_t> shape(2);
             shape[0] = 6; 
             shape[1] = 4; 
             andres::View<int, constTarget> v(shape.begin(), shape.end(), data_);
-            std::vector<size_t> base(2);
+            std::vector<std::size_t> base(2);
             base[0] =2;
             base[1] =2;
             shape[0] = 1; 
@@ -6046,11 +6046,11 @@ void ViewTest::subViewsTest(){
             test(s(0,0)==14);
         } 
         {
-            std::vector<size_t> shape(2);
+            std::vector<std::size_t> shape(2);
             shape[0] = 6; 
             shape[1] = 4; 
             andres::View<int, constTarget> v(shape.begin(), shape.end(), data_, andres::FirstMajorOrder);
-            std::vector<size_t> base(2);
+            std::vector<std::size_t> base(2);
             base[0] =2;
             base[1] =2;
             shape[0] = 1; 
@@ -6064,11 +6064,11 @@ void ViewTest::subViewsTest(){
         }     
         // 1D sub-view
         {
-            std::vector<size_t> shape(2);
+            std::vector<std::size_t> shape(2);
             shape[0] = 6; 
             shape[1] = 4; 
             andres::View<int, constTarget> v(shape.begin(), shape.end(), data_);
-            std::vector<size_t> base(2);
+            std::vector<std::size_t> base(2);
             base[0] =0;
             base[1] =0;
             shape[0] = 1; 
@@ -6081,11 +6081,11 @@ void ViewTest::subViewsTest(){
             test(s(0,0)==0 && s(0,1)==6 && s(0,2)==12 && s(0,3)==18 );
         } 
         {
-            std::vector<size_t> shape(2);
+            std::vector<std::size_t> shape(2);
             shape[0] = 6; 
             shape[1] = 4; 
             andres::View<int, constTarget> v(shape.begin(), shape.end(), data_, andres::FirstMajorOrder);
-            std::vector<size_t> base(2);
+            std::vector<std::size_t> base(2);
             base[0] =0;
             base[1] =0;
             shape[0] = 1; 
@@ -6100,11 +6100,11 @@ void ViewTest::subViewsTest(){
         // 2D sub-view
         {
             int list[] = {8, 9, 10, 14, 15, 16};
-            std::vector<size_t> shape(2);
+            std::vector<std::size_t> shape(2);
             shape[0] = 6;
             shape[1] = 4; 
             andres::View<int, constTarget> v(shape.begin(), shape.end(), data_);
-            std::vector<size_t> base(2);
+            std::vector<std::size_t> base(2);
             base[0] = 2;
             base[1] = 1;
             shape[0] = 3;
@@ -6123,11 +6123,11 @@ void ViewTest::subViewsTest(){
         } 
         {
             int list[] = {9, 13, 17, 10, 14, 18};
-            std::vector<size_t> shape(2);
+            std::vector<std::size_t> shape(2);
             shape[0] = 6;
             shape[1] = 4; 
             andres::View<int, constTarget> v(shape.begin(), shape.end(), data_, andres::FirstMajorOrder);
-            std::vector<size_t> base(2);
+            std::vector<std::size_t> base(2);
             base[0] = 2;
             base[1] = 1;
             shape[0] = 3;
@@ -6149,12 +6149,12 @@ void ViewTest::subViewsTest(){
     {
         // scalar sub-view
         {
-            std::vector<size_t> shape(3);
+            std::vector<std::size_t> shape(3);
             shape[0] = 3;
             shape[1] = 4;
             shape[2] = 2; 
             andres::View<int, constTarget> v(shape.begin(), shape.end(), data_);
-            std::vector<size_t> base(3);
+            std::vector<std::size_t> base(3);
             base[0] = 1;
             base[1] = 1;
             base[2] = 0; 
@@ -6169,12 +6169,12 @@ void ViewTest::subViewsTest(){
             test(s(0,0,0)==4);
         }
         {
-            std::vector<size_t> shape(3);
+            std::vector<std::size_t> shape(3);
             shape[0] = 3;
             shape[1] = 4;
             shape[2] = 2; 
             andres::View<int, constTarget> v(shape.begin(), shape.end(), data_, andres::FirstMajorOrder);
-            std::vector<size_t> base(3);
+            std::vector<std::size_t> base(3);
             base[0] = 1;
             base[1] = 1;
             base[2] = 0; 
@@ -6190,12 +6190,12 @@ void ViewTest::subViewsTest(){
         }
         // 1D sub-view
         {
-            std::vector<size_t> shape(3);
+            std::vector<std::size_t> shape(3);
             shape[0] = 3;
             shape[1] = 4;
             shape[2] = 2; 
             andres::View<int, constTarget> v(shape.begin(), shape.end(), data_);
-            std::vector<size_t> base(3);
+            std::vector<std::size_t> base(3);
             base[0] = 1;
             base[1] = 1;
             base[2] = 0; 
@@ -6210,12 +6210,12 @@ void ViewTest::subViewsTest(){
             test(s(0,0,0)==4 && s(0,1,0)==7 && s(0,2,0)==10);
         }
         {
-            std::vector<size_t> shape(3);
+            std::vector<std::size_t> shape(3);
             shape[0] = 3;
             shape[1] = 4;
             shape[2] = 2; 
             andres::View<int, constTarget> v(shape.begin(), shape.end(), data_, andres::FirstMajorOrder);
-            std::vector<size_t> base(3);
+            std::vector<std::size_t> base(3);
             base[0] = 1;
             base[1] = 1;
             base[2] = 0; 
@@ -6232,12 +6232,12 @@ void ViewTest::subViewsTest(){
         // 2D sub-view
         {
             int list[] = {4, 5, 7, 8, 10, 11};
-            std::vector<size_t> shape(3);
+            std::vector<std::size_t> shape(3);
             shape[0] = 3;
             shape[1] = 4;
             shape[2] = 2; 
             andres::View<int, constTarget> v(shape.begin(), shape.end(), data_);
-            std::vector<size_t> base(3);
+            std::vector<std::size_t> base(3);
             base[0] = 1;
             base[1] = 1;
             base[2] = 0; 
@@ -6259,12 +6259,12 @@ void ViewTest::subViewsTest(){
         }
         {
             int list[] = {10, 18, 12, 20, 14, 22};
-            std::vector<size_t> shape(3);
+            std::vector<std::size_t> shape(3);
             shape[0] = 3;
             shape[1] = 4;
             shape[2] = 2; 
             andres::View<int, constTarget> v(shape.begin(), shape.end(), data_, andres::FirstMajorOrder);
-            std::vector<size_t> base(3);
+            std::vector<std::size_t> base(3);
             base[0] = 1;
             base[1] = 1;
             base[2] = 0; 
@@ -6287,12 +6287,12 @@ void ViewTest::subViewsTest(){
         // 3D sub-view
         {
             int list[] = {4, 5, 7, 8, 16, 17, 19, 20};
-            std::vector<size_t> shape(3);
+            std::vector<std::size_t> shape(3);
             shape[0] = 3;
             shape[1] = 4; 
             shape[2] = 2; 
             andres::View<int, constTarget> v(shape.begin(), shape.end(), data_);
-            std::vector<size_t> base(3);
+            std::vector<std::size_t> base(3);
             base[0] = 1;
             base[1] = 1;
             base[2] = 0;
@@ -6314,12 +6314,12 @@ void ViewTest::subViewsTest(){
         } 
         {
             int list[] = {10, 18, 12, 20, 11, 19, 13, 21};
-            std::vector<size_t> shape(3);
+            std::vector<std::size_t> shape(3);
             shape[0] = 3;
             shape[1] = 4; 
             shape[2] = 2; 
             andres::View<int, constTarget> v(shape.begin(), shape.end(), data_, andres::FirstMajorOrder);
-            std::vector<size_t> base(3);
+            std::vector<std::size_t> base(3);
             base[0] = 1;
             base[1] = 1;
             base[2] = 0;
@@ -6347,10 +6347,10 @@ void ViewTest::subConstViewsTest(){
     {
         // scalar sub-view
         {
-            std::vector<size_t> shape(1);
+            std::vector<std::size_t> shape(1);
             shape[0] = 24; 
             andres::View<int, true> v(shape.begin(), shape.end(), data_);
-            std::vector<size_t> base(1);
+            std::vector<std::size_t> base(1);
             base[0] = 4;
             shape[0] = 1;
             andres::View<int, true> s;
@@ -6361,10 +6361,10 @@ void ViewTest::subConstViewsTest(){
             test(s(0)==4);
         }
         {
-            std::vector<size_t> shape(1);
+            std::vector<std::size_t> shape(1);
             shape[0] = 24; 
             andres::View<int, true> v(shape.begin(), shape.end(), data_, andres::FirstMajorOrder);
-            std::vector<size_t> base(1);
+            std::vector<std::size_t> base(1);
             base[0] = 4;
             shape[0] = 1;
             andres::View<int, true> s;
@@ -6377,10 +6377,10 @@ void ViewTest::subConstViewsTest(){
         }
         // 1D sub-view
         {
-            std::vector<size_t> shape(1);
+            std::vector<std::size_t> shape(1);
             shape[0] = 24; 
             andres::View<int, true> v(shape.begin(), shape.end(), data_);
-            std::vector<size_t> base(1);
+            std::vector<std::size_t> base(1);
             base[0] = 4;
             shape[0] = 3;
             andres::View<int, true> s;
@@ -6391,10 +6391,10 @@ void ViewTest::subConstViewsTest(){
             test(s(0)==4 && s(1)==5 && s(2)==6);
         }
         {
-            std::vector<size_t> shape(1);
+            std::vector<std::size_t> shape(1);
             shape[0] = 24; 
             andres::View<int, true> v(shape.begin(), shape.end(), data_, andres::FirstMajorOrder);
-            std::vector<size_t> base(1);
+            std::vector<std::size_t> base(1);
             base[0] = 4;
             shape[0] = 3;
             andres::View<int, true> s;
@@ -6409,11 +6409,11 @@ void ViewTest::subConstViewsTest(){
     {
         // scalar sub-view
         {
-            std::vector<size_t> shape(2);
+            std::vector<std::size_t> shape(2);
             shape[0] = 6; 
             shape[1] = 4; 
             andres::View<int, true> v(shape.begin(), shape.end(), data_);
-            std::vector<size_t> base(2);
+            std::vector<std::size_t> base(2);
             base[0] =2;
             base[1] =2;
             shape[0] = 1; 
@@ -6426,11 +6426,11 @@ void ViewTest::subConstViewsTest(){
             test(s(0,0)==14);
         } 
         {
-            std::vector<size_t> shape(2);
+            std::vector<std::size_t> shape(2);
             shape[0] = 6; 
             shape[1] = 4; 
             andres::View<int, true> v(shape.begin(), shape.end(), data_, andres::FirstMajorOrder);
-            std::vector<size_t> base(2);
+            std::vector<std::size_t> base(2);
             base[0] =2;
             base[1] =2;
             shape[0] = 1; 
@@ -6444,11 +6444,11 @@ void ViewTest::subConstViewsTest(){
         }     
         // 1D sub-view
         {
-            std::vector<size_t> shape(2);
+            std::vector<std::size_t> shape(2);
             shape[0] = 6; 
             shape[1] = 4; 
             andres::View<int, true> v(shape.begin(), shape.end(), data_);
-            std::vector<size_t> base(2);
+            std::vector<std::size_t> base(2);
             base[0] =0;
             base[1] =0;
             shape[0] = 1; 
@@ -6461,11 +6461,11 @@ void ViewTest::subConstViewsTest(){
             test(s(0,0)==0 && s(0,1)==6 && s(0,2)==12 && s(0,3)==18 );
         } 
         {
-            std::vector<size_t> shape(2);
+            std::vector<std::size_t> shape(2);
             shape[0] = 6; 
             shape[1] = 4; 
             andres::View<int, true> v(shape.begin(), shape.end(), data_, andres::FirstMajorOrder);
-            std::vector<size_t> base(2);
+            std::vector<std::size_t> base(2);
             base[0] =0;
             base[1] =0;
             shape[0] = 1; 
@@ -6480,11 +6480,11 @@ void ViewTest::subConstViewsTest(){
         // 2D sub-view
         {
             int list[] = {8, 9, 10, 14, 15, 16};
-            std::vector<size_t> shape(2);
+            std::vector<std::size_t> shape(2);
             shape[0] = 6;
             shape[1] = 4; 
             andres::View<int, true> v(shape.begin(), shape.end(), data_);
-            std::vector<size_t> base(2);
+            std::vector<std::size_t> base(2);
             base[0] = 2;
             base[1] = 1;
             shape[0] = 3;
@@ -6503,11 +6503,11 @@ void ViewTest::subConstViewsTest(){
         } 
         {
             int list[] = {9, 13, 17, 10, 14, 18};
-            std::vector<size_t> shape(2);
+            std::vector<std::size_t> shape(2);
             shape[0] = 6;
             shape[1] = 4; 
             andres::View<int, true> v(shape.begin(), shape.end(), data_, andres::FirstMajorOrder);
-            std::vector<size_t> base(2);
+            std::vector<std::size_t> base(2);
             base[0] = 2;
             base[1] = 1;
             shape[0] = 3;
@@ -6529,12 +6529,12 @@ void ViewTest::subConstViewsTest(){
     {
         // scalar sub-view
         {
-            std::vector<size_t> shape(3);
+            std::vector<std::size_t> shape(3);
             shape[0] = 3;
             shape[1] = 4;
             shape[2] = 2; 
             andres::View<int, true> v(shape.begin(), shape.end(), data_);
-            std::vector<size_t> base(3);
+            std::vector<std::size_t> base(3);
             base[0] = 1;
             base[1] = 1;
             base[2] = 0; 
@@ -6549,12 +6549,12 @@ void ViewTest::subConstViewsTest(){
             test(s(0,0,0)==4);
         }
         {
-            std::vector<size_t> shape(3);
+            std::vector<std::size_t> shape(3);
             shape[0] = 3;
             shape[1] = 4;
             shape[2] = 2; 
             andres::View<int, true> v(shape.begin(), shape.end(), data_, andres::FirstMajorOrder);
-            std::vector<size_t> base(3);
+            std::vector<std::size_t> base(3);
             base[0] = 1;
             base[1] = 1;
             base[2] = 0; 
@@ -6570,12 +6570,12 @@ void ViewTest::subConstViewsTest(){
         }
         // 1D sub-view
         {
-            std::vector<size_t> shape(3);
+            std::vector<std::size_t> shape(3);
             shape[0] = 3;
             shape[1] = 4;
             shape[2] = 2; 
             andres::View<int, true> v(shape.begin(), shape.end(), data_);
-            std::vector<size_t> base(3);
+            std::vector<std::size_t> base(3);
             base[0] = 1;
             base[1] = 1;
             base[2] = 0; 
@@ -6590,12 +6590,12 @@ void ViewTest::subConstViewsTest(){
             test(s(0,0,0)==4 && s(0,1,0)==7 && s(0,2,0)==10);
         }
         {
-            std::vector<size_t> shape(3);
+            std::vector<std::size_t> shape(3);
             shape[0] = 3;
             shape[1] = 4;
             shape[2] = 2; 
             andres::View<int, true> v(shape.begin(), shape.end(), data_, andres::FirstMajorOrder);
-            std::vector<size_t> base(3);
+            std::vector<std::size_t> base(3);
             base[0] = 1;
             base[1] = 1;
             base[2] = 0; 
@@ -6612,12 +6612,12 @@ void ViewTest::subConstViewsTest(){
         // 2D sub-view
         {
             int list[] = {4, 5, 7, 8, 10, 11};
-            std::vector<size_t> shape(3);
+            std::vector<std::size_t> shape(3);
             shape[0] = 3;
             shape[1] = 4;
             shape[2] = 2; 
             andres::View<int, true> v(shape.begin(), shape.end(), data_);
-            std::vector<size_t> base(3);
+            std::vector<std::size_t> base(3);
             base[0] = 1;
             base[1] = 1;
             base[2] = 0; 
@@ -6639,12 +6639,12 @@ void ViewTest::subConstViewsTest(){
         }
         {
             int list[] = {10, 18, 12, 20, 14, 22};
-            std::vector<size_t> shape(3);
+            std::vector<std::size_t> shape(3);
             shape[0] = 3;
             shape[1] = 4;
             shape[2] = 2; 
             andres::View<int, true> v(shape.begin(), shape.end(), data_, andres::FirstMajorOrder);
-            std::vector<size_t> base(3);
+            std::vector<std::size_t> base(3);
             base[0] = 1;
             base[1] = 1;
             base[2] = 0; 
@@ -6667,12 +6667,12 @@ void ViewTest::subConstViewsTest(){
         // 3D sub-view
         {
             int list[] = {4, 5, 7, 8, 16, 17, 19, 20};
-            std::vector<size_t> shape(3);
+            std::vector<std::size_t> shape(3);
             shape[0] = 3;
             shape[1] = 4; 
             shape[2] = 2; 
             andres::View<int, true> v(shape.begin(), shape.end(), data_);
-            std::vector<size_t> base(3);
+            std::vector<std::size_t> base(3);
             base[0] = 1;
             base[1] = 1;
             base[2] = 0;
@@ -6694,12 +6694,12 @@ void ViewTest::subConstViewsTest(){
         } 
         {
             int list[] = {10, 18, 12, 20, 11, 19, 13, 21};
-            std::vector<size_t> shape(3);
+            std::vector<std::size_t> shape(3);
             shape[0] = 3;
             shape[1] = 4; 
             shape[2] = 2; 
             andres::View<int, true> v(shape.begin(), shape.end(), data_, andres::FirstMajorOrder);
-            std::vector<size_t> base(3);
+            std::vector<std::size_t> base(3);
             base[0] = 1;
             base[1] = 1;
             base[2] = 0;
@@ -6727,7 +6727,7 @@ void ViewTest::iteratorAccessTest(){
     // 1D
     {
         {
-            std::vector<size_t> shape(1);
+            std::vector<std::size_t> shape(1);
             shape[0] = 24;
             andres::View<int, constTarget> v(shape.begin(), shape.end(), data_);
             typename andres::View<int, constTarget>::iterator it;
@@ -6741,7 +6741,7 @@ void ViewTest::iteratorAccessTest(){
         }
         // reverse
         {
-            std::vector<size_t> shape(1);
+            std::vector<std::size_t> shape(1);
             shape[0] = 24;
             andres::View<int, constTarget> v(shape.begin(), shape.end(), data_);
             typename andres::View<int, constTarget>::reverse_iterator it;
@@ -6755,7 +6755,7 @@ void ViewTest::iteratorAccessTest(){
         }
         // const
         {
-            std::vector<size_t> shape(1);
+            std::vector<std::size_t> shape(1);
             shape[0] = 24;
             andres::View<int, constTarget> v(shape.begin(), shape.end(), data_);
             typename andres::View<int, constTarget>::const_iterator it;
@@ -6771,7 +6771,7 @@ void ViewTest::iteratorAccessTest(){
     // 2D
     {
         {
-            std::vector<size_t> shape(2);
+            std::vector<std::size_t> shape(2);
             shape[0] = 6;
             shape[1] = 4;
             andres::View<int, constTarget> v(shape.begin(), shape.end(), data_);
@@ -6786,7 +6786,7 @@ void ViewTest::iteratorAccessTest(){
         }
         // reverse
         {
-            std::vector<size_t> shape(2);
+            std::vector<std::size_t> shape(2);
             shape[0] = 6;
             shape[1] = 4; 
             andres::View<int, constTarget> v(shape.begin(), shape.end(), data_);
@@ -6801,7 +6801,7 @@ void ViewTest::iteratorAccessTest(){
         }
         // const
         {
-            std::vector<size_t> shape(2);
+            std::vector<std::size_t> shape(2);
             shape[0] = 6;
             shape[1] = 4;
             andres::View<int, constTarget> v(shape.begin(), shape.end(), data_);
@@ -6818,7 +6818,7 @@ void ViewTest::iteratorAccessTest(){
     // 3D
     {
         {
-            std::vector<size_t> shape(3);
+            std::vector<std::size_t> shape(3);
             shape[0] = 3;
             shape[1] = 4;
             shape[2] = 2;
@@ -6834,7 +6834,7 @@ void ViewTest::iteratorAccessTest(){
         }
         // reverse
         {
-            std::vector<size_t> shape(3);
+            std::vector<std::size_t> shape(3);
             shape[0] = 3;
             shape[1] = 4;
             shape[2] = 2;
@@ -6850,7 +6850,7 @@ void ViewTest::iteratorAccessTest(){
         }
         // cosnt
         {
-            std::vector<size_t> shape(3);
+            std::vector<std::size_t> shape(3);
             shape[0] = 3;
             shape[1] = 4;
             shape[2] = 2;
@@ -6872,7 +6872,7 @@ void ViewTest::coordinateBindingTest() {
     // 1D
     {
         {
-            std::vector<size_t> shape(1);
+            std::vector<std::size_t> shape(1);
             shape[0] = 24;
             andres::View<int, constTarget> v(shape.begin(), shape.end(), data_);
             andres::View<int, constTarget> w = v.boundView(0,7);
@@ -6884,7 +6884,7 @@ void ViewTest::coordinateBindingTest() {
     {
         // bind(0,x)
         {
-            std::vector<size_t> shape(2); 
+            std::vector<std::size_t> shape(2); 
             shape[0] = 6;
             shape[1] = 4; 
             andres::View<int, constTarget> v(shape.begin(), shape.end(), data_);
@@ -6893,7 +6893,7 @@ void ViewTest::coordinateBindingTest() {
             test(w(0)==3 && w(1)==9 && w(2)==15 && w(3)==21);
         }
         {
-            std::vector<size_t> shape(2); 
+            std::vector<std::size_t> shape(2); 
             shape[0] = 6;
             shape[1] = 4; 
             andres::View<int, constTarget> v(shape.begin(), shape.end(), data_, andres::FirstMajorOrder);
@@ -6904,7 +6904,7 @@ void ViewTest::coordinateBindingTest() {
         }
         // bind(1,x)
         {
-            std::vector<size_t> shape(2); 
+            std::vector<std::size_t> shape(2); 
             shape[0] = 6;
             shape[1] = 4; 
             andres::View<int, constTarget> v(shape.begin(), shape.end(), data_);
@@ -6919,7 +6919,7 @@ void ViewTest::coordinateBindingTest() {
         }
         {
             int list[] = {2, 6, 10, 14, 18, 22};
-            std::vector<size_t> shape(2); 
+            std::vector<std::size_t> shape(2); 
             shape[0] = 6;
             shape[1] = 4; 
             andres::View<int, constTarget> v(shape.begin(), shape.end(), data_, andres::FirstMajorOrder);
@@ -6936,7 +6936,7 @@ void ViewTest::coordinateBindingTest() {
         // bind(0,x)
         {
             int list[] = {2, 5, 8, 11, 14, 17, 20, 23};
-            std::vector<size_t> shape(3); 
+            std::vector<std::size_t> shape(3); 
             shape[0] = 3;
             shape[1] = 4;
             shape[2] = 2;
@@ -6953,7 +6953,7 @@ void ViewTest::coordinateBindingTest() {
         }
         {
             int list[] = {16, 18, 20, 22, 17, 19, 21, 23};
-            std::vector<size_t> shape(3); 
+            std::vector<std::size_t> shape(3); 
             shape[0] = 3;
             shape[1] = 4;
             shape[2] = 2;
@@ -6971,7 +6971,7 @@ void ViewTest::coordinateBindingTest() {
         // bind(1,x)
         {
             int list[] = {6, 7, 8, 18, 19, 20};
-            std::vector<size_t> shape(3); 
+            std::vector<std::size_t> shape(3); 
             shape[0] = 3;
             shape[1] = 4;
             shape[2] = 2;
@@ -6988,7 +6988,7 @@ void ViewTest::coordinateBindingTest() {
         }
         {
             int list[] = {4, 12, 20, 5, 13, 21};
-            std::vector<size_t> shape(3); 
+            std::vector<std::size_t> shape(3); 
             shape[0] = 3;
             shape[1] = 4;
             shape[2] = 2;
@@ -7008,7 +7008,7 @@ void ViewTest::coordinateBindingTest() {
     {
         // 2D to scalar 
         {
-            std::vector<size_t> shape(2); 
+            std::vector<std::size_t> shape(2); 
             shape[0] = 1;
             shape[1] = 1;
             andres::View<int, constTarget> v(shape.begin(), shape.end(), data_);
@@ -7019,7 +7019,7 @@ void ViewTest::coordinateBindingTest() {
         }
         // 2D to 1D
         {
-            std::vector<size_t> shape(2); 
+            std::vector<std::size_t> shape(2); 
             shape[0] = 24;
             shape[1] = 1;
             andres::View<int, constTarget> v(shape.begin(), shape.end(), data_);
@@ -7031,7 +7031,7 @@ void ViewTest::coordinateBindingTest() {
         }
         // 3D to scalar 
         {
-            std::vector<size_t> shape(3); 
+            std::vector<std::size_t> shape(3); 
             shape[0] = 1;
             shape[1] = 1;
             shape[2] = 1;
@@ -7043,7 +7043,7 @@ void ViewTest::coordinateBindingTest() {
         } 
         // 3D to 1D with squeeze
         {
-            std::vector<size_t> shape(3); 
+            std::vector<std::size_t> shape(3); 
             shape[0] = 1;
             shape[1] = 24;
             shape[2] = 1;
@@ -7057,7 +7057,7 @@ void ViewTest::coordinateBindingTest() {
         } 
         // 3D to 2D
         {
-            std::vector<size_t> shape(3); 
+            std::vector<std::size_t> shape(3); 
             shape[0] = 1;
             shape[1] = 3;
             shape[2] = 2;
@@ -7076,7 +7076,7 @@ void ViewTest::coordinateBindingTest() {
         }
         // 6D to 3D
         {
-            std::vector<size_t> shape(6);
+            std::vector<std::size_t> shape(6);
             shape[0] = 1;
             shape[1] = 2;
             shape[2] = 1;
@@ -7106,7 +7106,7 @@ void ViewTest::transposeTest()
 {
     // 2D
     {
-        std::vector<size_t> shape(2);
+        std::vector<std::size_t> shape(2);
         shape[0] = 6; 
         shape[1] = 4;
         andres::View<int, constTarget> v(shape.begin(), shape.end(), data_);
@@ -7117,8 +7117,8 @@ void ViewTest::transposeTest()
         w2.transpose(0,0);
         w3.transpose(1,1);
 
-        for(size_t x=0; x<6; ++x) {
-            for(size_t y=0; y<4; ++y) {
+        for(std::size_t x=0; x<6; ++x) {
+            for(std::size_t y=0; y<4; ++y) {
                 test(v(x, y) == w1(y, x));
                 test(v(x, y) == w2(x, y));
                 test(v(x, y) == w3(x, y));
@@ -7126,7 +7126,7 @@ void ViewTest::transposeTest()
         }
     }
     {
-        std::vector<size_t> shape(2);
+        std::vector<std::size_t> shape(2);
         shape[0] = 6; 
         shape[1] = 4;
         andres::View<int, constTarget> v(shape.begin(), shape.end(), data_, andres::FirstMajorOrder);
@@ -7137,8 +7137,8 @@ void ViewTest::transposeTest()
         w2.transpose(0,0);
         w3.transpose(1,1);
 
-        for(size_t x=0; x<6; ++x) {
-            for(size_t y=0; y<4; ++y) {
+        for(std::size_t x=0; x<6; ++x) {
+            for(std::size_t y=0; y<4; ++y) {
                 test(v(x, y) == w1(y, x));
                 test(v(x, y) == w2(x, y));
                 test(v(x, y) == w3(x, y));
@@ -7149,7 +7149,7 @@ void ViewTest::transposeTest()
     {
         // shape[0], shape[1]
         {
-            std::vector<size_t> shape(3);
+            std::vector<std::size_t> shape(3);
             shape[0] = 3;
             shape[1] = 4;
             shape[2] = 2;
@@ -7157,16 +7157,16 @@ void ViewTest::transposeTest()
             andres::View<int, constTarget> w(shape.begin(), shape.end(), data_);
             w.transpose(0,1);
 
-            for(size_t x=0; x<3; ++x) {
-                for(size_t y=0; y<4; ++y) {
-                    for(size_t z=0; z<2; ++z) {
+            for(std::size_t x=0; x<3; ++x) {
+                for(std::size_t y=0; y<4; ++y) {
+                    for(std::size_t z=0; z<2; ++z) {
                         test(v(x, y, z) == w(y, x, z));
                     }
                 }
             }
         }
         {
-            std::vector<size_t> shape(3);
+            std::vector<std::size_t> shape(3);
             shape[0] = 3;
             shape[1] = 4;
             shape[2] = 2;
@@ -7174,9 +7174,9 @@ void ViewTest::transposeTest()
             andres::View<int, constTarget> w(shape.begin(), shape.end(), data_, andres::FirstMajorOrder);
             w.transpose(0,1);
 
-            for(size_t x=0; x<3; ++x) {
-                for(size_t y=0; y<4; ++y) {
-                    for(size_t z=0; z<2; ++z) {
+            for(std::size_t x=0; x<3; ++x) {
+                for(std::size_t y=0; y<4; ++y) {
+                    for(std::size_t z=0; z<2; ++z) {
                         test(v(x, y, z) == w(y, x, z));
                     }
                 }
@@ -7184,7 +7184,7 @@ void ViewTest::transposeTest()
         }
         // shape[0], shape[2]
         {
-            std::vector<size_t> shape(3);
+            std::vector<std::size_t> shape(3);
             shape[0] = 3;
             shape[1] = 4;
             shape[2] = 2;
@@ -7192,9 +7192,9 @@ void ViewTest::transposeTest()
             andres::View<int, constTarget> w(shape.begin(), shape.end(), data_);
             w.transpose(0,2);
 
-            for(size_t x=0; x<3; ++x) {
-                for(size_t y=0; y<4; ++y) {
-                    for(size_t z=0; z<2; ++z) {
+            for(std::size_t x=0; x<3; ++x) {
+                for(std::size_t y=0; y<4; ++y) {
+                    for(std::size_t z=0; z<2; ++z) {
 
                         test(v(x, y, z) == w(z, y, x));
                     }
@@ -7202,7 +7202,7 @@ void ViewTest::transposeTest()
             }
         }
         {
-            std::vector<size_t> shape(3);
+            std::vector<std::size_t> shape(3);
             shape[0] = 3;
             shape[1] = 4;
             shape[2] = 2;
@@ -7210,9 +7210,9 @@ void ViewTest::transposeTest()
             andres::View<int, constTarget> w(shape.begin(), shape.end(), data_, andres::FirstMajorOrder);
             w.transpose(0,2);
 
-            for(size_t x=0; x<3; ++x) {
-                for(size_t y=0; y<4; ++y) {
-                    for(size_t z=0; z<2; ++z) {
+            for(std::size_t x=0; x<3; ++x) {
+                for(std::size_t y=0; y<4; ++y) {
+                    for(std::size_t z=0; z<2; ++z) {
                         test(v(x, y, z) == w(z, y, x));
                     }
                 }
@@ -7220,7 +7220,7 @@ void ViewTest::transposeTest()
         }
         // shape[1], shape[2]
         {
-            std::vector<size_t> shape(3);
+            std::vector<std::size_t> shape(3);
             shape[0] = 3;
             shape[1] = 4;
             shape[2] = 2;
@@ -7228,16 +7228,16 @@ void ViewTest::transposeTest()
             andres::View<int, constTarget> w(shape.begin(), shape.end(), data_);
             w.transpose(1,2);
 
-            for(size_t x=0; x<3; ++x) {
-                for(size_t y=0; y<4; ++y) {
-                    for(size_t z=0; z<2; ++z) {
+            for(std::size_t x=0; x<3; ++x) {
+                for(std::size_t y=0; y<4; ++y) {
+                    for(std::size_t z=0; z<2; ++z) {
                         test(v(x, y, z) == w(x, z, y));
                     }
                 }
             }
         }
         {
-            std::vector<size_t> shape(3);
+            std::vector<std::size_t> shape(3);
             shape[0] = 3;
             shape[1] = 4;
             shape[2] = 2;
@@ -7245,9 +7245,9 @@ void ViewTest::transposeTest()
             andres::View<int, constTarget> w(shape.begin(), shape.end(), data_, andres::FirstMajorOrder);
             w.transpose(1,2);
 
-            for(size_t x=0; x<3; ++x) {
-                for(size_t y=0; y<4; ++y) {
-                    for(size_t z=0; z<2; ++z) {
+            for(std::size_t x=0; x<3; ++x) {
+                for(std::size_t y=0; y<4; ++y) {
+                    for(std::size_t z=0; z<2; ++z) {
                         test(v(x, y, z) == w(x, z, y));
                     }
                 }
@@ -7260,13 +7260,13 @@ template<bool constTarget>
 void ViewTest::permuteTest() {
     // 2D
     {
-        std::vector<size_t> shape(2);
+        std::vector<std::size_t> shape(2);
         shape[0] = 6; 
         shape[1] = 4;
         andres::View<int, constTarget> v(shape.begin(), shape.end(), data_);
         andres::View<int, constTarget> w1(shape.begin(), shape.end(), data_);
         andres::View<int, constTarget> w2(shape.begin(), shape.end(), data_);
-        std::vector<size_t> permutation(2);
+        std::vector<std::size_t> permutation(2);
         permutation[0] = 1;
         permutation[1] = 0;
         w1.permute(permutation.begin());
@@ -7274,21 +7274,21 @@ void ViewTest::permuteTest() {
         permutation[1] = 1;
         w2.permute(permutation.begin());
 
-        for(size_t x=0; x<6; ++x) {
-            for(size_t y=0; y<4; ++y) {
+        for(std::size_t x=0; x<6; ++x) {
+            for(std::size_t y=0; y<4; ++y) {
                 test(v(x, y) == w1(y, x));
                 test(v(x, y) == w2(x, y));
             }
         }
     }
     {
-        std::vector<size_t> shape(2);
+        std::vector<std::size_t> shape(2);
         shape[0] = 6; 
         shape[1] = 4;
         andres::View<int, constTarget> v(shape.begin(), shape.end(), data_, andres::FirstMajorOrder);
         andres::View<int, constTarget> w1(shape.begin(), shape.end(), data_, andres::FirstMajorOrder);
         andres::View<int, constTarget> w2(shape.begin(), shape.end(), data_, andres::FirstMajorOrder);
-        std::vector<size_t> permutation(2);
+        std::vector<std::size_t> permutation(2);
         permutation[0] = 1;
         permutation[1] = 0;
         w1.permute(permutation.begin());
@@ -7296,8 +7296,8 @@ void ViewTest::permuteTest() {
         permutation[1] = 1;
         w2.permute(permutation.begin());
 
-        for(size_t x=0; x<6; ++x) {
-            for(size_t y=0; y<4; ++y) {
+        for(std::size_t x=0; x<6; ++x) {
+            for(std::size_t y=0; y<4; ++y) {
                 test(v(x, y) == w1(y, x));
                 test(v(x, y) == w2(x, y));
             }
@@ -7305,7 +7305,7 @@ void ViewTest::permuteTest() {
     }
     // 3D 
     {
-        std::vector<size_t> shape(3);
+        std::vector<std::size_t> shape(3);
         shape[0] = 3;
         shape[1] = 4;
         shape[2] = 2;
@@ -7315,7 +7315,7 @@ void ViewTest::permuteTest() {
         andres::View<int, constTarget> w3(shape.begin(), shape.end(), data_);
         andres::View<int, constTarget> w4(shape.begin(), shape.end(), data_);
         andres::View<int, constTarget> w5(shape.begin(), shape.end(), data_);
-        std::vector<size_t> permutation(3);
+        std::vector<std::size_t> permutation(3);
         permutation[0] = 0;
         permutation[1] = 1; 
         permutation[2] = 2;
@@ -7337,9 +7337,9 @@ void ViewTest::permuteTest() {
         permutation[2] = 0;
         w5.permute(permutation.begin());
 
-        for(size_t x=0; x<3; ++x) {
-            for(size_t y=0; y<4; ++y) {
-                for(size_t z=0; z<2; ++z) {
+        for(std::size_t x=0; x<3; ++x) {
+            for(std::size_t y=0; y<4; ++y) {
+                for(std::size_t z=0; z<2; ++z) {
                     test(v(x, y, z) == w1(x, y, z));
                     test(v(x, y, z) == w2(y, x, z));
                     test(v(x, y, z) == w3(x, z, y));
@@ -7350,7 +7350,7 @@ void ViewTest::permuteTest() {
         }
     }
     {
-        std::vector<size_t> shape(3);
+        std::vector<std::size_t> shape(3);
         shape[0] = 3;
         shape[1] = 4;
         shape[2] = 2;
@@ -7360,7 +7360,7 @@ void ViewTest::permuteTest() {
         andres::View<int, constTarget> w3(shape.begin(), shape.end(), data_, andres::FirstMajorOrder);
         andres::View<int, constTarget> w4(shape.begin(), shape.end(), data_, andres::FirstMajorOrder);
         andres::View<int, constTarget> w5(shape.begin(), shape.end(), data_, andres::FirstMajorOrder);
-        std::vector<size_t> permutation(3);
+        std::vector<std::size_t> permutation(3);
         permutation[0] = 0;
         permutation[1] = 1; 
         permutation[2] = 2;
@@ -7382,9 +7382,9 @@ void ViewTest::permuteTest() {
         permutation[2] = 0;
         w5.permute(permutation.begin());
 
-        for(size_t x=0; x<3; ++x) {
-            for(size_t y=0; y<4; ++y) {
-                for(size_t z=0; z<2; ++z) {
+        for(std::size_t x=0; x<3; ++x) {
+            for(std::size_t y=0; y<4; ++y) {
+                for(std::size_t z=0; z<2; ++z) {
                     test(v(x, y, z) == w1(x, y, z));
                     test(v(x, y, z) == w2(y, x, z));
                     test(v(x, y, z) == w3(x, z, y));
@@ -7400,7 +7400,7 @@ template<bool constTarget, andres::CoordinateOrder internalFirstMajorOrder>
 void ViewTest::shiftOperatorTest() {
     // 2D
     {
-        std::vector<size_t> shape(2);
+        std::vector<std::size_t> shape(2);
         shape[0] = 6; 
         shape[1] = 4;
         andres::View<int, constTarget> v(shape.begin(), shape.end(), data_, internalFirstMajorOrder);
@@ -7417,8 +7417,8 @@ void ViewTest::shiftOperatorTest() {
         w5.shift(-2);
         w6.shift(-3);
 
-        for(size_t x=0; x<6; ++x) {
-            for(size_t y=0; y<4; ++y) {
+        for(std::size_t x=0; x<6; ++x) {
+            for(std::size_t y=0; y<4; ++y) {
                 test(v(x, y) == w1(y, x));
                 test(v(x, y) == w2(x, y));
                 test(v(x, y) == w3(y, x));
@@ -7430,7 +7430,7 @@ void ViewTest::shiftOperatorTest() {
     }
     // 3D
     {
-        std::vector<size_t> shape(3);
+        std::vector<std::size_t> shape(3);
         shape[0] = 3; 
         shape[1] = 4;
         shape[2] = 2;
@@ -7452,10 +7452,10 @@ void ViewTest::shiftOperatorTest() {
         w7.shift(-3);
         w8.shift(-4);
 
-        for(size_t x=0; x<3; ++x) {
-            for(size_t y=0; y<4; ++y) {
+        for(std::size_t x=0; x<3; ++x) {
+            for(std::size_t y=0; y<4; ++y) {
 
-                for(size_t z=0; z<2; ++z) {
+                for(std::size_t z=0; z<2; ++z) {
                     test(v(x, y, z) == w1(z, x, y));
                     test(v(x, y, z) == w2(y, z, x));
                     test(v(x, y, z) == w3(x, y, z));
@@ -7481,13 +7481,13 @@ void ViewTest::arithmeticOperatorsTest(){
                 for(int j=0; j<24; ++j) {
                     datav_[j] = j;
                 }
-                std::vector<size_t> shape(1);
+                std::vector<std::size_t> shape(1);
                 shape[0] = 24;
                 andres::View<int> v(shape.begin(), shape.end(), datav_);
                 andres::View<int>& w = (v += 1);
 
                 test(&v == &w);
-                for(int j=0; j<v.size(); ++j) {
+                for(std::size_t j=0; j<v.size(); ++j) {
                     test(v(j) == data_[j] + 1);
                 }
             }
@@ -7496,13 +7496,13 @@ void ViewTest::arithmeticOperatorsTest(){
                 for(int j=0; j<24; ++j) {
                     datav_[j] = float(j);
                 }
-                std::vector<size_t> shape(1);
+                std::vector<std::size_t> shape(1);
                 shape[0] = 24;
                 andres::View<float> v(shape.begin(), shape.end(), datav_);
                 andres::View<float>& w = (v += 2.0f);
 
                 test(&v == &w);
-                for(int j=0; j<v.size(); ++j) {
+                for(std::size_t j=0; j<v.size(); ++j) {
                     test(v(j) == data_[j] + 2.0f);
                 }
             }
@@ -7520,10 +7520,10 @@ void ViewTest::arithmeticOperatorsTest(){
             // v is not a scalar and w is a scalar 
             {
                 float datav_[24];
-                for(int j=0; j<24; ++j) {
+                for(std::size_t j=0; j<24; ++j) {
                     datav_[j] = float(j);
                 }
-                std::vector<size_t> shape(1);
+                std::vector<std::size_t> shape(1);
                 shape[0] = 24;
                 andres::View<float> v(shape.begin(), shape.end(), datav_);
                 float scalarw = 4711.0f;
@@ -7531,7 +7531,7 @@ void ViewTest::arithmeticOperatorsTest(){
 
                 andres::View<float>& r = (v += w);
                 test(&r == &v);
-                for(int j=0; j<v.size(); ++j) {
+                for(std::size_t j=0; j<v.size(); ++j) {
                     test(v(j) == float(j) + scalarw);
                 }
             }
@@ -7539,13 +7539,13 @@ void ViewTest::arithmeticOperatorsTest(){
             {
                 int datav_[24];
                 int dataw_[24];
-                for(int j=0; j<24; ++j) {
+                for(std::size_t j=0; j<24; ++j) {
                     datav_[j] = 1;
                     dataw_[j] = j;
                 }
-                std::vector<size_t> shape(1);
+                std::vector<std::size_t> shape(1);
                 shape[0] = 6;
-                std::vector<size_t> strides(1);
+                std::vector<std::size_t> strides(1);
                 strides[0] = 4;
                 andres::View<int> v(shape.begin(), shape.end(), datav_, andres::LastMajorOrder);
                 andres::View<int, true> w(shape.begin(), shape.end(),
@@ -7569,9 +7569,9 @@ void ViewTest::arithmeticOperatorsTest(){
                     datav_[j] = j;
                     dataw_[j] = 1;
                 }
-                std::vector<size_t> shape(1);
+                std::vector<std::size_t> shape(1);
                 shape[0] = 6;
-                std::vector<size_t> strides(1);
+                std::vector<std::size_t> strides(1);
                 strides[0] = 4;
                 andres::View<int> v(shape.begin(), shape.end(),
                     strides.begin(), datav_, andres::FirstMajorOrder);
@@ -7595,9 +7595,9 @@ void ViewTest::arithmeticOperatorsTest(){
                     datav_[j] = j;
                     dataw_[j] = j;
                 }
-                std::vector<size_t> shape(1);
+                std::vector<std::size_t> shape(1);
                 shape[0] = 6;
-                std::vector<size_t> strides(1);
+                std::vector<std::size_t> strides(1);
                 strides[0] = 4;
                 andres::View<int> v(shape.begin(), shape.end(),
                     strides.begin(), datav_, andres::FirstMajorOrder);
@@ -7622,14 +7622,14 @@ void ViewTest::arithmeticOperatorsTest(){
                     datav_[j] = 1;
                     dataw_[j] = 2;
                 }
-                std::vector<size_t> shape(1);
+                std::vector<std::size_t> shape(1);
                 shape[0] = 24;
                 andres::View<int> v(shape.begin(), shape.end(), datav_);
                 andres::View<int, true> w(shape.begin(), shape.end(), dataw_);
                 andres::View<int>& r = (v += w);
 
                 test(&r == &v);
-                for(int j=0; j<v.size(); ++j) {
+                for(std::size_t j=0; j<v.size(); ++j) {
                     test(v(j) == 3);
                 }
             }
@@ -7638,13 +7638,13 @@ void ViewTest::arithmeticOperatorsTest(){
                 for(int j=0; j<24; ++j) {
                     datav_[j] = 1;
                 }
-                std::vector<size_t> shape(1);
+                std::vector<std::size_t> shape(1);
                 shape[0] = 24;
                 andres::View<int> v(shape.begin(), shape.end(), datav_);
                 andres::View<int>& r = (v += v);
 
                 test(&r == &v);
-                for(int j=0; j<v.size(); ++j) {
+                for(std::size_t j=0; j<v.size(); ++j) {
                     test(v(j) == 2);
                 }
             }
@@ -7654,10 +7654,10 @@ void ViewTest::arithmeticOperatorsTest(){
                 for(int j=0; j<24; ++j) {
                     datav_[j] = 1;
                 }
-                std::vector<size_t> shape(2);
+                std::vector<std::size_t> shape(2);
                 shape[0] = 3;
                 shape[1] = 2;
-                std::vector<size_t> strides(2);
+                std::vector<std::size_t> strides(2);
                 strides[0] = 2;
                 strides[1] = 8;
                 andres::View<int> v(shape.begin(), shape.end(), 
@@ -7666,11 +7666,11 @@ void ViewTest::arithmeticOperatorsTest(){
 
                 test(&r == &v);
                 std::vector<bool> covered(24, false);
-                for(size_t x=0; x<shape[0]; ++x)
-                for(size_t y=0; y<shape[1]; ++y) {
+                for(std::size_t x=0; x<shape[0]; ++x)
+                for(std::size_t y=0; y<shape[1]; ++y) {
                     covered[x*strides[0]+y*strides[1]] = true;
                 }
-                for(size_t j=0; j<24; ++j) {
+                for(std::size_t j=0; j<24; ++j) {
                     if(covered[j]) {
                         test(datav_[j] == 3);
                     }
@@ -7727,7 +7727,7 @@ void ViewTest::arithmeticOperatorsTest(){
                 for(int j=0; j<24; ++j) {
                     datav_[j] = j;
                 }
-                std::vector<size_t> shape(3);
+                std::vector<std::size_t> shape(3);
                 shape[0] = 2;
                 shape[1] = 4;
                 shape[2] = 3;
@@ -7737,9 +7737,9 @@ void ViewTest::arithmeticOperatorsTest(){
 
                 test(m.size()==v.size() && m.dimension()==v.dimension()
                 );
-                for(size_t j=0; j<v.shape(0); ++j) {
-                    for(size_t k=0; k<v.shape(1); ++k) {
-                        for(size_t p=0; p<v.shape(2); ++p) {
+                for(std::size_t j=0; j<v.shape(0); ++j) {
+                    for(std::size_t k=0; k<v.shape(1); ++k) {
+                        for(std::size_t p=0; p<v.shape(2); ++p) {
                             test(m(j, k, p) == data_[ j + k*shape[0] + p*shape[0]*shape[1]] + 1);
                         }
                     }
@@ -7750,7 +7750,7 @@ void ViewTest::arithmeticOperatorsTest(){
                 for(int j=0; j<24; ++j) {
                     datav_[j] = float(j);
                 }
-                std::vector<size_t> shape(3);
+                std::vector<std::size_t> shape(3);
                 shape[0] = 2;
                 shape[1] = 4;
                 shape[2] = 3;
@@ -7760,9 +7760,9 @@ void ViewTest::arithmeticOperatorsTest(){
 
                 test(m.size()==v.size() && m.dimension()==v.dimension()
                 );
-                for(size_t j=0; j<v.shape(0); ++j) {
-                    for(size_t k=0; k<v.shape(1); ++k) {
-                        for(size_t p=0; p<v.shape(2); ++p) {
+                for(std::size_t j=0; j<v.shape(0); ++j) {
+                    for(std::size_t k=0; k<v.shape(1); ++k) {
+                        for(std::size_t p=0; p<v.shape(2); ++p) {
                             test(m(j, k, p) == data_[ j + k*shape[0] + p*shape[0]*shape[1]] + 1.0f);
                         }
                     }
@@ -7784,7 +7784,7 @@ void ViewTest::arithmeticOperatorsTest(){
                 for(int j=0; j<24; ++j) {
                     datav_[j] = j;
                 }
-                std::vector<size_t> shape(3);
+                std::vector<std::size_t> shape(3);
                 shape[0] = 2;
                 shape[1] = 4;
                 shape[2] = 3;
@@ -7794,9 +7794,9 @@ void ViewTest::arithmeticOperatorsTest(){
 
                 test(m.size()==v.size() && m.dimension()==v.dimension()
                 );
-                for(size_t j=0; j<v.shape(0); ++j) {
-                    for(size_t k=0; k<v.shape(1); ++k) {
-                        for(size_t p=0; p<v.shape(2); ++p) {
+                for(std::size_t j=0; j<v.shape(0); ++j) {
+                    for(std::size_t k=0; k<v.shape(1); ++k) {
+                        for(std::size_t p=0; p<v.shape(2); ++p) {
                             test(m(j, k, p) == data_[ j + k*shape[0] + p*shape[0]*shape[1]] + 1);
                         }
                     }
@@ -7807,7 +7807,7 @@ void ViewTest::arithmeticOperatorsTest(){
                 for(int j=0; j<24; ++j) {
                     datav_[j] = float(j);
                 }
-                std::vector<size_t> shape(3);
+                std::vector<std::size_t> shape(3);
                 shape[0] = 2;
                 shape[1] = 4;
                 shape[2] = 3;
@@ -7817,9 +7817,9 @@ void ViewTest::arithmeticOperatorsTest(){
 
                 test(m.size()==v.size() && m.dimension()==v.dimension()
                 );
-                for(size_t j=0; j<v.shape(0); ++j) {
-                    for(size_t k=0; k<v.shape(1); ++k) {
-                        for(size_t p=0; p<v.shape(2); ++p) {
+                for(std::size_t j=0; j<v.shape(0); ++j) {
+                    for(std::size_t k=0; k<v.shape(1); ++k) {
+                        for(std::size_t p=0; p<v.shape(2); ++p) {
                             test(m(j, k, p) == data_[ j + k*shape[0] + p*shape[0]*shape[1]] + 1.0f);
                         }
                     }
@@ -7833,7 +7833,7 @@ void ViewTest::arithmeticOperatorsTest(){
                     datav_[j] = 1;
                     dataw_[j] = 2;
                 }
-                std::vector<size_t> shape(3);
+                std::vector<std::size_t> shape(3);
                 shape[0] = 2;
                 shape[1] = 4;
                 shape[2] = 3;
@@ -7844,7 +7844,7 @@ void ViewTest::arithmeticOperatorsTest(){
 
                 test(m.size()==v.size() &&  m.dimension()==v.dimension()
                 );
-                for(size_t j=0; j<v.size(); ++j) {
+                for(std::size_t j=0; j<v.size(); ++j) {
                     test(m(j) == 3);
                 }
             }
@@ -7863,7 +7863,7 @@ void ViewTest::arithmeticOperatorsTest(){
                 for(int j=0; j<24; ++j) {
                     datav_[j] = 1;
                 }
-                std::vector<size_t> shape(3);
+                std::vector<std::size_t> shape(3);
                 shape[0] = 2;
                 shape[1] = 4;
                 shape[2] = 3;
@@ -7873,7 +7873,7 @@ void ViewTest::arithmeticOperatorsTest(){
 
                 test(m.size()==v.size() &&  m.dimension()==v.dimension()
                 );
-                for(size_t j=0; j<v.size(); ++j) {
+                for(std::size_t j=0; j<v.size(); ++j) {
                     test(m(j) == 2);
                 }
             }
@@ -7897,14 +7897,14 @@ void ViewTest::arithmeticOperatorsTest(){
             for(int j=0; j<24; ++j) {
                 datav_[j] = j;
             }
-            std::vector<size_t> shape(1);
+            std::vector<std::size_t> shape(1);
             shape[0] = 24;
             andres::View<int> v(shape.begin(), shape.end(), datav_);
             andres::View<int>& r = (++v);
 
             test(&r == &v
             );
-            for(size_t j=0; j<v.size(); ++j) {
+            for(std::size_t j=0; j<v.size(); ++j) {
                 test(v(j) == data_[j] + 1);
             }
         }
@@ -7919,30 +7919,30 @@ void ViewTest::arithmeticOperatorsTest(){
                 for(int j=0; j<24; ++j) {
                     datav_[j] = j;
                 }
-                std::vector<size_t> shape(1);
+                std::vector<std::size_t> shape(1);
                 shape[0] = 24;
                 andres::View<int> v(shape.begin(), shape.end(), datav_);
                 andres::View<int>& r = (v -= 1);
 
                 test(&r == &v
                 );
-                for(size_t j=0; j<v.size(); ++j) {
+                for(std::size_t j=0; j<v.size(); ++j) {
                     test(v(j) == data_[j] - 1);
                 }
             }
             {   
                 float datav_[24];
-                for(size_t j=0; j<24; ++j) {
+                for(std::size_t j=0; j<24; ++j) {
                     datav_[j] = float(j);
                 }
-                std::vector<size_t> shape(1);
+                std::vector<std::size_t> shape(1);
                 shape[0] = 24;
                 andres::View<float> v(shape.begin(), shape.end(), datav_);
                 andres::View<float>& r = (v -= 1.0f);
 
                 test(&r == &v
                 );
-                for(size_t j=0; j<v.size(); ++j) {
+                for(std::size_t j=0; j<v.size(); ++j) {
                     test(v(j) == data_[j] - 1.0f);
                 }
             }
@@ -7960,10 +7960,10 @@ void ViewTest::arithmeticOperatorsTest(){
             // v is not a scalar and w is a scalar 
             {
                 float datav_[24];
-                for(size_t j=0; j<24; ++j) {
+                for(std::size_t j=0; j<24; ++j) {
                     datav_[j] = float(j);
                 }
-                std::vector<size_t> shape(1);
+                std::vector<std::size_t> shape(1);
                 shape[0] = 24;
                 andres::View<float> v(shape.begin(), shape.end(), datav_);
                 float scalarw = 4711.0f;
@@ -7971,7 +7971,7 @@ void ViewTest::arithmeticOperatorsTest(){
 
                 andres::View<float>& r = (v -= w);
                 test(&r == &v);
-                for(size_t j=0; j<v.size(); ++j) {
+                for(std::size_t j=0; j<v.size(); ++j) {
                     test(v(j) == float(j) - scalarw);
                 }
             }
@@ -7983,9 +7983,9 @@ void ViewTest::arithmeticOperatorsTest(){
                     datav_[j] = 1;
                     dataw_[j] = j;
                 }
-                std::vector<size_t> shape(1);
+                std::vector<std::size_t> shape(1);
                 shape[0] = 6;
-                std::vector<size_t> strides(1);
+                std::vector<std::size_t> strides(1);
                 strides[0] = 4;
                 andres::View<int> v(shape.begin(), shape.end(), datav_, andres::LastMajorOrder);
                 andres::View<int, true> w(shape.begin(), shape.end(),
@@ -8009,9 +8009,9 @@ void ViewTest::arithmeticOperatorsTest(){
                     datav_[j] = j;
                     dataw_[j] = 1;
                 }
-                std::vector<size_t> shape(1);
+                std::vector<std::size_t> shape(1);
                 shape[0] = 6;
-                std::vector<size_t> strides(1);
+                std::vector<std::size_t> strides(1);
                 strides[0] = 4;
                 andres::View<int> v(shape.begin(), shape.end(),
                     strides.begin(), datav_, andres::FirstMajorOrder);
@@ -8035,9 +8035,9 @@ void ViewTest::arithmeticOperatorsTest(){
                     datav_[j] = j;
                     dataw_[j] = j;
                 }
-                std::vector<size_t> shape(1);
+                std::vector<std::size_t> shape(1);
                 shape[0] = 6;
-                std::vector<size_t> strides(1);
+                std::vector<std::size_t> strides(1);
                 strides[0] = 4;
                 andres::View<int> v(shape.begin(), shape.end(),
                     strides.begin(), datav_, andres::FirstMajorOrder);
@@ -8062,30 +8062,30 @@ void ViewTest::arithmeticOperatorsTest(){
                     datav_[j] = 1;
                     dataw_[j] = 2;
                 }
-                std::vector<size_t> shape(1);
+                std::vector<std::size_t> shape(1);
                 shape[0] = 24;
                 andres::View<int> v(shape.begin(), shape.end(), datav_);
                 andres::View<int, true> w(shape.begin(), shape.end(), dataw_);
                 andres::View<int>& r = (v -= w);
 
                 test(&r == &v);
-                for(size_t j=0; j<v.size(); ++j) {
+                for(std::size_t j=0; j<v.size(); ++j) {
                     test(v(j) == -1);
                 }
             }
             {   
                 int datav_[24];
-                for(size_t j=0; j<24; ++j) {
+                for(std::size_t j=0; j<24; ++j) {
                     datav_[j] = 1;
                 }
-                std::vector<size_t> shape(1);
+                std::vector<std::size_t> shape(1);
                 shape[0] = 24;
                 andres::View<int> v(shape.begin(), shape.end(), datav_);
                 andres::View<int>& r = (v -= v);
 
                 test(&r == &v
                 );
-                for(size_t j=0; j<v.size(); ++j) {
+                for(std::size_t j=0; j<v.size(); ++j) {
                     test(v(j) == 0);
                 }
             }
@@ -8109,14 +8109,14 @@ void ViewTest::arithmeticOperatorsTest(){
             for(int j=0; j<24; ++j) {
                 datav_[j] = j;
             }
-            std::vector<size_t> shape(1);
+            std::vector<std::size_t> shape(1);
             shape[0] = 24;
             andres::View<int> v(shape.begin(), shape.end(), datav_);
             andres::View<int>& r = (--v);
 
             test(&r == &v
             );
-            for(size_t j=0; j<v.size(); ++j) {
+            for(std::size_t j=0; j<v.size(); ++j) {
                 test(v(j) == data_[j] - 1);
             }
         }
@@ -8139,7 +8139,7 @@ void ViewTest::arithmeticOperatorsTest(){
             for(int j=0; j<24; ++j) {
                 datav_[j] = j;
             }
-            std::vector<size_t> shape(3);
+            std::vector<std::size_t> shape(3);
             shape[0] = 2;
             shape[1] = 4;
             shape[2] = 3;
@@ -8148,9 +8148,9 @@ void ViewTest::arithmeticOperatorsTest(){
             m = -v;
 
             test(m.size()==v.size() && m.dimension()==v.dimension());
-            for(size_t j=0; j<v.shape(0); ++j) {
-                for(size_t k=0; k<v.shape(1); ++k) {
-                    for(size_t p=0; p<v.shape(2); ++p) {
+            for(std::size_t j=0; j<v.shape(0); ++j) {
+                for(std::size_t k=0; k<v.shape(1); ++k) {
+                    for(std::size_t p=0; p<v.shape(2); ++p) {
                         test(m(j, k, p) == -data_[j + k*shape[0] + p*shape[0]*shape[1]]);
                     }
                 }
@@ -8200,7 +8200,7 @@ void ViewTest::arithmeticOperatorsTest(){
                 for(int j=0; j<24; ++j) {
                     datav_[j] = j;
                 }
-                std::vector<size_t> shape(3);
+                std::vector<std::size_t> shape(3);
                 shape[0] = 2;
                 shape[1] = 4;
                 shape[2] = 3;
@@ -8210,9 +8210,9 @@ void ViewTest::arithmeticOperatorsTest(){
 
                 test(m.size()==v.size() && m.dimension()==v.dimension()
                 );
-                for(size_t j=0; j<v.shape(0); ++j) {
-                    for(size_t k=0; k<v.shape(1); ++k) {
-                        for(size_t p=0; p<v.shape(2); ++p) {
+                for(std::size_t j=0; j<v.shape(0); ++j) {
+                    for(std::size_t k=0; k<v.shape(1); ++k) {
+                        for(std::size_t p=0; p<v.shape(2); ++p) {
                             test(m(j, k, p) == data_[ j + k*shape[0] + p*shape[0]*shape[1]] - 1);
                         }
                     }
@@ -8220,10 +8220,10 @@ void ViewTest::arithmeticOperatorsTest(){
             }
             {
                 float datav_[24];
-                for(size_t j=0; j<24; ++j) {
+                for(std::size_t j=0; j<24; ++j) {
                     datav_[j] = float(j);
                 }
-                std::vector<size_t> shape(3);
+                std::vector<std::size_t> shape(3);
                 shape[0] = 2;
                 shape[1] = 4;
                 shape[2] = 3;
@@ -8233,9 +8233,9 @@ void ViewTest::arithmeticOperatorsTest(){
 
                 test(m.size()==v.size() && m.dimension()==v.dimension()
                 );
-                for(size_t j=0; j<v.shape(0); ++j) {
-                    for(size_t k=0; k<v.shape(1); ++k) {
-                        for(size_t p=0; p<v.shape(2); ++p) {
+                for(std::size_t j=0; j<v.shape(0); ++j) {
+                    for(std::size_t k=0; k<v.shape(1); ++k) {
+                        for(std::size_t p=0; p<v.shape(2); ++p) {
                             test(m(j, k, p) == data_[ j + k*shape[0] + p*shape[0]*shape[1]] - 1.0f);
                         }
                     }
@@ -8257,7 +8257,7 @@ void ViewTest::arithmeticOperatorsTest(){
                 for(int j=0; j<24; ++j) {
                     datav_[j] = j;
                 }
-                std::vector<size_t> shape(3);
+                std::vector<std::size_t> shape(3);
                 shape[0] = 2;
                 shape[1] = 4;
                 shape[2] = 3;
@@ -8266,9 +8266,9 @@ void ViewTest::arithmeticOperatorsTest(){
 
                 test(m.size()==v.size() && m.dimension()==v.dimension()
                 );
-                for(size_t j=0; j<v.shape(0); ++j) {
-                    for(size_t k=0; k<v.shape(1); ++k) {
-                        for(size_t p=0; p<v.shape(2); ++p) {
+                for(std::size_t j=0; j<v.shape(0); ++j) {
+                    for(std::size_t k=0; k<v.shape(1); ++k) {
+                        for(std::size_t p=0; p<v.shape(2); ++p) {
                             test(m(j, k, p) == 1 - data_[ j + k*shape[0] + p*shape[0]*shape[1]]);
                         }
                     }
@@ -8276,10 +8276,10 @@ void ViewTest::arithmeticOperatorsTest(){
             }
             {
                 float datav_[24];
-                for(size_t j=0; j<24; ++j) {
+                for(std::size_t j=0; j<24; ++j) {
                     datav_[j] = float(j);
                 }
-                std::vector<size_t> shape(3);
+                std::vector<std::size_t> shape(3);
                 shape[0] = 2;
                 shape[1] = 4;
                 shape[2] = 3;
@@ -8288,9 +8288,9 @@ void ViewTest::arithmeticOperatorsTest(){
 
                 test(m.size()==v.size() && m.dimension()==v.dimension()
                 );
-                for(size_t j=0; j<v.shape(0); ++j) {
-                    for(size_t k=0; k<v.shape(1); ++k) {
-                        for(size_t p=0; p<v.shape(2); ++p) {
+                for(std::size_t j=0; j<v.shape(0); ++j) {
+                    for(std::size_t k=0; k<v.shape(1); ++k) {
+                        for(std::size_t p=0; p<v.shape(2); ++p) {
                             test(m(j, k, p) == 1.0f - data_[ j + k*shape[0] + p*shape[0]*shape[1]]);
                         }
                     }
@@ -8300,11 +8300,11 @@ void ViewTest::arithmeticOperatorsTest(){
             {
                 int datav_[24];
                 int dataw_[24];
-                for(size_t j=0; j<24; ++j) {
+                for(std::size_t j=0; j<24; ++j) {
                     datav_[j] = 1;
                     dataw_[j] = 2;
                 }
-                std::vector<size_t> shape(3);
+                std::vector<std::size_t> shape(3);
                 shape[0] = 2;
                 shape[1] = 4;
                 shape[2] = 3;
@@ -8314,7 +8314,7 @@ void ViewTest::arithmeticOperatorsTest(){
 
                 test(m.size()==v.size() &&  m.dimension()==v.dimension()
                 );
-                for(size_t j=0; j<v.size(); ++j) {
+                for(std::size_t j=0; j<v.size(); ++j) {
                     test(m(j) == -1);
                 }
             }
@@ -8330,10 +8330,10 @@ void ViewTest::arithmeticOperatorsTest(){
             }
             {
                 int datav_[24];
-                for(size_t j=0; j<24; ++j) {
+                for(std::size_t j=0; j<24; ++j) {
                     datav_[j] = 1;
                 }
-                std::vector<size_t> shape(3);
+                std::vector<std::size_t> shape(3);
                 shape[0] = 2;
                 shape[1] = 4;
                 shape[2] = 3;
@@ -8342,7 +8342,7 @@ void ViewTest::arithmeticOperatorsTest(){
 
                 test(m.size()==v.size() &&  m.dimension()==v.dimension()
                 );
-                for(size_t j=0; j<v.size(); ++j) {
+                for(std::size_t j=0; j<v.size(); ++j) {
                     test(m(j) == 0);
                 }
             }
@@ -8358,30 +8358,30 @@ void ViewTest::arithmeticOperatorsTest(){
                 for(int j=0; j<24; ++j) {
                     datav_[j] = j;
                 }
-                std::vector<size_t> shape(1);
+                std::vector<std::size_t> shape(1);
                 shape[0] = 24;
                 andres::View<int> v(shape.begin(), shape.end(), datav_);
                 andres::View<int>& r = (v *= 2);
 
                 test(&r == &v
                 );
-                for(size_t j=0; j<v.size(); ++j) {
+                for(std::size_t j=0; j<v.size(); ++j) {
                     test(v(j) == data_[j] * 2);
                 }
             }
             {   
                 float datav_[24];
-                for(size_t j=0; j<24; ++j) {
+                for(std::size_t j=0; j<24; ++j) {
                     datav_[j] = float(j);
                 }
-                std::vector<size_t> shape(1);
+                std::vector<std::size_t> shape(1);
                 shape[0] = 24;
                 andres::View<float> v(shape.begin(), shape.end(), datav_);
                 andres::View<float>& r = (v *= 2.0f);
 
                 test(&r == &v
                 );
-                for(size_t j=0; j<v.size(); ++j) {
+                for(std::size_t j=0; j<v.size(); ++j) {
                     test(v(j) == data_[j] * 2.0f);
                 }
             }
@@ -8399,10 +8399,10 @@ void ViewTest::arithmeticOperatorsTest(){
             // v is not a scalar and w is a scalar 
             {
                 float datav_[24];
-                for(size_t j=0; j<24; ++j) {
+                for(std::size_t j=0; j<24; ++j) {
                     datav_[j] = float(j);
                 }
-                std::vector<size_t> shape(1);
+                std::vector<std::size_t> shape(1);
                 shape[0] = 24;
                 andres::View<float> v(shape.begin(), shape.end(), datav_);
                 float scalarw = 4711.0f;
@@ -8410,7 +8410,7 @@ void ViewTest::arithmeticOperatorsTest(){
 
                 andres::View<float>& r = (v *= w);
                 test(&r == &v);
-                for(size_t j=0; j<v.size(); ++j) {
+                for(std::size_t j=0; j<v.size(); ++j) {
                     test(v(j) == float(j) * scalarw);
                 }
             }
@@ -8422,9 +8422,9 @@ void ViewTest::arithmeticOperatorsTest(){
                     datav_[j] = 1;
                     dataw_[j] = j;
                 }
-                std::vector<size_t> shape(1);
+                std::vector<std::size_t> shape(1);
                 shape[0] = 6;
-                std::vector<size_t> strides(1);
+                std::vector<std::size_t> strides(1);
                 strides[0] = 4;
                 andres::View<int> v(shape.begin(), shape.end(), datav_, andres::LastMajorOrder);
                 andres::View<int, true> w(shape.begin(), shape.end(),
@@ -8448,9 +8448,9 @@ void ViewTest::arithmeticOperatorsTest(){
                     datav_[j] = j;
                     dataw_[j] = 1;
                 }
-                std::vector<size_t> shape(1);
+                std::vector<std::size_t> shape(1);
                 shape[0] = 6;
-                std::vector<size_t> strides(1);
+                std::vector<std::size_t> strides(1);
                 strides[0] = 4;
                 andres::View<int> v(shape.begin(), shape.end(),
                     strides.begin(), datav_, andres::FirstMajorOrder);
@@ -8474,9 +8474,9 @@ void ViewTest::arithmeticOperatorsTest(){
                     datav_[j] = j;
                     dataw_[j] = j;
                 }
-                std::vector<size_t> shape(1);
+                std::vector<std::size_t> shape(1);
                 shape[0] = 6;
-                std::vector<size_t> strides(1);
+                std::vector<std::size_t> strides(1);
                 strides[0] = 4;
                 andres::View<int> v(shape.begin(), shape.end(),
                     strides.begin(), datav_, andres::FirstMajorOrder);
@@ -8497,34 +8497,34 @@ void ViewTest::arithmeticOperatorsTest(){
             {   
                 int datav_[24];
                 int dataw_[24];
-                for(size_t j=0; j<24; ++j) {
+                for(std::size_t j=0; j<24; ++j) {
                     datav_[j] = 1;
                     dataw_[j] = 2;
                 }
-                std::vector<size_t> shape(1);
+                std::vector<std::size_t> shape(1);
                 shape[0] = 24;
                 andres::View<int> v(shape.begin(), shape.end(), datav_);
                 andres::View<int, true> w(shape.begin(), shape.end(), dataw_);
                 andres::View<int>& r = (v *= w);
 
                 test(&r == &v);
-                for(size_t j=0; j<v.size(); ++j) {
+                for(std::size_t j=0; j<v.size(); ++j) {
                     test(v(j) == 2);
                 }
             }
             {   
                 int datav_[24];
-                for(size_t j=0; j<24; ++j) {
+                for(std::size_t j=0; j<24; ++j) {
                     datav_[j] = 2;
                 }
-                std::vector<size_t> shape(1);
+                std::vector<std::size_t> shape(1);
                 shape[0] = 24;
                 andres::View<int> v(shape.begin(), shape.end(), datav_);
                 andres::View<int>& r = (v *= v);
 
                 test(&r == &v
                 );
-                for(size_t j=0; j<v.size(); ++j) {
+                for(std::size_t j=0; j<v.size(); ++j) {
                     test(v(j) == 4);
                 }
             }
@@ -8575,7 +8575,7 @@ void ViewTest::arithmeticOperatorsTest(){
                 for(int j=0; j<24; ++j) {
                     datav_[j] = j;
                 }
-                std::vector<size_t> shape(3);
+                std::vector<std::size_t> shape(3);
                 shape[0] = 2;
                 shape[1] = 4;
                 shape[2] = 3;
@@ -8584,9 +8584,9 @@ void ViewTest::arithmeticOperatorsTest(){
 
                 test(m.size()==v.size() && m.dimension()==v.dimension()
                 );
-                for(size_t j=0; j<v.shape(0); ++j) {
-                    for(size_t k=0; k<v.shape(1); ++k) {
-                        for(size_t p=0; p<v.shape(2); ++p) {
+                for(std::size_t j=0; j<v.shape(0); ++j) {
+                    for(std::size_t k=0; k<v.shape(1); ++k) {
+                        for(std::size_t p=0; p<v.shape(2); ++p) {
                             test(m(j, k, p) == data_[ j + k*shape[0] + p*shape[0]*shape[1]] * 2);
                         }
                     }
@@ -8594,10 +8594,10 @@ void ViewTest::arithmeticOperatorsTest(){
             }
             {
                 float datav_[24];
-                for(size_t j=0; j<24; ++j) {
+                for(std::size_t j=0; j<24; ++j) {
                     datav_[j] = float(j);
                 }
-                std::vector<size_t> shape(3);
+                std::vector<std::size_t> shape(3);
                 shape[0] = 2;
                 shape[1] = 4;
                 shape[2] = 3;
@@ -8606,9 +8606,9 @@ void ViewTest::arithmeticOperatorsTest(){
 
                 test(m.size()==v.size() && m.dimension()==v.dimension()
                 );
-                for(size_t j=0; j<v.shape(0); ++j) {
-                    for(size_t k=0; k<v.shape(1); ++k) {
-                        for(size_t p=0; p<v.shape(2); ++p) {
+                for(std::size_t j=0; j<v.shape(0); ++j) {
+                    for(std::size_t k=0; k<v.shape(1); ++k) {
+                        for(std::size_t p=0; p<v.shape(2); ++p) {
                             test(m(j, k, p) == data_[ j + k*shape[0] + p*shape[0]*shape[1]] * 2.0f);
                         }
                     }
@@ -8630,7 +8630,7 @@ void ViewTest::arithmeticOperatorsTest(){
                 for(int j=0; j<24; ++j) {
                     datav_[j] = j;
                 }
-                std::vector<size_t> shape(3);
+                std::vector<std::size_t> shape(3);
                 shape[0] = 2;
                 shape[1] = 4;
                 shape[2] = 3;
@@ -8639,9 +8639,9 @@ void ViewTest::arithmeticOperatorsTest(){
 
                 test(m.size()==v.size() && m.dimension()==v.dimension()
                 );
-                for(size_t j=0; j<v.shape(0); ++j) {
-                    for(size_t k=0; k<v.shape(1); ++k) {
-                        for(size_t p=0; p<v.shape(2); ++p) {
+                for(std::size_t j=0; j<v.shape(0); ++j) {
+                    for(std::size_t k=0; k<v.shape(1); ++k) {
+                        for(std::size_t p=0; p<v.shape(2); ++p) {
                             test(m(j, k, p) == data_[ j + k*shape[0] + p*shape[0]*shape[1]] * 2);
                         }
                     }
@@ -8649,10 +8649,10 @@ void ViewTest::arithmeticOperatorsTest(){
             }
             {
                 float datav_[24];
-                for(size_t j=0; j<24; ++j) {
+                for(std::size_t j=0; j<24; ++j) {
                     datav_[j] = float(j);
                 }
-                std::vector<size_t> shape(3);
+                std::vector<std::size_t> shape(3);
                 shape[0] = 2;
                 shape[1] = 4;
                 shape[2] = 3;
@@ -8661,9 +8661,9 @@ void ViewTest::arithmeticOperatorsTest(){
 
                 test(m.size()==v.size() && m.dimension()==v.dimension()
                 );
-                for(size_t j=0; j<v.shape(0); ++j) {
-                    for(size_t k=0; k<v.shape(1); ++k) {
-                        for(size_t p=0; p<v.shape(2); ++p) {
+                for(std::size_t j=0; j<v.shape(0); ++j) {
+                    for(std::size_t k=0; k<v.shape(1); ++k) {
+                        for(std::size_t p=0; p<v.shape(2); ++p) {
                             test(m(j, k, p) == data_[ j + k*shape[0] + p*shape[0]*shape[1]] * 2.0f);
                         }
                     }
@@ -8673,11 +8673,11 @@ void ViewTest::arithmeticOperatorsTest(){
             {
                 int datav_[24];
                 int dataw_[24];
-                for(size_t j=0; j<24; ++j) {
+                for(std::size_t j=0; j<24; ++j) {
                     datav_[j] = 1;
                     dataw_[j] = 2;
                 }
-                std::vector<size_t> shape(3);
+                std::vector<std::size_t> shape(3);
                 shape[0] = 2;
                 shape[1] = 4;
                 shape[2] = 3;
@@ -8687,7 +8687,7 @@ void ViewTest::arithmeticOperatorsTest(){
 
                 test(m.size()==v.size() &&  m.dimension()==v.dimension()
                 );
-                for(size_t j=0; j<v.size(); ++j) {
+                for(std::size_t j=0; j<v.size(); ++j) {
                     test(m(j) == 2);
                 }
             }
@@ -8703,10 +8703,10 @@ void ViewTest::arithmeticOperatorsTest(){
             }
             {
                 int datav_[24];
-                for(size_t j=0; j<24; ++j) {
+                for(std::size_t j=0; j<24; ++j) {
                     datav_[j] = 2;
                 }
-                std::vector<size_t> shape(3);
+                std::vector<std::size_t> shape(3);
                 shape[0] = 2;
                 shape[1] = 4;
                 shape[2] = 3;
@@ -8715,7 +8715,7 @@ void ViewTest::arithmeticOperatorsTest(){
 
                 test(m.size()==v.size() &&  m.dimension()==v.dimension()
                 );
-                for(size_t j=0; j<v.size(); ++j) {
+                for(std::size_t j=0; j<v.size(); ++j) {
                     test(m(j) == 4);
                 }
             }
@@ -8729,18 +8729,18 @@ void ViewTest::arithmeticOperatorsTest(){
             {   
                 float datav_[24];
                 float dataw_[24];
-                for(size_t j=0; j<24; ++j) {
+                for(std::size_t j=0; j<24; ++j) {
                     datav_[j] = float(j);
                     dataw_[j] = float(j);
                 }
-                std::vector<size_t> shape(1);
+                std::vector<std::size_t> shape(1);
                 shape[0] = 24;
                 andres::View<float> v(shape.begin(), shape.end(), datav_);
                 andres::View<float>& r = (v /= 2.0f);
                 
                 test(&r == &v
                 );
-                for(size_t j=0; j<v.size(); ++j) {
+                for(std::size_t j=0; j<v.size(); ++j) {
                     test(r(j) == dataw_[j] / 2.0f);
                 }
             }
@@ -8759,10 +8759,10 @@ void ViewTest::arithmeticOperatorsTest(){
             // v is not a scalar and w is a scalar 
             {
                 float datav_[24];
-                for(size_t j=0; j<24; ++j) {
+                for(std::size_t j=0; j<24; ++j) {
                     datav_[j] = float(j);
                 }
-                std::vector<size_t> shape(1);
+                std::vector<std::size_t> shape(1);
                 shape[0] = 24;
                 andres::View<float> v(shape.begin(), shape.end(), datav_);
                 float scalarw = 2.0f;
@@ -8770,7 +8770,7 @@ void ViewTest::arithmeticOperatorsTest(){
 
                 andres::View<float>& r = (v /= w);
                 test(&r == &v);
-                for(size_t j=0; j<v.size(); ++j) {
+                for(std::size_t j=0; j<v.size(); ++j) {
                     test(v(j) == float(j) / scalarw);
                 }
             }
@@ -8778,13 +8778,13 @@ void ViewTest::arithmeticOperatorsTest(){
             {
                 float datav_[25];
                 float dataw_[25];
-                for(size_t j=0; j<25; ++j) {
+                for(std::size_t j=0; j<25; ++j) {
                     datav_[j] = 1;
                     dataw_[j] = static_cast<float>(j);
                 }
-                std::vector<size_t> shape(1);
+                std::vector<std::size_t> shape(1);
                 shape[0] = 6;
-                std::vector<size_t> strides(1);
+                std::vector<std::size_t> strides(1);
                 strides[0] = 4;
                 andres::View<float> v(shape.begin(), shape.end(), datav_, andres::LastMajorOrder);
                 andres::View<float, true> w(shape.begin(), shape.end(),
@@ -8804,13 +8804,13 @@ void ViewTest::arithmeticOperatorsTest(){
             {
                 float datav_[25];
                 float dataw_[25];
-                for(size_t j=0; j<25; ++j) {
+                for(std::size_t j=0; j<25; ++j) {
                     datav_[j] = static_cast<float>(j);
                     dataw_[j] = 1;
                 }
-                std::vector<size_t> shape(1);
+                std::vector<std::size_t> shape(1);
                 shape[0] = 6;
-                std::vector<size_t> strides(1);
+                std::vector<std::size_t> strides(1);
                 strides[0] = 4;
                 andres::View<float> v(shape.begin(), shape.end(),
                     strides.begin(), datav_+1, andres::FirstMajorOrder);
@@ -8830,13 +8830,13 @@ void ViewTest::arithmeticOperatorsTest(){
             {
                 float datav_[25];
                 float dataw_[25];
-                for(size_t j=0; j<24; ++j) {
+                for(std::size_t j=0; j<24; ++j) {
                     datav_[j] = static_cast<float>(j);
                     dataw_[j] = static_cast<float>(j);
                 }
-                std::vector<size_t> shape(1);
+                std::vector<std::size_t> shape(1);
                 shape[0] = 6;
-                std::vector<size_t> strides(1);
+                std::vector<std::size_t> strides(1);
                 strides[0] = 4;
                 andres::View<float> v(shape.begin(), shape.end(),
                     strides.begin(), datav_+1, andres::FirstMajorOrder);
@@ -8855,34 +8855,34 @@ void ViewTest::arithmeticOperatorsTest(){
             {   
                 int datav_[24];
                 int dataw_[24];
-                for(size_t j=0; j<24; ++j) {
+                for(std::size_t j=0; j<24; ++j) {
                     datav_[j] = 4;
                     dataw_[j] = 2;
                 }
-                std::vector<size_t> shape(1);
+                std::vector<std::size_t> shape(1);
                 shape[0] = 24;
                 andres::View<int> v(shape.begin(), shape.end(), datav_);
                 andres::View<int, true> w(shape.begin(), shape.end(), dataw_);
                 andres::View<int>& r = (v /= w);
 
                 test(&r == &v);
-                for(size_t j=0; j<v.size(); ++j) {
+                for(std::size_t j=0; j<v.size(); ++j) {
                     test(v(j) == 2);
                 }
             }
             {   
                 int datav_[24];
-                for(size_t j=0; j<24; ++j) {
+                for(std::size_t j=0; j<24; ++j) {
                     datav_[j] = 4;
                 }
-                std::vector<size_t> shape(1);
+                std::vector<std::size_t> shape(1);
                 shape[0] = 24;
                 andres::View<int> v(shape.begin(), shape.end(), datav_);
                 andres::View<int>& r = (v /= v);
 
                 test(&r == &v
                 );
-                for(size_t j=0; j<v.size(); ++j) {
+                for(std::size_t j=0; j<v.size(); ++j) {
                     test(v(j) == 1);
                 }
             }
@@ -8929,11 +8929,11 @@ void ViewTest::arithmeticOperatorsTest(){
             {
                 float datav_[24];
                 float dataf_[24];
-                for(size_t j=0; j<24; ++j) {
+                for(std::size_t j=0; j<24; ++j) {
                     datav_[j] = float(j);
                     dataf_[j] = float(j);
                 }
-                std::vector<size_t> shape(3);
+                std::vector<std::size_t> shape(3);
                 shape[0] = 2;
                 shape[1] = 4;
                 shape[2] = 3;
@@ -8942,9 +8942,9 @@ void ViewTest::arithmeticOperatorsTest(){
 
                 test(m.size()==v.size() && m.dimension()==v.dimension()
                 );
-                for(size_t j=0; j<v.shape(0); ++j) {
-                    for(size_t k=0; k<v.shape(1); ++k) {
-                        for(size_t p=0; p<v.shape(2); ++p) {
+                for(std::size_t j=0; j<v.shape(0); ++j) {
+                    for(std::size_t k=0; k<v.shape(1); ++k) {
+                        for(std::size_t p=0; p<v.shape(2); ++p) {
                             test(m(j, k, p) == dataf_[ j + k*shape[0] + p*shape[0]*shape[1]] / 2);
                         }
                     }
@@ -8964,11 +8964,11 @@ void ViewTest::arithmeticOperatorsTest(){
             {
                 float datav_[24];
                 float dataf_[24];
-                for(size_t j=0; j<24; ++j) {
+                for(std::size_t j=0; j<24; ++j) {
                     datav_[j] = 4.0f;
                     dataf_[j] = 4.0f;
                 }
-                std::vector<size_t> shape(3);
+                std::vector<std::size_t> shape(3);
                 shape[0] = 2;
                 shape[1] = 4;
                 shape[2] = 3;
@@ -8977,9 +8977,9 @@ void ViewTest::arithmeticOperatorsTest(){
 
                 test(m.size()==v.size() && m.dimension()==v.dimension()
                 );
-                for(size_t j=0; j<v.shape(0); ++j) {
-                    for(size_t k=0; k<v.shape(1); ++k) {
-                        for(size_t p=0; p<v.shape(2); ++p) {
+                for(std::size_t j=0; j<v.shape(0); ++j) {
+                    for(std::size_t k=0; k<v.shape(1); ++k) {
+                        for(std::size_t p=0; p<v.shape(2); ++p) {
                             test(m(j, k, p) == 2.0f / dataf_[ j + k*shape[0] + p*shape[0]*shape[1]]);
                         }
                     }
@@ -8989,11 +8989,11 @@ void ViewTest::arithmeticOperatorsTest(){
             {
                 int datav_[24];
                 int dataw_[24];
-                for(size_t j=0; j<24; ++j) {
+                for(std::size_t j=0; j<24; ++j) {
                     datav_[j] = 4;
                     dataw_[j] = 2;
                 }
-                std::vector<size_t> shape(3);
+                std::vector<std::size_t> shape(3);
                 shape[0] = 2;
                 shape[1] = 4;
                 shape[2] = 3;
@@ -9003,7 +9003,7 @@ void ViewTest::arithmeticOperatorsTest(){
 
                 test(m.size()==v.size() &&  m.dimension()==v.dimension()
                 );
-                for(size_t j=0; j<v.size(); ++j) {
+                for(std::size_t j=0; j<v.size(); ++j) {
                     test(m(j) == 2);
                 }
             }
@@ -9019,10 +9019,10 @@ void ViewTest::arithmeticOperatorsTest(){
             }
             {
                 int datav_[24];
-                for(size_t j=0; j<24; ++j) {
+                for(std::size_t j=0; j<24; ++j) {
                     datav_[j] = 4;
                 }
-                std::vector<size_t> shape(3);
+                std::vector<std::size_t> shape(3);
                 shape[0] = 2;
                 shape[1] = 4;
                 shape[2] = 3;
@@ -9031,7 +9031,7 @@ void ViewTest::arithmeticOperatorsTest(){
 
                 test(m.size()==v.size() &&  m.dimension()==v.dimension()
                 );
-                for(size_t j=0; j<v.size(); ++j) {
+                for(std::size_t j=0; j<v.size(); ++j) {
                     test(m(j) == 1);
                 }
             }
@@ -9043,7 +9043,7 @@ template<bool constTarget>
 void ViewTest::asStringTest()
 {
     {
-        size_t shape[3] = {3, 2, 4};
+        std::size_t shape[3] = {3, 2, 4};
 
         andres::View<int, constTarget> v(&shape[0], &shape[3], data_);
         std::stringstream s;
@@ -9059,14 +9059,14 @@ void ViewTest::asStringTest()
 void ViewTest::reshapeTest()
 {
     float data[24];
-    for(size_t j=0; j<24; ++j) {
+    for(std::size_t j=0; j<24; ++j) {
         data[j] = static_cast<float>(j);
     }
-    size_t shape[] = {2, 4, 3};
+    std::size_t shape[] = {2, 4, 3};
     andres::View<float, false> v(&shape[0], &shape[3], data);
     andres::View<float, false> w = v; // copy
     
-    size_t newShape[] = {4, 6};
+    std::size_t newShape[] = {4, 6};
     v.reshape(&newShape[0], &newShape[2]);
 
     test(v.dimension() == 2);
@@ -9075,15 +9075,15 @@ void ViewTest::reshapeTest()
     test(v.shape(1) == 6);
     test(v.isSimple());
     test(&v(0) == &w(0));
-    for(size_t j=0; j<v.size(); ++j) {
+    for(std::size_t j=0; j<v.size(); ++j) {
         test(v(j) == w(j));
     }
 
     if(!andres::MARRAY_NO_DEBUG) {
         // negative test
-        size_t base[] = {0, 1, 1};
-        size_t shape[] = {2, 3, 2};
-        size_t newShape[] = {3, 4};
+        std::size_t base[] = {0, 1, 1};
+        std::size_t shape[] = {2, 3, 2};
+        std::size_t newShape[] = {3, 4};
         andres::View<float, false> x = v.view(base, shape);
         try {
             x.reshape(&newShape[0], &newShape[2]);
@@ -9096,10 +9096,10 @@ void ViewTest::reshapeTest()
 void ViewTest::overlapTreatmentTest()
 {
     {
-        size_t shape[] = {3, 3};
+        std::size_t shape[] = {3, 3};
         andres::Marray<int> m(shape, shape + 2, 0);
         m(0, 0) = 1; m(0, 1) = 2; m(1, 0) = 3; m(1, 1) = 4;
-        size_t base[] = {0, 0};
+        std::size_t base[] = {0, 0};
         shape[0] = 2;
         shape[1] = 2;
         andres::View<int> v = m.view(base, shape);
@@ -9112,11 +9112,11 @@ void ViewTest::overlapTreatmentTest()
         test(w(0, 0) == 1 && w(0, 1) == 2 && w(1, 0) == 3 && w(1, 1) == 4);
     }
     {
-        size_t shape[] = {3, 3};
+        std::size_t shape[] = {3, 3};
         andres::Marray<int> m(shape, shape + 2, 0);
         m(0, 0) = 1; m(0, 1) = 2; m(1, 0) = 3; m(1, 1) = 4;
         andres::Marray<int> n = m;
-        size_t base[] = {0, 0};
+        std::size_t base[] = {0, 0};
         shape[0] = 2;
         shape[1] = 2;
         andres::View<int> v = m.view(base, shape);
@@ -9132,11 +9132,11 @@ void ViewTest::overlapTreatmentTest()
                && w(1, 1) == n(2, 2)+n(1, 1) );
     }
     {
-        size_t shape[] = {3, 3};
+        std::size_t shape[] = {3, 3};
         andres::Marray<int> m(shape, shape + 2, 0);
         m(0, 0) = 1; m(0, 1) = 2; m(1, 0) = 3; m(1, 1) = 4;
         andres::Marray<int> n = m;
-        size_t base[] = {0, 0};
+        std::size_t base[] = {0, 0};
         shape[0] = 2;
         shape[1] = 2;
         andres::View<int> v = m.view(base, shape);
@@ -9152,11 +9152,11 @@ void ViewTest::overlapTreatmentTest()
                && w(1, 1) == n(2, 2)-n(1, 1) );
     }
     {
-        size_t shape[] = {3, 3};
+        std::size_t shape[] = {3, 3};
         andres::Marray<int> m(shape, shape + 2, 1);
         m(0, 0) = 2; m(0, 1) = 3; m(1, 0) = 4; m(1, 1) = 5;
         andres::Marray<int> n = m;
-        size_t base[] = {0, 0};
+        std::size_t base[] = {0, 0};
         shape[0] = 2;
         shape[1] = 2;
         andres::View<int> v = m.view(base, shape);
@@ -9172,11 +9172,11 @@ void ViewTest::overlapTreatmentTest()
                && w(1, 1) == n(2, 2)*n(1, 1) );
     }
     {
-        size_t shape[] = {3, 3};
+        std::size_t shape[] = {3, 3};
         andres::Marray<float> m(shape, shape + 2, 1);
         m(0, 0) = 2; m(0, 1) = 4; m(1, 0) = 8; m(1, 1) = 16;
         andres::Marray<float> n = m;
-        size_t base[] = {0, 0};
+        std::size_t base[] = {0, 0};
         shape[0] = 2;
         shape[1] = 2;
         andres::View<float> v = m.view(base, shape);
@@ -9198,51 +9198,51 @@ void ViewTest::compatibilityFunctionsTest()
     #ifdef MARRAY_COMPATIBILITY
     // permuteDimensions
     {
-        size_t shape[] = {2, 4, 3}; 
+        std::size_t shape[] = {2, 4, 3}; 
         andres::Marray<float> m(&shape[0], &shape[3]);
-        size_t perm[] = {0, 2, 1};
+        std::size_t perm[] = {0, 2, 1};
         andres::View<float> v = m.permuteDimensions(perm);
         andres::View<float> w = m.permutedView(perm);
         
         test(v.dimension() == w.dimension());
-        for(size_t j=0; j<v.dimension(); ++j) {
+        for(std::size_t j=0; j<v.dimension(); ++j) {
             test(v.shape(j) == w.shape(j));
         }
         test(v.size() == w.size());
-        for(size_t j=0; j<v.size(); ++j) {
+        for(std::size_t j=0; j<v.size(); ++j) {
             test(v(j) == w(j));
         }
     }
     // shiftDimensions
     {
-        size_t shape[] = {2, 4, 3}; 
+        std::size_t shape[] = {2, 4, 3}; 
         andres::Marray<float> m(&shape[0], &shape[3]);
         andres::View<float> v = m.shiftDimensions(2);
         andres::View<float> w = m.shiftedView(2);
         test(v.dimension() == w.dimension());
-        for(size_t j=0; j<v.dimension(); ++j) {
+        for(std::size_t j=0; j<v.dimension(); ++j) {
             test(v.shape(j) == w.shape(j));
         }
         test(v.size() == w.size());
-        for(size_t j=0; j<v.size(); ++j) {
+        for(std::size_t j=0; j<v.size(); ++j) {
             test(v(j) == w(j));
         }
     }
     // subarray
     {
-        size_t shape[] = {2, 4, 3}; 
+        std::size_t shape[] = {2, 4, 3}; 
         andres::Marray<float> m(&shape[0], &shape[3]);
-        size_t b[] = {0, 2, 1};
-        size_t s[] = {2, 1, 2};
+        std::size_t b[] = {0, 2, 1};
+        std::size_t s[] = {2, 1, 2};
         andres::View<float> v = m.view(b, s);
-        size_t e[] = {2, 3, 3};
+        std::size_t e[] = {2, 3, 3};
         andres::View<float> w = m.subarray(b, e);
         test(v.dimension() == w.dimension());
-        for(size_t j=0; j<v.dimension(); ++j) {
+        for(std::size_t j=0; j<v.dimension(); ++j) {
             test(v.shape(j) == w.shape(j));
         }
         test(v.size() == w.size());
-        for(size_t j=0; j<v.size(); ++j) {
+        for(std::size_t j=0; j<v.size(); ++j) {
             test(v(j) == w(j));
         }
     }
@@ -9290,12 +9290,12 @@ void IteratorTest::constructorTest(){
         {
             // zero offset
             {
-                std::vector<size_t> shape(1);
+                std::vector<std::size_t> shape(1);
                 shape[0] = 24;
                 andres::View<int, constTarget> v(shape.begin(), shape.end(), data_);
                 andres::Iterator<int, constTarget> it(v, 0);
                 
-                for(size_t j = 0; j < 24; ++j){
+                for(std::size_t j = 0; j < 24; ++j){
                     test(*it == data_[j]);
                     ++it;
                 }
@@ -9303,12 +9303,12 @@ void IteratorTest::constructorTest(){
                       *(--it) == 46);
             }
             {
-                std::vector<size_t> shape(1);
+                std::vector<std::size_t> shape(1);
                 shape[0] = 24;
                 const andres::View<int, true> v(shape.begin(), shape.end(), data_);
                 andres::Iterator<int, true> it(v, 0);
                 
-                for(size_t j = 0; j < 24; ++j){
+                for(std::size_t j = 0; j < 24; ++j){
                     test(*it == data_[j]);
                     ++it;
                 }
@@ -9316,12 +9316,12 @@ void IteratorTest::constructorTest(){
                       *(--it) == 46);
             }
             {
-                std::vector<size_t> shape(1);
+                std::vector<std::size_t> shape(1);
                 shape[0] = 24;
                 andres::View<int, false> v(shape.begin(), shape.end(), data_);
                 andres::Iterator<int, true> it(v, 0);
                 
-                for(size_t j = 0; j < 24; ++j){
+                for(std::size_t j = 0; j < 24; ++j){
                     test(*it == data_[j]);
                     ++it;
                 }
@@ -9330,14 +9330,14 @@ void IteratorTest::constructorTest(){
             }
             // non-zero offset
             {
-                std::vector<size_t> shape(1);
+                std::vector<std::size_t> shape(1);
                 shape[0] = 24;
                 andres::View<int, constTarget> v(shape.begin(), shape.end(), data_);
                 andres::Iterator<int, constTarget> it(v, 12);
                 
                 test(it.index() == 12
                 );
-                for(size_t j = 12; j < 24; ++j){
+                for(std::size_t j = 12; j < 24; ++j){
                     test(*it == data_[j]);
                     ++it;
                 }
@@ -9345,14 +9345,14 @@ void IteratorTest::constructorTest(){
                       *(--it) == 46);
             }
             {
-                std::vector<size_t> shape(1);
+                std::vector<std::size_t> shape(1);
                 shape[0] = 24;
                 const andres::View<int, true> v(shape.begin(), shape.end(), data_);
                 andres::Iterator<int, true> it(v, 12);
                 
                 test(it.index() == 12
                 );
-                for(size_t j = 12; j < 24; ++j){
+                for(std::size_t j = 12; j < 24; ++j){
                     test(*it == data_[j]);
                     ++it;
                 }
@@ -9360,14 +9360,14 @@ void IteratorTest::constructorTest(){
                       *(--it) == 46);
             }
             {
-                std::vector<size_t> shape(1);
+                std::vector<std::size_t> shape(1);
                 shape[0] = 24;
                 andres::View<int, false> v(shape.begin(), shape.end(), data_);
                 andres::Iterator<int, true> it(v, 12);
                 
                 test(it.index() == 12
                 );
-                for(size_t j = 12; j < 24; ++j){
+                for(std::size_t j = 12; j < 24; ++j){
                     test(*it == data_[j]);
                     ++it;
                 }
@@ -9379,13 +9379,13 @@ void IteratorTest::constructorTest(){
         {
             // zero offset
             {
-                std::vector<size_t> shape(2);
+                std::vector<std::size_t> shape(2);
                 shape[0] = 6;
                 shape[1] = 4;
                 andres::View<int, constTarget> v(shape.begin(), shape.end(), data_);
                 andres::Iterator<int, constTarget> it(v, 0);
                 
-                for(size_t j = 0; j < 24; ++j){
+                for(std::size_t j = 0; j < 24; ++j){
                     test(*it == data_[j]);
                     ++it;
                 }
@@ -9393,13 +9393,13 @@ void IteratorTest::constructorTest(){
                       *(--it) == 46);
             }
             {
-                std::vector<size_t> shape(2);
+                std::vector<std::size_t> shape(2);
                 shape[0] = 6;
                 shape[1] = 4;
                 const andres::View<int, true> v(shape.begin(), shape.end(), data_);
                 andres::Iterator<int, true> it(v, 0);
                 
-                for(size_t j = 0; j < 24; ++j){
+                for(std::size_t j = 0; j < 24; ++j){
                     test(*it == data_[j]);
                     ++it;
                 }
@@ -9407,13 +9407,13 @@ void IteratorTest::constructorTest(){
                       *(--it) == 46);
             }
             {
-                std::vector<size_t> shape(2);
+                std::vector<std::size_t> shape(2);
                 shape[0] = 6;
                 shape[1] = 4;
                 andres::View<int, false> v(shape.begin(), shape.end(), data_);
                 andres::Iterator<int, true> it(v, 0);
                 
-                for(size_t j = 0; j < 24; ++j){
+                for(std::size_t j = 0; j < 24; ++j){
                     test(*it == data_[j]);
                     ++it;
                 }
@@ -9422,14 +9422,14 @@ void IteratorTest::constructorTest(){
             }
             // non-zero offset
             {
-                std::vector<size_t> shape(2);
+                std::vector<std::size_t> shape(2);
                 shape[0] = 6;
                 shape[1] = 4;
                 andres::View<int, constTarget> v(shape.begin(), shape.end(), data_);
                 andres::Iterator<int, constTarget> it(v, 12);
                 
                 test(it.index() == 12);
-                for(size_t j = 12; j < 24; ++j){
+                for(std::size_t j = 12; j < 24; ++j){
                     test(*it == data_[j]);
                     ++it;
                 }
@@ -9437,14 +9437,14 @@ void IteratorTest::constructorTest(){
                       *(--it) == 46);
             }
             {
-                std::vector<size_t> shape(2);
+                std::vector<std::size_t> shape(2);
                 shape[0] = 6;
                 shape[1] = 4;
                 const andres::View<int, true> v(shape.begin(), shape.end(), data_);
                 andres::Iterator<int, true> it(v, 12);
                 
                 test(it.index() == 12);
-                for(size_t j = 12; j < 24; ++j){
+                for(std::size_t j = 12; j < 24; ++j){
                     test(*it == data_[j]);
                     ++it;
                 }
@@ -9452,14 +9452,14 @@ void IteratorTest::constructorTest(){
                       *(--it) == 46);
             }
             {
-                std::vector<size_t> shape(2);
+                std::vector<std::size_t> shape(2);
                 shape[0] = 6;
                 shape[1] = 4;
                 andres::View<int, false> v(shape.begin(), shape.end(), data_);
                 andres::Iterator<int, true> it(v, 12);
                 
                 test(it.index() == 12);
-                for(size_t j = 12; j < 24; ++j){
+                for(std::size_t j = 12; j < 24; ++j){
                     test(*it == data_[j]);
                     ++it;
                 }
@@ -9471,14 +9471,14 @@ void IteratorTest::constructorTest(){
         {
             // zero offset
             {
-                std::vector<size_t> shape(3);
+                std::vector<std::size_t> shape(3);
                 shape[0] = 3;
                 shape[1] = 4;
                 shape[2] = 2;
                 andres::View<int, constTarget> v(shape.begin(), shape.end(), data_);
                 andres::Iterator<int, constTarget> it(v, 0);
                 
-                for(size_t j = 0; j < 24; ++j){
+                for(std::size_t j = 0; j < 24; ++j){
                     test(*it == data_[j]);
                     ++it;
                 }
@@ -9486,14 +9486,14 @@ void IteratorTest::constructorTest(){
                       *(--it) == 46);
             }
             {
-                std::vector<size_t> shape(3);
+                std::vector<std::size_t> shape(3);
                 shape[0] = 3;
                 shape[1] = 4;
                 shape[2] = 2;
                 const andres::View<int, true> v(shape.begin(), shape.end(), data_);
                 andres::Iterator<int, true> it(v, 0);
                 
-                for(size_t j = 0; j < 24; ++j){
+                for(std::size_t j = 0; j < 24; ++j){
                     test(*it == data_[j]);
                     ++it;
                 }
@@ -9501,14 +9501,14 @@ void IteratorTest::constructorTest(){
                       *(--it) == 46);
             }
             {
-                std::vector<size_t> shape(3);
+                std::vector<std::size_t> shape(3);
                 shape[0] = 3;
                 shape[1] = 4;
                 shape[2] = 2;
                 andres::View<int, false> v(shape.begin(), shape.end(), data_);
                 andres::Iterator<int, true> it(v, 0);
                 
-                for(size_t j = 0; j < 24; ++j){
+                for(std::size_t j = 0; j < 24; ++j){
                     test(*it == data_[j]);
                     ++it;
                 }
@@ -9517,7 +9517,7 @@ void IteratorTest::constructorTest(){
             }
             // non-zero offset
             {
-                std::vector<size_t> shape(3);
+                std::vector<std::size_t> shape(3);
                 shape[0] = 3;
                 shape[1] = 4;
                 shape[2] = 2;
@@ -9525,7 +9525,7 @@ void IteratorTest::constructorTest(){
                 andres::Iterator<int, constTarget> it(v, 12);
                 
                 test(it.index() == 12);
-                for(size_t j = 12; j < 24; ++j){
+                for(std::size_t j = 12; j < 24; ++j){
                     test(*it == data_[j]);
                     ++it;
                 }
@@ -9533,7 +9533,7 @@ void IteratorTest::constructorTest(){
                       *(--it) == 46);
             }
             {
-                std::vector<size_t> shape(3);
+                std::vector<std::size_t> shape(3);
                 shape[0] = 3;
                 shape[1] = 4;
                 shape[2] = 2;
@@ -9541,7 +9541,7 @@ void IteratorTest::constructorTest(){
                 andres::Iterator<int, true> it(v, 12);
                 
                 test(it.index() == 12);
-                for(size_t j = 12; j < 24; ++j){
+                for(std::size_t j = 12; j < 24; ++j){
                     test(*it == data_[j]);
                     ++it;
                 }
@@ -9549,7 +9549,7 @@ void IteratorTest::constructorTest(){
                       *(--it) == 46);
             }
             {
-                std::vector<size_t> shape(3);
+                std::vector<std::size_t> shape(3);
                 shape[0] = 3;
                 shape[1] = 4;
                 shape[2] = 2;
@@ -9557,7 +9557,7 @@ void IteratorTest::constructorTest(){
                 andres::Iterator<int, true> it(v, 12);
                 
                 test(it.index() == 12);
-                for(size_t j = 12; j < 24; ++j){
+                for(std::size_t j = 12; j < 24; ++j){
                     test(*it == data_[j]);
                     ++it;
                 }
@@ -9568,7 +9568,7 @@ void IteratorTest::constructorTest(){
     }
     // conversion from mutable to const
     {
-        std::vector<size_t> shape(1);
+        std::vector<std::size_t> shape(1);
         shape[0] = 24;
         andres::View<int, false> v(shape.begin(), shape.end(), data_);
         andres::Iterator<int, false> it;
@@ -9588,7 +9588,7 @@ template<bool constTarget>
 void IteratorTest::accessIteratorOperations() {
     // operator*
     {
-        std::vector<size_t> shape(1);
+        std::vector<std::size_t> shape(1);
         shape[0] = 24;
         andres::View<int, constTarget> v(shape.begin(), shape.end(), data_);
         andres::Iterator<int, constTarget> it;
@@ -9602,7 +9602,7 @@ void IteratorTest::accessIteratorOperations() {
         test(*(--it)==46);
     }
     {
-        std::vector<size_t> shape(1);
+        std::vector<std::size_t> shape(1);
         shape[0] = 24;
         const andres::View<int, true> v(shape.begin(), shape.end(), data_);
         andres::Iterator<int, true> it;
@@ -9616,7 +9616,7 @@ void IteratorTest::accessIteratorOperations() {
         test(*(--it)==46);
     }
     {
-        std::vector<size_t> shape(1);
+        std::vector<std::size_t> shape(1);
         shape[0] = 24;
         andres::View<int, false> v(shape.begin(), shape.end(), data_);
         andres::Iterator<int, true> it;
@@ -9632,52 +9632,52 @@ void IteratorTest::accessIteratorOperations() {
     // operator->
     {
         TestType data[24];
-        for(size_t j=0; j<24; ++j) {
+        for(std::size_t j=0; j<24; ++j) {
             data[j].data_ = j;
         }
-        std::vector<size_t> shape(1);
+        std::vector<std::size_t> shape(1);
         shape[0] = 24;
         andres::View<TestType, constTarget> v(shape.begin(),
             shape.end(), &data[0]);
         andres::Iterator<TestType, constTarget> it = v.begin();
-        for(size_t j=0; j<24; ++j) {
+        for(std::size_t j=0; j<24; ++j) {
             test(it->data_ == j);
             ++it;
         }
     }
     {
         TestType data[24];
-        for(size_t j=0; j<24; ++j) {
+        for(std::size_t j=0; j<24; ++j) {
             data[j].data_ = j;
         }
-        std::vector<size_t> shape(1);
+        std::vector<std::size_t> shape(1);
         shape[0] = 24;
         const andres::View<TestType, true> v(shape.begin(),
             shape.end(), &data[0]);
         andres::Iterator<TestType, true> it = v.begin();
-        for(size_t j=0; j<24; ++j) {
+        for(std::size_t j=0; j<24; ++j) {
             test(it->data_ == j);
             ++it;
         }
     }
     {
         TestType data[24];
-        for(size_t j=0; j<24; ++j) {
+        for(std::size_t j=0; j<24; ++j) {
             data[j].data_ = j;
         }
-        std::vector<size_t> shape(1);
+        std::vector<std::size_t> shape(1);
         shape[0] = 24;
         andres::View<TestType, false> v(shape.begin(),
             shape.end(), &data[0]);
         andres::Iterator<TestType, true> it = v.begin();
-        for(size_t j=0; j<24; ++j) {
+        for(std::size_t j=0; j<24; ++j) {
             test(it->data_ == j);
             ++it;
         }
     }
     // operator[]
     {
-        std::vector<size_t> shape(1);
+        std::vector<std::size_t> shape(1);
         shape[0] = 24;
         andres::View<int, constTarget> v(shape.begin(), shape.end(), data_);
         andres::Iterator<int, constTarget> it;
@@ -9691,7 +9691,7 @@ void IteratorTest::accessIteratorOperations() {
                it[16] == data_[16]);
     }
     {
-        std::vector<size_t> shape(1);
+        std::vector<std::size_t> shape(1);
         shape[0] = 24;
         const andres::View<int, true> v(shape.begin(), shape.end(), data_);
         andres::Iterator<int, true> it;
@@ -9705,7 +9705,7 @@ void IteratorTest::accessIteratorOperations() {
                it[16] == data_[16]);
     }
     {
-        std::vector<size_t> shape(1);
+        std::vector<std::size_t> shape(1);
         shape[0] = 24;
         andres::View<int, false> v(shape.begin(), shape.end(), data_);
         andres::Iterator<int, true> it;
@@ -9724,7 +9724,7 @@ template<bool constTarget>
 void IteratorTest::arithmeticOperatorsTest(){
     // operator+=
     {
-        std::vector<size_t> shape(1);
+        std::vector<std::size_t> shape(1);
         shape[0] = 24;
         andres::View<int, constTarget> v(shape.begin(), shape.end(), data_);
         andres::Iterator<int, constTarget> it;
@@ -9738,7 +9738,7 @@ void IteratorTest::arithmeticOperatorsTest(){
         test(*(--it)==46);
     }
     {
-        std::vector<size_t> shape(1);
+        std::vector<std::size_t> shape(1);
         shape[0] = 24;
         const andres::View<int, true> v(shape.begin(), shape.end(), data_);
         andres::Iterator<int, true> it;
@@ -9752,7 +9752,7 @@ void IteratorTest::arithmeticOperatorsTest(){
         test(*(--it)==46);
     }
     {
-        std::vector<size_t> shape(1);
+        std::vector<std::size_t> shape(1);
         shape[0] = 24;
         andres::View<int, false> v(shape.begin(), shape.end(), data_);
         andres::Iterator<int, true> it;
@@ -9767,7 +9767,7 @@ void IteratorTest::arithmeticOperatorsTest(){
     }
     // operator-=
     {
-        std::vector<size_t> shape(1);
+        std::vector<std::size_t> shape(1);
         shape[0] = 24;
         andres::View<int, constTarget> v(shape.begin(), shape.end(), data_);
         andres::Iterator<int, constTarget> it;
@@ -9782,7 +9782,7 @@ void IteratorTest::arithmeticOperatorsTest(){
         test(*it==0);
     }
     {
-        std::vector<size_t> shape(1);
+        std::vector<std::size_t> shape(1);
         shape[0] = 24;
         const andres::View<int, true> v(shape.begin(), shape.end(), data_);
         andres::Iterator<int, true> it;
@@ -9796,7 +9796,7 @@ void IteratorTest::arithmeticOperatorsTest(){
         test(*it==0);
     }
     {
-        std::vector<size_t> shape(1);
+        std::vector<std::size_t> shape(1);
         shape[0] = 24;
         andres::View<int, false> v(shape.begin(), shape.end(), data_);
         andres::Iterator<int, true> it;
@@ -9811,7 +9811,7 @@ void IteratorTest::arithmeticOperatorsTest(){
     }
     // operator++ prefix
     {
-        std::vector<size_t> shape(1);
+        std::vector<std::size_t> shape(1);
         shape[0] = 24;
         andres::View<int, constTarget> v(shape.begin(), shape.end(), data_);
         andres::Iterator<int, constTarget> it;
@@ -9825,7 +9825,7 @@ void IteratorTest::arithmeticOperatorsTest(){
         test(*(--it)==46);
     }
     {
-        std::vector<size_t> shape(1);
+        std::vector<std::size_t> shape(1);
         shape[0] = 24;
         const andres::View<int, true> v(shape.begin(), shape.end(), data_);
         andres::Iterator<int, true> it;
@@ -9839,7 +9839,7 @@ void IteratorTest::arithmeticOperatorsTest(){
         test(*(--it)==46);
     }
     {
-        std::vector<size_t> shape(1);
+        std::vector<std::size_t> shape(1);
         shape[0] = 24;
         andres::View<int, false> v(shape.begin(), shape.end(), data_);
         andres::Iterator<int, true> it;
@@ -9854,7 +9854,7 @@ void IteratorTest::arithmeticOperatorsTest(){
     }
     // operator-- prefix
     {
-        std::vector<size_t> shape(1);
+        std::vector<std::size_t> shape(1);
         shape[0] = 24;
         andres::View<int, constTarget> v(shape.begin(), shape.end(), data_);
         andres::Iterator<int, constTarget> it;
@@ -9868,7 +9868,7 @@ void IteratorTest::arithmeticOperatorsTest(){
         test(*it==0);
     }
     {
-        std::vector<size_t> shape(1);
+        std::vector<std::size_t> shape(1);
         shape[0] = 24;
         const andres::View<int, true> v(shape.begin(), shape.end(), data_);
         andres::Iterator<int, true> it;
@@ -9882,7 +9882,7 @@ void IteratorTest::arithmeticOperatorsTest(){
         test(*it==0);
     }
     {
-        std::vector<size_t> shape(1);
+        std::vector<std::size_t> shape(1);
         shape[0] = 24;
         andres::View<int, false> v(shape.begin(), shape.end(), data_);
         andres::Iterator<int, true> it;
@@ -9897,7 +9897,7 @@ void IteratorTest::arithmeticOperatorsTest(){
     }
     // operator++ postfix
     {
-        std::vector<size_t> shape(1);
+        std::vector<std::size_t> shape(1);
         shape[0] = 24;
         andres::View<int, constTarget> v(shape.begin(), shape.end(), data_);
         andres::Iterator<int, constTarget> it;
@@ -9911,7 +9911,7 @@ void IteratorTest::arithmeticOperatorsTest(){
         test(*(--it)==46);
     }
     {
-        std::vector<size_t> shape(1);
+        std::vector<std::size_t> shape(1);
         shape[0] = 24;
         const andres::View<int, true> v(shape.begin(), shape.end(), data_);
         andres::Iterator<int, true> it;
@@ -9925,7 +9925,7 @@ void IteratorTest::arithmeticOperatorsTest(){
         test(*(--it)==46);
     }
     {
-        std::vector<size_t> shape(1);
+        std::vector<std::size_t> shape(1);
         shape[0] = 24;
         andres::View<int, false> v(shape.begin(), shape.end(), data_);
         andres::Iterator<int, true> it;
@@ -9940,7 +9940,7 @@ void IteratorTest::arithmeticOperatorsTest(){
     }
     // operator-- postfix
     {
-        std::vector<size_t> shape(1);
+        std::vector<std::size_t> shape(1);
         shape[0] = 24;
         andres::View<int, constTarget> v(shape.begin(), shape.end(), data_);
         andres::Iterator<int, constTarget> it;
@@ -9954,7 +9954,7 @@ void IteratorTest::arithmeticOperatorsTest(){
         test(*it==0);
     }
     {
-        std::vector<size_t> shape(1);
+        std::vector<std::size_t> shape(1);
         shape[0] = 24;
         const andres::View<int, true> v(shape.begin(), shape.end(), data_);
         andres::Iterator<int, true> it;
@@ -9968,7 +9968,7 @@ void IteratorTest::arithmeticOperatorsTest(){
         test(*it==0);
     }
     {
-        std::vector<size_t> shape(1);
+        std::vector<std::size_t> shape(1);
         shape[0] = 24;
         andres::View<int, false> v(shape.begin(), shape.end(), data_);
         andres::Iterator<int, true> it;
@@ -9987,7 +9987,7 @@ template<bool constTarget>
 void IteratorTest::comparisonOperators(){
     // operator-
     {
-        std::vector<size_t> shape(1);
+        std::vector<std::size_t> shape(1);
         shape[0] = 24;
         andres::View<int, constTarget> v(shape.begin(), shape.end(), data_);
         andres::Iterator<int, constTarget> it1;
@@ -10013,7 +10013,7 @@ void IteratorTest::comparisonOperators(){
         test((it1-it2)==-24);
     }
     {
-        std::vector<size_t> shape(1);
+        std::vector<std::size_t> shape(1);
         shape[0] = 24;
         const andres::View<int, true> v(shape.begin(), shape.end(), data_);
         andres::Iterator<int, true> it1;
@@ -10039,7 +10039,7 @@ void IteratorTest::comparisonOperators(){
         test((it1-it2)==-24);
     }
     {
-        std::vector<size_t> shape(1);
+        std::vector<std::size_t> shape(1);
         shape[0] = 24;
         andres::View<int, false> v(shape.begin(), shape.end(), data_);
         andres::Iterator<int, true> it1;
@@ -10066,7 +10066,7 @@ void IteratorTest::comparisonOperators(){
     }
     // operator==
     {
-        std::vector<size_t> shape(1);
+        std::vector<std::size_t> shape(1);
         shape[0] = 24;
         andres::View<int, constTarget> v(shape.begin(), shape.end(), data_);
         andres::Iterator<int, constTarget> it1;
@@ -10083,7 +10083,7 @@ void IteratorTest::comparisonOperators(){
         test(*(--it1)==46 && *(--it2)==46);
     }
     {
-        std::vector<size_t> shape(1);
+        std::vector<std::size_t> shape(1);
         shape[0] = 24;
         const andres::View<int, true> v(shape.begin(), shape.end(), data_);
         andres::Iterator<int, true> it1;
@@ -10100,7 +10100,7 @@ void IteratorTest::comparisonOperators(){
         test(*(--it1)==46 && *(--it2)==46);
     }
     {
-        std::vector<size_t> shape(1);
+        std::vector<std::size_t> shape(1);
         shape[0] = 24;
         andres::View<int, false> v(shape.begin(), shape.end(), data_);
         andres::Iterator<int, true> it1;
@@ -10118,7 +10118,7 @@ void IteratorTest::comparisonOperators(){
     }
     //operator!=
     {
-        std::vector<size_t> shape(1);
+        std::vector<std::size_t> shape(1);
         shape[0] = 24;
         andres::View<int, constTarget> v(shape.begin(), shape.end(), data_);
         andres::Iterator<int, constTarget> it1;
@@ -10133,7 +10133,7 @@ void IteratorTest::comparisonOperators(){
         }
     }
     {
-        std::vector<size_t> shape(1);
+        std::vector<std::size_t> shape(1);
         shape[0] = 24;
         const andres::View<int, true> v(shape.begin(), shape.end(), data_);
         andres::Iterator<int, true> it1;
@@ -10148,7 +10148,7 @@ void IteratorTest::comparisonOperators(){
         }
     }
     {
-        std::vector<size_t> shape(1);
+        std::vector<std::size_t> shape(1);
         shape[0] = 24;
         andres::View<int, false> v(shape.begin(), shape.end(), data_);
         andres::Iterator<int, true> it1;
@@ -10164,7 +10164,7 @@ void IteratorTest::comparisonOperators(){
     }
     //operator<
     {
-        std::vector<size_t> shape(1);
+        std::vector<std::size_t> shape(1);
         shape[0] = 24;
         andres::View<int, constTarget> v(shape.begin(), shape.end(), data_);
         andres::Iterator<int, constTarget> it1;
@@ -10179,7 +10179,7 @@ void IteratorTest::comparisonOperators(){
         }
     }
     {
-        std::vector<size_t> shape(1);
+        std::vector<std::size_t> shape(1);
         shape[0] = 24;
         const andres::View<int, true> v(shape.begin(), shape.end(), data_);
         andres::Iterator<int, true> it1;
@@ -10194,7 +10194,7 @@ void IteratorTest::comparisonOperators(){
         }
     }
     {
-        std::vector<size_t> shape(1);
+        std::vector<std::size_t> shape(1);
         shape[0] = 24;
         andres::View<int, false> v(shape.begin(), shape.end(), data_);
         andres::Iterator<int, true> it1;
@@ -10210,7 +10210,7 @@ void IteratorTest::comparisonOperators(){
     }
     //operator>
     {
-        std::vector<size_t> shape(1);
+        std::vector<std::size_t> shape(1);
         shape[0] = 24;
         andres::View<int, constTarget> v(shape.begin(), shape.end(), data_);
         andres::Iterator<int, constTarget> it1;
@@ -10225,7 +10225,7 @@ void IteratorTest::comparisonOperators(){
         }
     }
     {
-        std::vector<size_t> shape(1);
+        std::vector<std::size_t> shape(1);
         shape[0] = 24;
         const andres::View<int, true> v(shape.begin(), shape.end(), data_);
         andres::Iterator<int, true> it1;
@@ -10240,7 +10240,7 @@ void IteratorTest::comparisonOperators(){
         }
     }
     {
-        std::vector<size_t> shape(1);
+        std::vector<std::size_t> shape(1);
         shape[0] = 24;
         andres::View<int, false> v(shape.begin(), shape.end(), data_);
         andres::Iterator<int, true> it1;
@@ -10256,7 +10256,7 @@ void IteratorTest::comparisonOperators(){
     }
     //operator<=
     {
-        std::vector<size_t> shape(1);
+        std::vector<std::size_t> shape(1);
         shape[0] = 24;
         andres::View<int, constTarget> v(shape.begin(), shape.end(), data_);
         andres::Iterator<int, constTarget> it1;
@@ -10272,7 +10272,7 @@ void IteratorTest::comparisonOperators(){
         }
     }
     {
-        std::vector<size_t> shape(1);
+        std::vector<std::size_t> shape(1);
         shape[0] = 24;
         const andres::View<int, true> v(shape.begin(), shape.end(), data_);
         andres::Iterator<int, true> it1;
@@ -10288,7 +10288,7 @@ void IteratorTest::comparisonOperators(){
         }
     }
     {
-        std::vector<size_t> shape(1);
+        std::vector<std::size_t> shape(1);
         shape[0] = 24;
         andres::View<int, false> v(shape.begin(), shape.end(), data_);
         andres::Iterator<int, true> it1;
@@ -10305,7 +10305,7 @@ void IteratorTest::comparisonOperators(){
     }
     //operator>=
     {
-        std::vector<size_t> shape(1);
+        std::vector<std::size_t> shape(1);
         shape[0] = 24;
         andres::View<int, constTarget> v(shape.begin(), shape.end(), data_);
         andres::Iterator<int, constTarget> it1;
@@ -10321,7 +10321,7 @@ void IteratorTest::comparisonOperators(){
         }
     }
     {
-        std::vector<size_t> shape(1);
+        std::vector<std::size_t> shape(1);
         shape[0] = 24;
         const andres::View<int, true> v(shape.begin(), shape.end(), data_);
         andres::Iterator<int, true> it1;
@@ -10337,7 +10337,7 @@ void IteratorTest::comparisonOperators(){
         }
     }
     {
-        std::vector<size_t> shape(1);
+        std::vector<std::size_t> shape(1);
         shape[0] = 24;
         andres::View<int, false> v(shape.begin(), shape.end(), data_);
         andres::Iterator<int, true> it1;
@@ -10357,7 +10357,7 @@ void IteratorTest::comparisonOperators(){
 template<bool constTarget>
 void IteratorTest::hasMoreTest() {
     {
-        std::vector<size_t> shape(1);
+        std::vector<std::size_t> shape(1);
         shape[0] = 24;
         andres::View<int, constTarget> v(shape.begin(), shape.end(), data_);
         andres::Iterator<int, constTarget> it;
@@ -10370,7 +10370,7 @@ void IteratorTest::hasMoreTest() {
         test(!it.hasMore());
     }
     {
-        std::vector<size_t> shape(1);
+        std::vector<std::size_t> shape(1);
         shape[0] = 24;
         const andres::View<int, true> v(shape.begin(), shape.end(), data_);
         andres::Iterator<int, true> it;
@@ -10383,7 +10383,7 @@ void IteratorTest::hasMoreTest() {
         test(!it.hasMore());
     }
     {
-        std::vector<size_t> shape(1);
+        std::vector<std::size_t> shape(1);
         shape[0] = 24;
         andres::View<int, false> v(shape.begin(), shape.end(), data_);
         andres::Iterator<int, true> it;
@@ -10400,38 +10400,38 @@ void IteratorTest::hasMoreTest() {
 template<bool constTarget>
 void IteratorTest::indexTest() {
     {
-        std::vector<size_t> shape(1);
+        std::vector<std::size_t> shape(1);
         shape[0] = 24;
         andres::View<int, constTarget> v(shape.begin(), shape.end(), data_);
         andres::Iterator<int, constTarget> it;
         it = v.begin();
 
         for(int i = 0; i < 24; ++i){
-            test(it.index()== static_cast<size_t>(data_[i]/2));
+            test(it.index()== static_cast<std::size_t>(data_[i]/2));
             ++it;
         }
     }
     {
-        std::vector<size_t> shape(1);
+        std::vector<std::size_t> shape(1);
         shape[0] = 24;
         const andres::View<int, true> v(shape.begin(), shape.end(), data_);
         andres::Iterator<int, true> it;
         it = v.begin();
 
         for(int i = 0; i < 24; ++i){
-            test(it.index()== static_cast<size_t>(data_[i]/2));
+            test(it.index()== static_cast<std::size_t>(data_[i]/2));
             ++it;
         }
     }
     {
-        std::vector<size_t> shape(1);
+        std::vector<std::size_t> shape(1);
         shape[0] = 24;
         andres::View<int, false> v(shape.begin(), shape.end(), data_);
         andres::Iterator<int, true> it;
         it = v.begin();
 
         for(int i = 0; i < 24; ++i){
-            test(it.index()== static_cast<size_t>(data_[i]/2));
+            test(it.index()== static_cast<std::size_t>(data_[i]/2));
             ++it;
         }
     }
@@ -10440,15 +10440,15 @@ void IteratorTest::indexTest() {
 template<bool constTarget>
 void IteratorTest::coordinateTest() {
     {
-        std::vector<size_t> shape(2);
+        std::vector<std::size_t> shape(2);
         shape[0] = 3;
         shape[1] = 8;
         andres::View<int, constTarget> v(shape.begin(), shape.end(), data_);
         andres::Iterator<int, constTarget> it(v, 0);
 
-        for(size_t y=0; y<8; ++y) {
-            for(size_t x=0; x<3; ++x) {
-                std::vector<size_t> c(2);
+        for(std::size_t y=0; y<8; ++y) {
+            for(std::size_t x=0; x<3; ++x) {
+                std::vector<std::size_t> c(2);
                 it.coordinate(c.begin());
                 test(c[0] == x && c[1] == y);
                 ++it;
@@ -10456,15 +10456,15 @@ void IteratorTest::coordinateTest() {
         }
     }
     {
-        std::vector<size_t> shape(2);
+        std::vector<std::size_t> shape(2);
         shape[0] = 3;
         shape[1] = 8;
         const andres::View<int, true> v(shape.begin(), shape.end(), data_);
         andres::Iterator<int, true> it(v, 0);
 
-        for(size_t y=0; y<8; ++y) {
-            for(size_t x=0; x<3; ++x) {
-                std::vector<size_t> c(2);
+        for(std::size_t y=0; y<8; ++y) {
+            for(std::size_t x=0; x<3; ++x) {
+                std::vector<std::size_t> c(2);
                 it.coordinate(c.begin());
                 test(c[0] == x && c[1] == y);
                 ++it;
@@ -10472,15 +10472,15 @@ void IteratorTest::coordinateTest() {
         }
     }
     {
-        std::vector<size_t> shape(2);
+        std::vector<std::size_t> shape(2);
         shape[0] = 3;
         shape[1] = 8;
         andres::View<int, false> v(shape.begin(), shape.end(), data_);
         andres::Iterator<int, true> it(v, 0);
 
-        for(size_t y=0; y<8; ++y) {
-            for(size_t x=0; x<3; ++x) {
-                std::vector<size_t> c(2);
+        for(std::size_t y=0; y<8; ++y) {
+            for(std::size_t x=0; x<3; ++x) {
+                std::vector<std::size_t> c(2);
                 it.coordinate(c.begin());
                 test(c[0] == x && c[1] == y);
                 ++it;
@@ -10513,7 +10513,7 @@ void MarrayTest::constructorTest(){
     }
     // 1D
     {
-        std::vector<size_t> shape(1);
+        std::vector<std::size_t> shape(1);
         shape[0] = 24;
         andres::Marray<int> m(shape.begin(), shape.end(), scalar_);
 
@@ -10524,7 +10524,7 @@ void MarrayTest::constructorTest(){
     }
     // 2D
     {
-        std::vector<size_t> shape(2);
+        std::vector<std::size_t> shape(2);
         shape[0] = 6; 
         shape[1] = 4;
         andres::Marray<int> m(shape.begin(), shape.end(), scalar_);
@@ -10539,7 +10539,7 @@ void MarrayTest::constructorTest(){
     }
     // 3D 
     {
-        std::vector<size_t> shape(3); 
+        std::vector<std::size_t> shape(3); 
         shape[0] = 3;
         shape[1] = 4; 
         shape[2] = 2; 
@@ -10558,7 +10558,7 @@ void MarrayTest::constructorTest(){
     }
     // 3D skip initialization
     {
-        std::vector<size_t> shape(3); 
+        std::vector<std::size_t> shape(3); 
         shape[0] = 3;
         shape[1] = 4; 
         shape[2] = 2; 
@@ -10574,7 +10574,7 @@ void MarrayTest::constructorTest(){
 
 void MarrayTest::assignTest()
 {
-        std::vector<size_t> shape(3); 
+        std::vector<std::size_t> shape(3); 
         shape[0] = 3;
         shape[1] = 4; 
         shape[2] = 2; 
@@ -10604,7 +10604,7 @@ void MarrayTest::copyConstructorTest() {
         }
         // 1D
         {
-            std::vector<size_t> shape(1);
+            std::vector<std::size_t> shape(1);
             shape[0] = 24;
             andres::Marray<int> m(shape.begin(), shape.end(), scalar_);
             andres::Marray<int> n(m);
@@ -10616,7 +10616,7 @@ void MarrayTest::copyConstructorTest() {
         }
         // 2D
         {
-            std::vector<size_t> shape(2);
+            std::vector<std::size_t> shape(2);
             shape[0] = 6; 
             shape[1] = 4;
             andres::Marray<int> m(shape.begin(), shape.end(), scalar_);
@@ -10631,7 +10631,7 @@ void MarrayTest::copyConstructorTest() {
         }
         // 3D 
         {
-            std::vector<size_t> shape(3); 
+            std::vector<std::size_t> shape(3); 
             shape[0] = 3;
             shape[1] = 4; 
             shape[2] = 2; 
@@ -10662,7 +10662,7 @@ void MarrayTest::copyConstructorTest() {
         {
             // without strides
             {
-                std::vector<size_t> shape(1);
+                std::vector<std::size_t> shape(1);
                 shape[0] = 24;
                 andres::View<int, constTarget> v(shape.begin(), shape.end(), data_);
                 andres::Marray<int> m(v);
@@ -10674,9 +10674,9 @@ void MarrayTest::copyConstructorTest() {
             }
             // with strides and without offset
             {
-                std::vector<size_t> shape(1);
+                std::vector<std::size_t> shape(1);
                 shape[0] = 6;
-                std::vector<size_t> strides(1);
+                std::vector<std::size_t> strides(1);
                 strides[0] = 4;
                 andres::View<int, constTarget> v(shape.begin(), shape.end(),
                     strides.begin(), data_, andres::LastMajorOrder);
@@ -10693,9 +10693,9 @@ void MarrayTest::copyConstructorTest() {
             }
             // with strides and offset
             {
-                std::vector<size_t> shape(1);
+                std::vector<std::size_t> shape(1);
                 shape[0] = 6;
-                std::vector<size_t> strides(1);
+                std::vector<std::size_t> strides(1);
                 strides[0] = 4;
                 andres::View<int, constTarget> v(shape.begin(), shape.end(),
                     strides.begin(), data_+2, andres::LastMajorOrder);
@@ -10715,7 +10715,7 @@ void MarrayTest::copyConstructorTest() {
         {
             // without strides
             {
-                std::vector<size_t> shape(2);
+                std::vector<std::size_t> shape(2);
                 shape[0] = 6; 
                 shape[1] = 4;
                 andres::View<int, constTarget> v(shape.begin(), shape.end(), data_);
@@ -10730,10 +10730,10 @@ void MarrayTest::copyConstructorTest() {
             }
             // with strides and without offset
             {
-                std::vector<size_t> shape(2);
+                std::vector<std::size_t> shape(2);
                 shape[0] = 3;
                 shape[1] = 2;
-                std::vector<size_t> strides(2);
+                std::vector<std::size_t> strides(2);
                 strides[0] = 1;
                 strides[1] = 3;
                 andres::View<int, constTarget> v(shape.begin(), shape.end(), strides.begin(), data_, andres::LastMajorOrder);
@@ -10750,10 +10750,10 @@ void MarrayTest::copyConstructorTest() {
             }
             // with strides and offset
             {
-                std::vector<size_t> shape(2);
+                std::vector<std::size_t> shape(2);
                 shape[0] = 3;
                 shape[1] = 2;
-                std::vector<size_t> strides(2);
+                std::vector<std::size_t> strides(2);
                 strides[0] = 1;
                 strides[1] = 3;
                 andres::View<int, constTarget> v(shape.begin(), shape.end(), strides.begin(),
@@ -10774,7 +10774,7 @@ void MarrayTest::copyConstructorTest() {
         {
             // without strides
             {
-                std::vector<size_t> shape(3);
+                std::vector<std::size_t> shape(3);
                 shape[0] = 3;
                 shape[1] = 4; 
                 shape[2] = 2; 
@@ -10792,11 +10792,11 @@ void MarrayTest::copyConstructorTest() {
             }
             // with strides and without offset
             {        
-                std::vector<size_t> shape(3);
+                std::vector<std::size_t> shape(3);
                 shape[0] = 3;
                 shape[1] = 4;
                 shape[2] = 2;
-                std::vector<size_t> strides(3);
+                std::vector<std::size_t> strides(3);
                 strides[0] = 2;
                 strides[1] = 10;
                 strides[2] = 35;
@@ -10814,11 +10814,11 @@ void MarrayTest::copyConstructorTest() {
             }
             // with strides and offset
             {       
-                std::vector<size_t> shape(3);
+                std::vector<std::size_t> shape(3);
                 shape[0] = 3;
                 shape[1] = 4;
                 shape[2] = 2;
-                std::vector<size_t> strides(3);
+                std::vector<std::size_t> strides(3);
                 strides[0] = 2;
                 strides[1] = 10;
                 strides[2] = 35;
@@ -10862,7 +10862,7 @@ void MarrayTest::assignmentOperatorTest(){
             }
             // 1D
             {
-                std::vector<size_t> shape(1);
+                std::vector<std::size_t> shape(1);
                 shape[0] = 24;
                 andres::Marray<int> m(shape.begin(), shape.end(), scalar_);
                 andres::Marray<int> n;
@@ -10875,7 +10875,7 @@ void MarrayTest::assignmentOperatorTest(){
             }
             // 2D
             {
-                std::vector<size_t> shape(2);
+                std::vector<std::size_t> shape(2);
                 shape[0] = 6; 
                 shape[1] = 4;
                 andres::Marray<int> m(shape.begin(), shape.end(), scalar_);
@@ -10892,7 +10892,7 @@ void MarrayTest::assignmentOperatorTest(){
             }
             // 3D 
             {
-                std::vector<size_t> shape(3); 
+                std::vector<std::size_t> shape(3); 
                 shape[0] = 3;
                 shape[1] = 4; 
                 shape[2] = 2; 
@@ -10930,7 +10930,7 @@ void MarrayTest::assignmentOperatorTest(){
             }
             // 1D
             {
-                std::vector<size_t> shape(1);
+                std::vector<std::size_t> shape(1);
                 shape[0] = 24;
                 andres::View<int, constTarget> v(shape.begin(), shape.end(), data_);
                 andres::Marray<int> m;
@@ -10943,7 +10943,7 @@ void MarrayTest::assignmentOperatorTest(){
             }
             // 2D
             {
-                std::vector<size_t> shape(2);
+                std::vector<std::size_t> shape(2);
                 shape[0] = 6; 
                 shape[1] = 4;
                 andres::View<int, constTarget> v(shape.begin(), shape.end(), data_);
@@ -10959,7 +10959,7 @@ void MarrayTest::assignmentOperatorTest(){
             }
             // 3D
             {
-                std::vector<size_t> shape(3);
+                std::vector<std::size_t> shape(3);
                 shape[0] = 3;
                 shape[1] = 4; 
                 shape[2] = 2; 
@@ -11031,7 +11031,7 @@ void MarrayTest::assignmentOperatorTest(){
             // empty
             {
                 andres::Marray<int> m;
-                std::vector<size_t> shapen(1);
+                std::vector<std::size_t> shapen(1);
                 shapen[0] = 24;
                 andres::Marray<int> n(shapen.begin(), shapen.end(), scalar_);
                 n = m;
@@ -11039,10 +11039,10 @@ void MarrayTest::assignmentOperatorTest(){
             // 1D
             {
                 int scalar = 2;
-                std::vector<size_t> shape(1);
+                std::vector<std::size_t> shape(1);
                 shape[0] = 24;
                 andres::Marray<int> m(shape.begin(), shape.end(), scalar);
-                std::vector<size_t> shapen(1);
+                std::vector<std::size_t> shapen(1);
                 shapen[0] = 24;
                 andres::Marray<int> n(shapen.begin(), shapen.end(), scalar_);
                 int* n_address = &n(0);
@@ -11061,17 +11061,17 @@ void MarrayTest::assignmentOperatorTest(){
             // empty
             {
                 andres::View<int, constTarget> v;
-                std::vector<size_t> shapem(1);
+                std::vector<std::size_t> shapem(1);
                 shapem[0] = 24;
                 andres::Marray<int> m(shapem.begin(), shapem.end(), scalar_);
                 m = v;
             }
             // 1D
             {
-                std::vector<size_t> shape(1);
+                std::vector<std::size_t> shape(1);
                 shape[0] = 24;
                 andres::View<int, constTarget> v(shape.begin(), shape.end(), data_);
-                std::vector<size_t> shapem(1);
+                std::vector<std::size_t> shapem(1);
                 shapem[0] = 24;
                 andres::Marray<int> m(shapem.begin(), shapem.end(), scalar_);
                 int* m_address = &m(0);
@@ -11093,7 +11093,7 @@ void MarrayTest::assignmentOperatorTest(){
             // empty
             {
                 andres::Marray<int> m;
-                std::vector<size_t> shapen(2);
+                std::vector<std::size_t> shapen(2);
                 shapen[0] = 4;
                 shapen[1] = 6;
                 andres::Marray<int> n(shapen.begin(), shapen.end(), scalar_);
@@ -11102,11 +11102,11 @@ void MarrayTest::assignmentOperatorTest(){
             // 2D
             {
                 int scalar = 2;
-                std::vector<size_t> shape(2);
+                std::vector<std::size_t> shape(2);
                 shape[0] = 6; 
                 shape[1] = 4;
                 andres::Marray<int> m(shape.begin(), shape.end(), scalar);
-                std::vector<size_t> shapen(2);
+                std::vector<std::size_t> shapen(2);
                 shapen[0] = 6;
                 shapen[1] = 4;
                 andres::Marray<int> n(shapen.begin(), shapen.end(), scalar_);
@@ -11126,7 +11126,7 @@ void MarrayTest::assignmentOperatorTest(){
             // empty
             {
                 andres::View<int, constTarget> v;
-                std::vector<size_t> shapen(2);
+                std::vector<std::size_t> shapen(2);
                 shapen[0] = 4;
                 shapen[1] = 6;
                 andres::Marray<int> m(shapen.begin(), shapen.end(), scalar_);
@@ -11134,11 +11134,11 @@ void MarrayTest::assignmentOperatorTest(){
             }
             // 2D
             {
-                std::vector<size_t> shape(2);
+                std::vector<std::size_t> shape(2);
                 shape[0] = 6; 
                 shape[1] = 4;
                 andres::View<int, constTarget> v(shape.begin(), shape.end(), data_);
-                std::vector<size_t> shapen(2);
+                std::vector<std::size_t> shapen(2);
                 shapen[0] = 6;
                 shapen[1] = 4;
                 andres::Marray<int> m(shapen.begin(), shapen.end(), scalar_);
@@ -11161,7 +11161,7 @@ void MarrayTest::assignmentOperatorTest(){
             // empty
             {
                 andres::Marray<int> m;
-                std::vector<size_t> shapen(3);
+                std::vector<std::size_t> shapen(3);
                 shapen[0] = 2;
                 shapen[1] = 3;
                 shapen[2] = 4;
@@ -11171,12 +11171,12 @@ void MarrayTest::assignmentOperatorTest(){
             // 3D 
             {
                 int scalar = 2;
-                std::vector<size_t> shape(3); 
+                std::vector<std::size_t> shape(3); 
                 shape[0] = 3;
                 shape[1] = 4; 
                 shape[2] = 2; 
                 andres::Marray<int> m(shape.begin(), shape.end(), scalar);
-                std::vector<size_t> shapen(3);
+                std::vector<std::size_t> shapen(3);
                 shapen[0] = 3;
                 shapen[1] = 4;
                 shapen[2] = 2;
@@ -11199,7 +11199,7 @@ void MarrayTest::assignmentOperatorTest(){
             // empty
             {
                 andres::View<int, constTarget> v;
-                std::vector<size_t> shapen(3);
+                std::vector<std::size_t> shapen(3);
                 shapen[0] = 2;
                 shapen[1] = 3;
                 shapen[2] = 4;
@@ -11208,12 +11208,12 @@ void MarrayTest::assignmentOperatorTest(){
             }
             // 3D
             {
-                std::vector<size_t> shape(3);
+                std::vector<std::size_t> shape(3);
                 shape[0] = 3;
                 shape[1] = 4; 
                 shape[2] = 2; 
                 andres::View<int, constTarget> v(shape.begin(), shape.end(), data_);
-                std::vector<size_t> shapen(3);
+                std::vector<std::size_t> shapen(3);
                 shapen[0] = 3;
                 shapen[1] = 4;
                 shapen[2] = 2;
@@ -11239,7 +11239,7 @@ void MarrayTest::assignmentOperatorTest(){
 void MarrayTest::reshapeTest() {
     // 2D 
     {
-        std::vector<size_t> shape(2); 
+        std::vector<std::size_t> shape(2); 
         shape[0] = 6; 
         shape[1] = 4;
         andres::Marray<int> m(shape.begin(), shape.end(), scalar_);
@@ -11251,7 +11251,7 @@ void MarrayTest::reshapeTest() {
                m.shape(1)==6);
     }
     {
-        std::vector<size_t> shape(2); 
+        std::vector<std::size_t> shape(2); 
         shape[0] = 6; 
         shape[1] = 4;
         andres::Marray<int> m(shape.begin(), shape.end(), scalar_, andres::FirstMajorOrder);
@@ -11264,7 +11264,7 @@ void MarrayTest::reshapeTest() {
     }
     // 3D
     {
-        std::vector<size_t> shape(3);
+        std::vector<std::size_t> shape(3);
         shape[0] = 3;
         shape[1] = 4; 
         shape[2] = 2;
@@ -11279,7 +11279,7 @@ void MarrayTest::reshapeTest() {
                m.shape(2)==4);
     }
     {
-        std::vector<size_t> shape(3);
+        std::vector<std::size_t> shape(3);
         shape[0] = 3;
         shape[1] = 4; 
         shape[2] = 2;
@@ -11301,7 +11301,7 @@ void MarrayTest::resizeTest() {
     {
         // shrink
         {
-            std::vector<size_t> shape(1);
+            std::vector<std::size_t> shape(1);
             shape[0] = 24; 
             andres::Marray<int> m(shape.begin(), shape.end(), scalar_, coordinateOrder);
             shape[0] = 12; 
@@ -11313,14 +11313,14 @@ void MarrayTest::resizeTest() {
         }
         // shrink to dimension == 0 
         {
-            std::vector<size_t> shape(1), shape0(0);
+            std::vector<std::size_t> shape(1), shape0(0);
             shape[0] = 24; 
             andres::Marray<int> m(shape.begin(), shape.end(), scalar_, coordinateOrder);
             m.resize(shape0.begin(), shape0.end(), 1);
         }
         // shrink to scalar 
         {
-            std::vector<size_t> shape(1);
+            std::vector<std::size_t> shape(1);
             shape[0] = 24; 
             andres::Marray<int> m(shape.begin(), shape.end(), scalar_, coordinateOrder);
             shape[0] = 1; 
@@ -11333,7 +11333,7 @@ void MarrayTest::resizeTest() {
         // grow scalar to 1D
         {
             int scalar = 1;
-            std::vector<size_t> shape(1);
+            std::vector<std::size_t> shape(1);
             shape[0] = 24; 
             andres::Marray<int> m(scalar);
             m.resize(shape.begin(), shape.end(), 3);
@@ -11348,7 +11348,7 @@ void MarrayTest::resizeTest() {
         }
         // grow 1D
         {
-            std::vector<size_t> shape(1);
+            std::vector<std::size_t> shape(1);
             shape[0] = 12; 
             andres::Marray<int> m(shape.begin(), shape.end(), scalar_, coordinateOrder);
             shape[0] = 24; 
@@ -11370,7 +11370,7 @@ void MarrayTest::resizeTest() {
         {
             int scalar = 1;
             andres::Marray<int> m(scalar); 
-            std::vector<size_t> newShape(3);
+            std::vector<std::size_t> newShape(3);
             newShape[0] = 5;
             newShape[1] = 5; 
             newShape[2] = 2;
@@ -11395,10 +11395,10 @@ void MarrayTest::resizeTest() {
         }
         // grow to 3D
         {
-            std::vector<size_t> shape(1);
+            std::vector<std::size_t> shape(1);
             shape[0] = 12; 
             andres::Marray<int> m(shape.begin(), shape.end(), scalar_, coordinateOrder); 
-            std::vector<size_t> newShape(3);
+            std::vector<std::size_t> newShape(3);
             newShape[0] = 5;
             newShape[1] = 5; 
             newShape[2] = 2;
@@ -11426,7 +11426,7 @@ void MarrayTest::resizeTest() {
     {
         // shrink
         {
-            std::vector<size_t> shape(2); 
+            std::vector<std::size_t> shape(2); 
             shape[0] = 6; 
             shape[1] = 4;
             andres::Marray<int> m(shape.begin(), shape.end(), scalar_, coordinateOrder);
@@ -11441,7 +11441,7 @@ void MarrayTest::resizeTest() {
         }
         // grow
         {
-            std::vector<size_t> shape(2); 
+            std::vector<std::size_t> shape(2); 
             shape[0] = 3; 
             shape[1] = 2;
             andres::Marray<int> m(shape.begin(), shape.end(), scalar_, coordinateOrder);
@@ -11466,21 +11466,21 @@ void MarrayTest::resizeTest() {
         }
         // shrink to dimension == 0
         {
-            std::vector<size_t> shape(2); 
+            std::vector<std::size_t> shape(2); 
             shape[0] = 6; 
             shape[1] = 4;
             andres::Marray<int> m(shape.begin(), shape.end(), scalar_, coordinateOrder);
-            std::vector<size_t> newShape(0); 
+            std::vector<std::size_t> newShape(0); 
             m.resize(newShape.begin(), newShape.end(), 3);
         }
         // shrink to scalar
         {
-            std::vector<size_t> shape(2); 
+            std::vector<std::size_t> shape(2); 
             shape[0] = 6; 
             shape[1] = 4;
 
             andres::Marray<int> m(shape.begin(), shape.end(), scalar_, coordinateOrder);
-            std::vector<size_t> newShape(1); 
+            std::vector<std::size_t> newShape(1); 
             newShape[0] = 12; 
             m.resize(newShape.begin(), newShape.end(), 3);
 
@@ -11489,11 +11489,11 @@ void MarrayTest::resizeTest() {
         }
         // shrink to 1D
         {
-            std::vector<size_t> shape(2); 
+            std::vector<std::size_t> shape(2); 
             shape[0] = 6; 
             shape[1] = 4;
             andres::Marray<int> m(shape.begin(), shape.end(), scalar_, coordinateOrder);
-            std::vector<size_t> newShape(1); 
+            std::vector<std::size_t> newShape(1); 
             newShape[0] = 12; 
             m.resize(newShape.begin(), newShape.end(), 3);
 
@@ -11507,11 +11507,11 @@ void MarrayTest::resizeTest() {
         }
         // grow to 3D
         {
-            std::vector<size_t> shape(2); 
+            std::vector<std::size_t> shape(2); 
             shape[0] = 3; 
             shape[1] = 2;
             andres::Marray<int> m(shape.begin(), shape.end(), scalar_, coordinateOrder);
-            std::vector<size_t> newShape(3);
+            std::vector<std::size_t> newShape(3);
             newShape[0] = 5;
             newShape[1] = 5; 
             newShape[2] = 2;
@@ -11539,7 +11539,7 @@ void MarrayTest::resizeTest() {
     {
         // shrink
         {
-            std::vector<size_t> shape(3);
+            std::vector<std::size_t> shape(3);
             shape[0] = 3;
             shape[1] = 4; 
             shape[2] = 2;
@@ -11557,7 +11557,7 @@ void MarrayTest::resizeTest() {
         }
         // grow
         {
-            std::vector<size_t> shape(3);
+            std::vector<std::size_t> shape(3);
             shape[0] = 3;
             shape[1] = 4; 
             shape[2] = 2;
@@ -11586,22 +11586,22 @@ void MarrayTest::resizeTest() {
         }
         // shrink to dimension == 0
         {
-            std::vector<size_t> shape(3);
+            std::vector<std::size_t> shape(3);
             shape[0] = 3;
             shape[1] = 4; 
             shape[2] = 2;
             andres::Marray<int> m(shape.begin(), shape.end(), scalar_, coordinateOrder);
-            std::vector<size_t> newShape(0); 
+            std::vector<std::size_t> newShape(0); 
             m.resize(newShape.begin(), newShape.end(), 3);
         }
         // shrink to scalar
         {
-            std::vector<size_t> shape(3);
+            std::vector<std::size_t> shape(3);
             shape[0] = 3;
             shape[1] = 4; 
             shape[2] = 2;
             andres::Marray<int> m(shape.begin(), shape.end(), scalar_, coordinateOrder);
-            std::vector<size_t> newShape(1); 
+            std::vector<std::size_t> newShape(1); 
             newShape[0] = 12; 
             m.resize(newShape.begin(), newShape.end(), 3);
 
@@ -11611,12 +11611,12 @@ void MarrayTest::resizeTest() {
         }
         // shrink to 1D
         {
-            std::vector<size_t> shape(3);
+            std::vector<std::size_t> shape(3);
             shape[0] = 3;
             shape[1] = 4; 
             shape[2] = 2;
             andres::Marray<int> m(shape.begin(), shape.end(), scalar_, coordinateOrder);
-            std::vector<size_t> newShape(1); 
+            std::vector<std::size_t> newShape(1); 
             newShape[0] = 12; 
             m.resize(newShape.begin(), newShape.end(), 3);
 
@@ -11630,12 +11630,12 @@ void MarrayTest::resizeTest() {
         }
         // shrink to 2D
         {
-            std::vector<size_t> shape(3);
+            std::vector<std::size_t> shape(3);
             shape[0] = 3;
             shape[1] = 4; 
             shape[2] = 2;
             andres::Marray<int> m(shape.begin(), shape.end(), scalar_, coordinateOrder);
-            std::vector<size_t> newShape(2); 
+            std::vector<std::size_t> newShape(2); 
             newShape[0] = 6; 
             newShape[1] = 4; 
             m.resize(newShape.begin(), newShape.end(), 3);
@@ -11660,19 +11660,19 @@ void MarrayTest::resizeTest() {
 
 ExpressionTemplateTest::ExpressionTemplateTest()
 {
-    for(size_t j=0; j<24; ++j) {
+    for(std::size_t j=0; j<24; ++j) {
         dataInt_[j] = static_cast<int>(j+1);
     }
 }
 
 void ExpressionTemplateTest::arithmeticOperatorsTest()
 {
-    size_t shape[] = {2, 3, 2};
+    std::size_t shape[] = {2, 3, 2};
     andres::View<int> v(shape, shape+3, dataInt_);
     andres::View<int> w(shape, shape+3, dataInt_ + 2);
-    for(size_t z=0; z<2; ++z) {
-        for(size_t y=0; y<3; ++y) {
-            for(size_t x=0; x<2; ++x) {
+    for(std::size_t z=0; z<2; ++z) {
+        for(std::size_t y=0; y<3; ++y) {
+            for(std::size_t x=0; x<2; ++x) {
                 test((+v)(x,y,z) == + v(x,y,z));
 
                 test((-v)(x,y,z) == - v(x,y,z));
@@ -11705,21 +11705,21 @@ void ExpressionTemplateTest::constructionAndAssignmentTest()
 {
     // Marray
     {
-        size_t shape[] = {2, 3, 2};
+        std::size_t shape[] = {2, 3, 2};
         andres::View<int> v(shape, shape+3, dataInt_);
         andres::View<int> w(shape, shape+3, dataInt_ + 2);
         andres::Marray<int> r(v + w); // construction
-        for(size_t z=0; z<2; ++z) {
-            for(size_t y=0; y<3; ++y) {
-                for(size_t x=0; x<2; ++x) {
+        for(std::size_t z=0; z<2; ++z) {
+            for(std::size_t y=0; y<3; ++y) {
+                for(std::size_t x=0; x<2; ++x) {
                     test( r(x,y,z) == (v + w)(x,y,z) );
                 }
             }
         }
         r = v * w; // assignment
-        for(size_t z=0; z<2; ++z) {
-            for(size_t y=0; y<3; ++y) {
-                for(size_t x=0; x<2; ++x) {
+        for(std::size_t z=0; z<2; ++z) {
+            for(std::size_t y=0; y<3; ++y) {
+                for(std::size_t x=0; x<2; ++x) {
                     test( r(x,y,z) == (v * w)(x,y,z) );
                 }
             }
@@ -11729,7 +11729,7 @@ void ExpressionTemplateTest::constructionAndAssignmentTest()
 
 DifferingTypesTest::DifferingTypesTest()
 {
-    for(size_t j=0; j<24; ++j) {
+    for(std::size_t j=0; j<24; ++j) {
         dataShort_[j] = static_cast<short>(j+1);
         dataInt_[j] = static_cast<int>(j+1);
     }
@@ -11741,31 +11741,31 @@ void DifferingTypesTest::constructionTest()
     {
         // from View 
         {
-            size_t shape[] = {3, 2, 4};
+            std::size_t shape[] = {3, 2, 4};
             andres::View<short> v(shape, shape+3, dataShort_);
             andres::Marray<int> m(v);
             test(v.size() == m.size());
-            for(size_t j=0; j<v.size(); ++j) {
+            for(std::size_t j=0; j<v.size(); ++j) {
                 test(v(j) == m(j));
             }
         }
         // from ViewExpression
         {
-            size_t shape[] = {3, 2, 4};
+            std::size_t shape[] = {3, 2, 4};
             andres::View<short> v(shape, shape+3, dataShort_);
             andres::Marray<int> m(v + v);
             test(v.size() == m.size());
-            for(size_t j=0; j<v.size(); ++j) {
+            for(std::size_t j=0; j<v.size(); ++j) {
                 test(v(j)+v(j) == m(j));
             }
         }
         // from Marray
         {
-            size_t shape[] = {3, 2, 4};
+            std::size_t shape[] = {3, 2, 4};
             andres::Marray<short> m(shape, shape+3);
             andres::Marray<int> n(m);
             test(n.size() == m.size());
-            for(size_t j=0; j<n.size(); ++j) {
+            for(std::size_t j=0; j<n.size(); ++j) {
                 test(n(j) == m(j));
             }
         }
@@ -11778,10 +11778,10 @@ void DifferingTypesTest::assignmentTest()
     {
         // from constant
         {
-            size_t shape[] = {3, 2, 4};
+            std::size_t shape[] = {3, 2, 4};
             andres::View<short> v(shape, shape+3, dataShort_);
             v = 2;
-            for(size_t j=0; j<v.size(); ++j) {
+            for(std::size_t j=0; j<v.size(); ++j) {
                 test(v(j) == 2);
             }
         }
@@ -11789,11 +11789,11 @@ void DifferingTypesTest::assignmentTest()
         { 
             // compilers may issue a warning here
             if(sizeof(float) == sizeof(int)) {
-                size_t shape[] = {3, 2, 4};
+                std::size_t shape[] = {3, 2, 4};
                 andres::View<int> v(shape, shape+3, dataInt_);
                 andres::View<float, true> w;
                 w = v;
-                for(size_t j=0; j<v.size(); ++j) {
+                for(std::size_t j=0; j<v.size(); ++j) {
                     test( w(j) == *static_cast<float*>(
                         static_cast<void*>(&dataInt_[j])));
                 }
@@ -11801,11 +11801,11 @@ void DifferingTypesTest::assignmentTest()
         }
         // from ViewExpression
         { 
-            size_t shape[] = {3, 2, 4};
+            std::size_t shape[] = {3, 2, 4};
             andres::View<short> v(shape, shape+3, dataShort_);
             andres::View<int> w(shape, shape+3, dataInt_);
             w = v + v;
-            for(size_t j=0; j<w.size(); ++j) {
+            for(std::size_t j=0; j<w.size(); ++j) {
                 test(w(j) == (v + v)(j));
             }
         }
@@ -11814,43 +11814,43 @@ void DifferingTypesTest::assignmentTest()
     {
         // from constant
         {
-            size_t shape[] = {3, 2, 4};
+            std::size_t shape[] = {3, 2, 4};
             andres::Marray<short> m(shape, shape+3);
             m = 2;
-            for(size_t j=0; j<m.size(); ++j) {
+            for(std::size_t j=0; j<m.size(); ++j) {
                 test(m(j) == 2);
             }
         }
         // from View 
         {
-            size_t shape[] = {3, 2, 4};
+            std::size_t shape[] = {3, 2, 4};
             andres::View<short> v(shape, shape+3, dataShort_);
             andres::Marray<int> m;
             m = v;
             test(v.size() == m.size());
-            for(size_t j=0; j<v.size(); ++j) {
+            for(std::size_t j=0; j<v.size(); ++j) {
                 test(v(j) == m(j));
             }
         }
         // from ViewExpression
         {
-            size_t shape[] = {3, 2, 4};
+            std::size_t shape[] = {3, 2, 4};
             andres::View<short> v(shape, shape+3, dataShort_);
             andres::Marray<int> m;
             m = v + v;
             test(v.size() == m.size());
-            for(size_t j=0; j<v.size(); ++j) {
+            for(std::size_t j=0; j<v.size(); ++j) {
                 test(v(j)+v(j) == m(j));
             }
         }
         // from Marray
         {
-            size_t shape[] = {3, 2, 4};
+            std::size_t shape[] = {3, 2, 4};
             andres::Marray<short> m(shape, shape+3);
             andres::Marray<int> n;
             n = m;
             test(n.size() == m.size());
-            for(size_t j=0; j<n.size(); ++j) {
+            for(std::size_t j=0; j<n.size(); ++j) {
                 test(n(j) == m(j));
             }
         }
@@ -11861,12 +11861,12 @@ void DifferingTypesTest::arithmeticOperatorsTest()
 {
     // ViewExpression
     {
-        size_t shape[] = {2, 3, 2};
+        std::size_t shape[] = {2, 3, 2};
         andres::View<short> v(shape, shape+3, dataShort_);
         andres::View<int> w(shape, shape+3, dataInt_);
-        for(size_t z=0; z<2; ++z) {
-            for(size_t y=0; y<3; ++y) {
-                for(size_t x=0; x<2; ++x) {
+        for(std::size_t z=0; z<2; ++z) {
+            for(std::size_t y=0; y<3; ++y) {
+                for(std::size_t x=0; x<2; ++x) {
                     test((2+v)(x,y,z) == 2 + v(x,y,z));
                     test((v+2)(x,y,z) == v(x,y,z) + 2);
                     test((v+w)(x,y,z) == v(x,y,z) + w(x,y,z));
@@ -11894,113 +11894,113 @@ void DifferingTypesTest::arithmeticOperatorsTest()
     {
         // += constant
         {
-            size_t shape[] = {2, 3, 4};
+            std::size_t shape[] = {2, 3, 4};
             andres::Marray<short> m(shape, shape+3);
-            for(size_t j=0; j<m.size(); ++j) {
+            for(std::size_t j=0; j<m.size(); ++j) {
                 m(j) = static_cast<short>(j+1);
             }
             andres::Marray<short> n(m); // copy for comparsion
             m += 2;
-            for(size_t j=0; j<m.size(); ++j) {
+            for(std::size_t j=0; j<m.size(); ++j) {
                 test(m(j) == n(j) + 2);
             }
         }
         // += Marray
         {
-            size_t shape[] = {2, 3, 4};
+            std::size_t shape[] = {2, 3, 4};
             andres::Marray<short> m1(shape, shape+3);
             andres::Marray<int> m2(shape, shape+3);
-            for(size_t j=0; j<m1.size(); ++j) {
+            for(std::size_t j=0; j<m1.size(); ++j) {
                 m1(j) = static_cast<short>(j+1);
                 m2(j) = static_cast<int>(j+1);
             }
             andres::Marray<short> n(m1); // copy for comparison
             m1 += m2;
-            for(size_t j=0; j<m1.size(); ++j) {
+            for(std::size_t j=0; j<m1.size(); ++j) {
                 test(m1(j) == n(j) + m2(j));
             }
         }
         // -= constant
         {
-            size_t shape[] = {2, 3, 4};
+            std::size_t shape[] = {2, 3, 4};
             andres::Marray<short> m(shape, shape+3);
-            for(size_t j=0; j<m.size(); ++j) {
+            for(std::size_t j=0; j<m.size(); ++j) {
                 m(j) = static_cast<short>(j+1);
             }
             andres::Marray<short> n(m); // copy for comparsion
             m -= 2;
-            for(size_t j=0; j<m.size(); ++j) {
+            for(std::size_t j=0; j<m.size(); ++j) {
                 test(m(j) == n(j) - 2);
             }
         }
         // -= Marray
         {
-            size_t shape[] = {2, 3, 4};
+            std::size_t shape[] = {2, 3, 4};
             andres::Marray<short> m1(shape, shape+3);
             andres::Marray<int> m2(shape, shape+3);
-            for(size_t j=0; j<m1.size(); ++j) {
+            for(std::size_t j=0; j<m1.size(); ++j) {
                 m1(j) = static_cast<short>(j+1);
                 m2(j) = static_cast<int>(j+1);
             }
             andres::Marray<short> n(m1); // copy for comparison
             m1 -= m2;
-            for(size_t j=0; j<m1.size(); ++j) {
+            for(std::size_t j=0; j<m1.size(); ++j) {
                 test(m1(j) == n(j) - m2(j));
             }
         }
         // *= constant
         {
-            size_t shape[] = {2, 3, 4};
+            std::size_t shape[] = {2, 3, 4};
             andres::Marray<short> m(shape, shape+3);
-            for(size_t j=0; j<m.size(); ++j) {
+            for(std::size_t j=0; j<m.size(); ++j) {
                 m(j) = static_cast<short>(j+1);
             }
             andres::Marray<short> n(m); // copy for comparsion
             m *= 2;
-            for(size_t j=0; j<m.size(); ++j) {
+            for(std::size_t j=0; j<m.size(); ++j) {
                 test(m(j) == n(j) * 2);
             }
         }
         // *= Marray
         {
-            size_t shape[] = {2, 3, 4};
+            std::size_t shape[] = {2, 3, 4};
             andres::Marray<short> m1(shape, shape+3);
             andres::Marray<int> m2(shape, shape+3);
-            for(size_t j=0; j<m1.size(); ++j) {
+            for(std::size_t j=0; j<m1.size(); ++j) {
                 m1(j) = static_cast<short>(j+1);
                 m2(j) = static_cast<int>(j+1);
             }
             andres::Marray<short> n(m1); // copy for comparison
             m1 *= m2;
-            for(size_t j=0; j<m1.size(); ++j) {
+            for(std::size_t j=0; j<m1.size(); ++j) {
                 test(m1(j) == n(j) * m2(j));
             }
         }
         // /= constant
         {
-            size_t shape[] = {2, 3, 4};
+            std::size_t shape[] = {2, 3, 4};
             andres::Marray<short> m(shape, shape+3);
-            for(size_t j=0; j<m.size(); ++j) {
+            for(std::size_t j=0; j<m.size(); ++j) {
                 m(j) = static_cast<short>(j+1);
             }
             andres::Marray<short> n(m); // copy for comparsion
             m /= 2;
-            for(size_t j=0; j<m.size(); ++j) {
+            for(std::size_t j=0; j<m.size(); ++j) {
                 test(m(j) == n(j) / 2);
             }
         }
         // /= Marray
         {
-            size_t shape[] = {2, 3, 4};
+            std::size_t shape[] = {2, 3, 4};
             andres::Marray<short> m1(shape, shape+3);
             andres::Marray<int> m2(shape, shape+3);
-            for(size_t j=0; j<m1.size(); ++j) {
+            for(std::size_t j=0; j<m1.size(); ++j) {
                 m1(j) = static_cast<short>(j+1);
                 m2(j) = static_cast<int>(j+1);
             }
             andres::Marray<short> n(m1); // copy for comparison
             m1 /= m2;
-            for(size_t j=0; j<m1.size(); ++j) {
+            for(std::size_t j=0; j<m1.size(); ++j) {
                 test(m1(j) == n(j) / m2(j));
             }
         }
@@ -12011,9 +12011,9 @@ struct MyTestType {};
 
 void DifferingTypesTest::nonBasicTypesTest()
 {
-    size_t shape[] = {3, 4};
+    std::size_t shape[] = {3, 4};
     andres::Marray<MyTestType> m(shape, shape + 2);
-    size_t base[] = {0, 0};
+    std::size_t base[] = {0, 0};
     shape[0] = 2;
     shape[1] = 2;
     andres::View<MyTestType> v = m.view(base, shape);
@@ -12022,10 +12022,10 @@ void DifferingTypesTest::nonBasicTypesTest()
 
 void DifferingTypesTest::typePromotionTest()
 {
-    size_t shape[] = {3, 4};
+    std::size_t shape[] = {3, 4};
     andres::Marray<unsigned char> a(shape, shape + 2, 250);
     andres::Marray<int> b(shape, shape + 2, 1000);
-    for(size_t j=0; j<a.size(); ++j) {
+    for(std::size_t j=0; j<a.size(); ++j) {
         test((a + b)(j) == 1250);
         test((a - b)(j) == -750);
         test((b + a)(j) == 1250);
@@ -12041,7 +12041,7 @@ class Cpp0xTest {
     
     public:
     Cpp0xTest() {
-        for(size_t j=0; j<24; ++j) {
+        for(std::size_t j=0; j<24; ++j) {
             data_[j] = j;
         }
     }
@@ -12049,7 +12049,7 @@ class Cpp0xTest {
     void test() {
         {
             andres::View<int, false> v({3,2,4}, data_, andres::LastMajorOrder, andres::LastMajorOrder);
-            size_t a = 100;
+            std::size_t a = 100;
             v.coordinatesToIndex({1,1,3}, a);
             v.coordinatesToOffset({1,1,3}, a);
         }
