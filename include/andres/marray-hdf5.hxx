@@ -1,42 +1,39 @@
-// Marray: Fast Runtime-Flexible Multi-dimensional Arrays and Views in C++.
-// (HDF5 Support)
-//
-// Copyright (c) 2011 by Bjoern Andres (bjoern@andres.sc).
-//
+// Copyright (c) 2011-2013 by Bjoern Andres.
+// 
 // This software was developed by Bjoern Andres.
 // Enquiries shall be directed to bjoern@andres.sc.
 //
 // All advertising materials mentioning features or use of this software must
-// display the following acknowledgement: ``This product includes the Marray
-// package developed by Bjoern Andres. Please direct enquiries concerning the
-// Marray package to bjoern@andres.sc''.
+// display the following acknowledgement: ``This product includes 
+// andres::marray developed by Bjoern Andres. Please direct enquiries 
+// concerning andres::marray to bjoern@andres.sc''.
 //
-// Redistribution and use in source and binary forms, with or without
+// Redistribution and use in source and binary forms, with or without 
 // modification, are permitted provided that the following conditions are met:
 //
 // - Redistributions of source code must retain the above copyright notice,
 //   this list of conditions and the following disclaimer.
-// - Redistributions in binary form must reproduce the above copyright notice,
+// - Redistributions in binary form must reproduce the above copyright notice, 
 //   this list of conditions and the following disclaimer in the documentation
 //   and/or other materials provided with the distribution.
-// - All advertising materials mentioning features or use of this software must
-//   display the following acknowledgement: ``This product includes the Marray
-//   package developed by Bjoern Andres. Please direct enquiries concerning the
-//   Marray package to bjoern@andres.sc''.
-// - The name of the author must not be used to endorse or promote products
+// - All advertising materials mentioning features or use of this software must 
+//   display the following acknowledgement: ``This product includes 
+//   andres::marray developed by Bjoern Andres. Please direct enquiries 
+//   concerning andres::marray to bjoern@andres.sc''.
+// - The name of the author must not be used to endorse or promote products 
 //   derived from this software without specific prior written permission.
 //
-// THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR IMPLIED
-// WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
-// MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO
+// THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR IMPLIED 
+// WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF 
+// MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO 
 // EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
 // SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
-// PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
-// OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
-// WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
-// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
+// PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; 
+// OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, 
+// WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR 
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF 
 // ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-//
+// 
 #pragma once
 #ifndef MARRAY_HDF5_HXX
 #define MARRAY_HDF5_HXX
@@ -51,12 +48,13 @@
 #define H5Acreate_vers 2
 #endif
 
+#include <cstddef>
 #include <cstring>
 
 #include "marray.hxx"
 #include "hdf5.h"
 
-namespace marray {
+namespace andres {
 /// HDF5 import/export support.
 namespace hdf5 {
 
@@ -66,16 +64,16 @@ namespace hdf5 {
 template<bool B> class HandleCheck;
 template<> class HandleCheck<false> {
 public:
-	HandleCheck()
-		{ counter_ = H5Fget_obj_count(H5F_OBJ_ALL, H5F_OBJ_ALL); }
-	void check()
-		{ marray_detail::Assert( counter_ == H5Fget_obj_count(H5F_OBJ_ALL, H5F_OBJ_ALL)); }
+    HandleCheck()
+        { counter_ = H5Fget_obj_count(H5F_OBJ_ALL, H5F_OBJ_ALL); }
+    void check()
+        { marray_detail::Assert( counter_ == H5Fget_obj_count(H5F_OBJ_ALL, H5F_OBJ_ALL)); }
 private:
-	ssize_t counter_;
+    ssize_t counter_;
 };
 template<> class HandleCheck<true> {
 public:
-	void check() {}
+    void check() {}
 };
 // \endcond
 
@@ -88,34 +86,54 @@ const char reverseShapeAttributeName[14] = "reverse-shape";
 enum FileAccessMode {READ_ONLY, READ_WRITE};
 enum HDF5Version {DEFAULT_HDF5_VERSION, LATEST_HDF5_VERSION};
 
-inline hid_t createFile(const std::string&, HDF5Version = DEFAULT_HDF5_VERSION);
-inline hid_t openFile(const std::string&, FileAccessMode = READ_ONLY, HDF5Version = DEFAULT_HDF5_VERSION);
-inline void closeFile(const hid_t&);
+hid_t createFile(const std::string&, HDF5Version = DEFAULT_HDF5_VERSION);
+hid_t openFile(const std::string&, FileAccessMode = READ_ONLY, HDF5Version = DEFAULT_HDF5_VERSION);
+void closeFile(const hid_t&);
 
-inline hid_t createGroup(const hid_t&, const std::string&);
-inline hid_t openGroup(const hid_t&, const std::string&);
-inline void closeGroup(const hid_t&);
+hid_t createGroup(const hid_t&, const std::string&);
+hid_t openGroup(const hid_t&, const std::string&);
+void closeGroup(const hid_t&);
 
 template<class T>
-	void save(const hid_t&, const std::string&, const Marray<T>&);
+    void save(const hid_t&, const std::string&, const Marray<T>&);
 template<class T, bool isConst>
-	void save(const hid_t&, const std::string&, const View<T, isConst>&);
+    void save(const hid_t&, const std::string&, const View<T, isConst>&);
 template<class T>
     void save(const hid_t&, const std::string&, const std::vector<T>&);
 template<class T, class BaseIterator, class ShapeIterator>
-	void saveHyperslab(const hid_t&, const std::string&,
-		BaseIterator, BaseIterator, ShapeIterator, const Marray<T>&);
+    void saveHyperslab(const hid_t&, const std::string&,
+        BaseIterator, BaseIterator, ShapeIterator, const Marray<T>&);
 template<class T, class ShapeIterator>
     void create(const hid_t&, const std::string&, ShapeIterator,
         ShapeIterator, CoordinateOrder);
 
 template<class T>
-	void load(const hid_t&, const std::string&, Marray<T>&);
+    void load(const hid_t&, const std::string&, Marray<T>&);
+// TODO: implement the following functions that throw an error 
+// if the dimension is not correct
+// template<class T>
+//     void load(const hid_t&, const std::string&, Vector<T>&);
+// template<class T>
+//     void load(const hid_t&, const std::string&, Matrix<T>&);
 template<class T>
-	void loadShape(const hid_t&, const std::string&, Vector<T>&);
+    void load(const hid_t&, const std::string&, std::vector<T>&);
+
+template<class T>
+    void load(const std::string&, const std::string&, Marray<T>&, HDF5Version = DEFAULT_HDF5_VERSION);
+// TODO: implement the following functions that throw an error 
+// if the dimension is not correct
+// template<class T>
+//     void load(const std::string&, const std::string&, Vector<T>&, HDF5Version = DEFAULT_HDF5_VERSION);
+// template<class T>
+//     void load(const std::string&, const std::string&, Matrix<T>&, HDF5Version = DEFAULT_HDF5_VERSION);
+template<class T>
+    void load(const std::string&, const std::string&, std::vector<T>&, HDF5Version = DEFAULT_HDF5_VERSION);
+
+template<class T>
+    void loadShape(const hid_t&, const std::string&, std::vector<T>&);
 template<class T, class BaseIterator, class ShapeIterator>
-	void loadHyperslab(const hid_t&, const std::string&,
-		BaseIterator, BaseIterator, ShapeIterator, Marray<T>&);
+    void loadHyperslab(const hid_t&, const std::string&,
+        BaseIterator, BaseIterator, ShapeIterator, Marray<T>&);
 
 // type conversion from C++ to HDF5
 
@@ -123,44 +141,44 @@ template<class T, class BaseIterator, class ShapeIterator>
 template<class T>
 inline hid_t uintTypeHelper() {
    switch(sizeof(T)) {
-	   case 1:
-		   return H5T_STD_U8LE;
-	   case 2:
-		   return H5T_STD_U16LE;
-	   case 4:
-		   return H5T_STD_U32LE;
-	   case 8:
-		   return H5T_STD_U64LE;
-	   default:
-		   throw std::runtime_error("No matching HDF5 type.");
+       case 1:
+           return H5T_STD_U8LE;
+       case 2:
+           return H5T_STD_U16LE;
+       case 4:
+           return H5T_STD_U32LE;
+       case 8:
+           return H5T_STD_U64LE;
+       default:
+           throw std::runtime_error("No matching HDF5 type.");
    }
 }
 
 template<class T>
 inline hid_t intTypeHelper() {
    switch(sizeof(T)) {
-	   case 1:
-		   return H5T_STD_I8LE;
-	   case 2:
-		   return H5T_STD_I16LE;
-	   case 4:
-		   return H5T_STD_I32LE;
-	   case 8:
-		   return H5T_STD_I64LE;
-	   default:
-		   throw std::runtime_error("No matching HDF5 type.");
+       case 1:
+           return H5T_STD_I8LE;
+       case 2:
+           return H5T_STD_I16LE;
+       case 4:
+           return H5T_STD_I32LE;
+       case 8:
+           return H5T_STD_I64LE;
+       default:
+           throw std::runtime_error("No matching HDF5 type.");
    }
 }
 
 template<class T>
 inline hid_t floatingTypeHelper() {
    switch(sizeof(T)) {
-	   case 4:
-		   return H5T_IEEE_F32LE;
-	   case 8:
-		   return H5T_IEEE_F64LE;
-	   default:
-		   throw std::runtime_error("No matching HDF5 type.");
+       case 4:
+           return H5T_IEEE_F32LE;
+       case 8:
+           return H5T_IEEE_F64LE;
+       default:
+           throw std::runtime_error("No matching HDF5 type.");
    }
 }
 
@@ -168,31 +186,33 @@ template<class T>
 inline hid_t hdf5Type();
 
 template<> inline hid_t hdf5Type<unsigned char>()
-	{ return uintTypeHelper<unsigned char>(); }
+    { return uintTypeHelper<unsigned char>(); }
 template<> inline hid_t hdf5Type<unsigned short>()
-	{ return uintTypeHelper<unsigned short>(); }
+    { return uintTypeHelper<unsigned short>(); }
 template<> inline hid_t hdf5Type<unsigned int>()
-	{ return uintTypeHelper<unsigned int>(); }
+    { return uintTypeHelper<unsigned int>(); }
 template<> inline hid_t hdf5Type<unsigned long>()
-	{ return uintTypeHelper<unsigned long>(); }
+    { return uintTypeHelper<unsigned long>(); }
 template<> inline hid_t hdf5Type<unsigned long long>()
-	{ return uintTypeHelper<unsigned long long>(); }
+    { return uintTypeHelper<unsigned long long>(); }
 
+template<> inline hid_t hdf5Type<signed char>()
+    { return intTypeHelper<signed char>(); }
 template<> inline hid_t hdf5Type<char>()
-	{ return uintTypeHelper<char>(); }
+    { return uintTypeHelper<char>(); }
 template<> inline hid_t hdf5Type<short>()
-	{ return intTypeHelper<short>(); }
+    { return intTypeHelper<short>(); }
 template<> inline hid_t hdf5Type<int>()
-	{ return intTypeHelper<int>(); }
+    { return intTypeHelper<int>(); }
 template<> inline hid_t hdf5Type<long>()
-	{ return intTypeHelper<long>(); }
+    { return intTypeHelper<long>(); }
 template<> inline hid_t hdf5Type<long long>()
-	{ return intTypeHelper<long long>(); }
+    { return intTypeHelper<long long>(); }
 
 template<> inline hid_t hdf5Type<float>()
-	{ return floatingTypeHelper<float>(); }
+    { return floatingTypeHelper<float>(); }
 template<> inline hid_t hdf5Type<double>()
-	{ return floatingTypeHelper<double>(); }
+    { return floatingTypeHelper<double>(); }
 // \endcond
 
 // implementation
@@ -209,85 +229,85 @@ template<> inline hid_t hdf5Type<double>()
 ///
 template<class T, class ShapeIterator>
 void create(
-	const hid_t& groupHandle,
-	const std::string& datasetName,
-	ShapeIterator begin,
-	ShapeIterator end,
-	CoordinateOrder coordinateOrder
+    const hid_t& groupHandle,
+    const std::string& datasetName,
+    ShapeIterator begin,
+    ShapeIterator end,
+    CoordinateOrder coordinateOrder
 ) {
-	marray_detail::Assert(MARRAY_NO_ARG_TEST || groupHandle >= 0);
-	HandleCheck<MARRAY_NO_DEBUG> handleCheck;
+    marray_detail::Assert(MARRAY_NO_ARG_TEST || groupHandle >= 0);
+    HandleCheck<MARRAY_NO_DEBUG> handleCheck;
 
-	// build dataspace
-	hid_t datatype = H5Tcopy(hdf5Type<T>());
-	size_t dimension = std::distance(begin, end);
-	Vector<hsize_t> shape((size_t)(dimension));
-	if(coordinateOrder == FirstMajorOrder) {
-		// copy shape as is
-		for(size_t j=0; j<dimension; ++j) {
-			shape[j] = hsize_t(*begin);
-			++begin;
-		}
-	}
-	else {
-		// reverse shape
-		for(size_t j=0; j<dimension; ++j) {
-			shape[dimension-j-1] = hsize_t(*begin);
-			++begin;
-		}
-	}
+    // build dataspace
+    hid_t datatype = H5Tcopy(hdf5Type<T>());
+    std::size_t dimension = std::distance(begin, end);
+    std::vector<hsize_t> shape(dimension);
+    if(coordinateOrder == FirstMajorOrder) {
+        // copy shape as is
+        for(std::size_t j=0; j<dimension; ++j) {
+            shape[j] = hsize_t(*begin);
+            ++begin;
+        }
+    }
+    else {
+        // reverse shape
+        for(std::size_t j=0; j<dimension; ++j) {
+            shape[dimension-j-1] = hsize_t(*begin);
+            ++begin;
+        }
+    }
     hid_t dataspace = H5Screate_simple(dimension, &shape[0], NULL);
-	if(dataspace < 0) {
-		H5Tclose(datatype);
-		throw std::runtime_error("Marray cannot create dataspace.");
-	}
+    if(dataspace < 0) {
+        H5Tclose(datatype);
+        throw std::runtime_error("Marray cannot create dataspace.");
+    }
 
 
-	// create new dataset
-	hid_t dataset = H5Dcreate(groupHandle, datasetName.c_str(), datatype,
-		dataspace, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
-	if(dataset < 0) {
-		H5Sclose(dataspace);
-		H5Tclose(datatype);
-		throw std::runtime_error("Marray cannot create dataset.");
-	}
+    // create new dataset
+    hid_t dataset = H5Dcreate(groupHandle, datasetName.c_str(), datatype,
+        dataspace, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
+    if(dataset < 0) {
+        H5Sclose(dataspace);
+        H5Tclose(datatype);
+        throw std::runtime_error("Marray cannot create dataset.");
+    }
 
-	// write attribute to indicate whether shape is reversed
-	if(coordinateOrder == LastMajorOrder) {
-		hsize_t attributeShape[1] = {1};
-		hid_t attributeDataspace = H5Screate_simple(1, attributeShape, NULL);
-		if(attributeDataspace < 0) {
-			H5Dclose(dataset);
-			H5Sclose(dataspace);
-			H5Tclose(datatype);
-			throw std::runtime_error("Marray cannot create dataspace.");
-		}
-		hid_t attribute = H5Acreate(dataset, reverseShapeAttributeName,
-			H5T_STD_U8LE, attributeDataspace, H5P_DEFAULT, H5P_DEFAULT);
-		if(attribute < 0) {
-			H5Sclose(attributeDataspace);
-			H5Dclose(dataset);
-			H5Sclose(dataspace);
-			H5Tclose(datatype);
-			throw std::runtime_error("Marray cannot create attribute.");
-		}
-		unsigned int data = 1;
-		herr_t err = H5Awrite(attribute, H5T_STD_U8LE, &data);
-		H5Aclose(attribute);
-		H5Sclose(attributeDataspace);
-		if(err < 0) {
-			H5Dclose(dataset);
-			H5Sclose(dataspace);
-			H5Tclose(datatype);
-			throw std::runtime_error("Marray cannot create write to attribute.");
-		}
-	}
+    // write attribute to indicate whether shape is reversed
+    if(coordinateOrder == LastMajorOrder) {
+        hsize_t attributeShape[1] = {1};
+        hid_t attributeDataspace = H5Screate_simple(1, attributeShape, NULL);
+        if(attributeDataspace < 0) {
+            H5Dclose(dataset);
+            H5Sclose(dataspace);
+            H5Tclose(datatype);
+            throw std::runtime_error("Marray cannot create dataspace.");
+        }
+        hid_t attribute = H5Acreate(dataset, reverseShapeAttributeName,
+            H5T_STD_U8LE, attributeDataspace, H5P_DEFAULT, H5P_DEFAULT);
+        if(attribute < 0) {
+            H5Sclose(attributeDataspace);
+            H5Dclose(dataset);
+            H5Sclose(dataspace);
+            H5Tclose(datatype);
+            throw std::runtime_error("Marray cannot create attribute.");
+        }
+        unsigned int data = 1;
+        herr_t err = H5Awrite(attribute, H5T_STD_U8LE, &data);
+        H5Aclose(attribute);
+        H5Sclose(attributeDataspace);
+        if(err < 0) {
+            H5Dclose(dataset);
+            H5Sclose(dataspace);
+            H5Tclose(datatype);
+            throw std::runtime_error("Marray cannot create write to attribute.");
+        }
+    }
 
-	// clean up
-	H5Dclose(dataset);
-	H5Sclose(dataspace);
-	H5Tclose(datatype);
-	handleCheck.check();
+    // clean up
+    H5Dclose(dataset);
+    H5Sclose(dataspace);
+    H5Tclose(datatype);
+    handleCheck.check();
 }
 
 /// Save an Marray as an HDF5 dataset.
@@ -300,85 +320,85 @@ void create(
 ///
 template<class T>
 void save(
-	const hid_t& groupHandle,
-	const std::string& datasetName,
-	const Marray<T>& in
+    const hid_t& groupHandle,
+    const std::string& datasetName,
+    const Marray<T>& in
 ) {
-	marray_detail::Assert(MARRAY_NO_ARG_TEST || groupHandle >= 0);
-	HandleCheck<MARRAY_NO_DEBUG> handleCheck;
+    marray_detail::Assert(MARRAY_NO_ARG_TEST || groupHandle >= 0);
+    HandleCheck<MARRAY_NO_DEBUG> handleCheck;
 
-	// build dataspace
-	hid_t datatype = H5Tcopy(hdf5Type<T>());
-	Vector<hsize_t> shape(in.dimension());
-	if(in.coordinateOrder() == FirstMajorOrder) {
-		// copy shape as is
-		for(size_t j=0; j<in.dimension(); ++j) {
-			shape[j] = hsize_t(in.shape(j));
-		}
-	}
-	else {
-		// reverse shape
-		for(size_t j=0; j<in.dimension(); ++j) {
-			shape[size_t(in.dimension()-j-1)] = hsize_t(in.shape(j));
-		}
-	}
+    // build dataspace
+    hid_t datatype = H5Tcopy(hdf5Type<T>());
+    std::vector<hsize_t> shape(in.dimension());
+    if(in.coordinateOrder() == FirstMajorOrder) {
+        // copy shape as is
+        for(std::size_t j=0; j<in.dimension(); ++j) {
+            shape[j] = hsize_t(in.shape(j));
+        }
+    }
+    else {
+        // reverse shape
+        for(std::size_t j=0; j<in.dimension(); ++j) {
+            shape[std::size_t(in.dimension()-j-1)] = hsize_t(in.shape(j));
+        }
+    }
     hid_t dataspace = H5Screate_simple(in.dimension(), &shape[0], NULL);
-	if(dataspace < 0) {
-		H5Tclose(datatype);
-		throw std::runtime_error("Marray cannot create dataspace.");
-	}
+    if(dataspace < 0) {
+        H5Tclose(datatype);
+        throw std::runtime_error("Marray cannot create dataspace.");
+    }
 
-	// create new dataset
-	hid_t dataset = H5Dcreate(groupHandle, datasetName.c_str(), datatype,
-		dataspace, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
-	if(dataset < 0) {
-		H5Sclose(dataspace);
-		H5Tclose(datatype);
-		throw std::runtime_error("Marray cannot create dataset.");
-	}
+    // create new dataset
+    hid_t dataset = H5Dcreate(groupHandle, datasetName.c_str(), datatype,
+        dataspace, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
+    if(dataset < 0) {
+        H5Sclose(dataspace);
+        H5Tclose(datatype);
+        throw std::runtime_error("Marray cannot create dataset.");
+    }
 
-	// write attribute to indicate whether shape is reversed
-	if(in.coordinateOrder() == LastMajorOrder) {
-		hsize_t attributeShape[1] = {1};
-		hid_t attributeDataspace = H5Screate_simple(1, attributeShape, NULL);
-		if(attributeDataspace < 0) {
-			H5Dclose(dataset);
-			H5Sclose(dataspace);
-			H5Tclose(datatype);
-			throw std::runtime_error("Marray cannot create dataspace.");
-		}
-		hid_t attribute = H5Acreate(dataset, reverseShapeAttributeName,
-			H5T_STD_U8LE, attributeDataspace, H5P_DEFAULT, H5P_DEFAULT);
-		if(attribute < 0) {
-			H5Sclose(attributeDataspace);
-			H5Dclose(dataset);
-			H5Sclose(dataspace);
-			H5Tclose(datatype);
-			throw std::runtime_error("Marray cannot create attribute.");
-		}
-		unsigned int data = 1;
-		herr_t err = H5Awrite(attribute, H5T_STD_U8LE, &data);
-		H5Aclose(attribute);
-		H5Sclose(attributeDataspace);
-		if(err < 0) {
-			H5Dclose(dataset);
-			H5Sclose(dataspace);
-			H5Tclose(datatype);
-			throw std::runtime_error("Marray cannot create write to attribute.");
-		}
-	}
+    // write attribute to indicate whether shape is reversed
+    if(in.coordinateOrder() == LastMajorOrder) {
+        hsize_t attributeShape[1] = {1};
+        hid_t attributeDataspace = H5Screate_simple(1, attributeShape, NULL);
+        if(attributeDataspace < 0) {
+            H5Dclose(dataset);
+            H5Sclose(dataspace);
+            H5Tclose(datatype);
+            throw std::runtime_error("Marray cannot create dataspace.");
+        }
+        hid_t attribute = H5Acreate(dataset, reverseShapeAttributeName,
+            H5T_STD_U8LE, attributeDataspace, H5P_DEFAULT, H5P_DEFAULT);
+        if(attribute < 0) {
+            H5Sclose(attributeDataspace);
+            H5Dclose(dataset);
+            H5Sclose(dataspace);
+            H5Tclose(datatype);
+            throw std::runtime_error("Marray cannot create attribute.");
+        }
+        unsigned int data = 1;
+        herr_t err = H5Awrite(attribute, H5T_STD_U8LE, &data);
+        H5Aclose(attribute);
+        H5Sclose(attributeDataspace);
+        if(err < 0) {
+            H5Dclose(dataset);
+            H5Sclose(dataspace);
+            H5Tclose(datatype);
+            throw std::runtime_error("Marray cannot create write to attribute.");
+        }
+    }
 
-	// write
-	herr_t status = H5Dwrite(dataset, datatype, H5S_ALL, H5S_ALL,
-		H5P_DEFAULT, &in(0));
-	H5Dclose(dataset);
+    // write
+    herr_t status = H5Dwrite(dataset, datatype, H5S_ALL, H5S_ALL,
+        H5P_DEFAULT, &in(0));
+    H5Dclose(dataset);
     H5Sclose(dataspace);
     H5Tclose(datatype);
-	if(status < 0) {
-		throw std::runtime_error("Marray cannot write to dataset.");
-	}
+    if(status < 0) {
+        throw std::runtime_error("Marray cannot write to dataset.");
+    }
 
-	handleCheck.check();
+    handleCheck.check();
 }
 
 /// Save a View as an HDF5 dataset.
@@ -391,12 +411,12 @@ void save(
 ///
 template<class T, bool isConst>
 inline void save(
-	const hid_t& groupHandle,
-	const std::string& datasetName,
-	const View<T, isConst>& in
+    const hid_t& groupHandle,
+    const std::string& datasetName,
+    const View<T, isConst>& in
 ) {
-	Marray<T> m = in;
-	save(groupHandle, datasetName, m);
+    Marray<T> m = in;
+    save(groupHandle, datasetName, m);
 }
 
 /// Save an std::vector as an HDF5 dataset.
@@ -409,16 +429,87 @@ inline void save(
 ///
 template<class T>
 void save(
-	const hid_t& groupHandle,
-	const std::string& datasetName,
+    const hid_t& groupHandle,
+    const std::string& datasetName,
     const std::vector<T>& in
 )
 {
-    marray::Vector<T> v(in.size());
+    std::size_t shape[] = {in.size()};
+    andres::Marray<T> mvector(shape, shape + 1);
     for(size_t j=0; j<in.size(); ++j) {
-        v[j] = in[j];
+        mvector(j) = in[j];
     }
-    save(groupHandle, datasetName, v);
+    save(groupHandle, datasetName, mvector);
+}
+
+/// Open an HDF5 file (read only), load an Marray from an HDF5 dataset, and close the file.
+///
+/// \param filename Name of the file.
+/// \param datasetName Name of the HDF5 dataset.
+/// \param out Marray.
+/// \param hdf5version HDF5 version tag.
+///
+/// \sa load(), loadHyperslab()
+///
+/// TODO: write a unit test for this function
+template<class T>
+inline void 
+load(
+    const std::string& filename,
+    const std::string& datasetName,
+    Marray<T>& out,
+    HDF5Version hdf5version
+) {
+    hid_t file = openFile(filename, READ_ONLY, hdf5version);
+    load(file, datasetName, out);
+    closeFile(file);
+}
+
+/// Open an HDF5 file (read only), load an std::vector from an HDF5 dataset, and close the file.
+///
+/// \param filename Name of the file.
+/// \param datasetName Name of the HDF5 dataset.
+/// \param out std::vector.
+/// \param hdf5version HDF5 version tag.
+///
+/// \sa load(), loadHyperslab()
+///
+/// TODO: write a unit test for this function
+template<class T>
+inline void 
+load(
+    const std::string& filename,
+    const std::string& datasetName,
+    std::vector<T>& out,
+    HDF5Version hdf5version
+) {
+    hid_t file = openFile(filename, READ_ONLY, hdf5version);
+    load(file, datasetName, out);
+    closeFile(file);
+}
+
+/// Load an std::vector from an HDF5 dataset.
+///
+/// \param groupHandle Handle of the parent HDF5 file or group.
+/// \param datasetName Name of the HDF5 dataset.
+/// \param out std::vector.
+///
+/// \sa load(), loadHyperslab()
+///
+/// TODO: write a unit test for this function
+template<class T>
+inline void 
+load(
+    const hid_t& groupHandle, 
+    const std::string& datasetName, 
+    std::vector<T>& out
+) {
+    Marray<T> in;
+    load(groupHandle, datasetName, in);
+    if(in.dimension() != 1) {
+        throw std::runtime_error("dataset is not 1-dimensional.");
+    }
+    out.assign(in.begin(), in.end());
 }
 
 /// Load an Marray from an HDF5 dataset.
@@ -431,68 +522,68 @@ void save(
 ///
 template<class T>
 void load(
-	const hid_t& groupHandle,
-	const std::string& datasetName,
-	Marray<T>& out
+    const hid_t& groupHandle,
+    const std::string& datasetName,
+    Marray<T>& out
 ) {
-	marray_detail::Assert(MARRAY_NO_ARG_TEST || groupHandle >= 0);
-	HandleCheck<MARRAY_NO_DEBUG> handleCheck;
+    marray_detail::Assert(MARRAY_NO_ARG_TEST || groupHandle >= 0);
+    HandleCheck<MARRAY_NO_DEBUG> handleCheck;
 
-	hid_t dataset = H5Dopen(groupHandle, datasetName.c_str(), H5P_DEFAULT);
-	if(dataset < 0) {
-		throw std::runtime_error("Marray cannot open dataset.");
-	}
-	hid_t filespace = H5Dget_space(dataset);
-	hid_t type = H5Dget_type(dataset);
-	hid_t nativeType = H5Tget_native_type(type, H5T_DIR_DESCEND);
-	if(!H5Tequal(nativeType, hdf5Type<T>())) {
-		H5Dclose(dataset);
-		H5Tclose(nativeType);
-		H5Tclose(type);
-		H5Sclose(filespace);
-		throw std::runtime_error("Data types not equal error.");
-	}
-	int dimension = H5Sget_simple_extent_ndims(filespace);
-	Vector<hsize_t> shape(dimension);
-	herr_t status = H5Sget_simple_extent_dims(filespace, &shape[0], NULL);
-	if(status < 0) {
-		H5Dclose(dataset);
-		H5Tclose(nativeType);
-		H5Tclose(type);
-		H5Sclose(filespace);
-		throw std::runtime_error("H5Sget_simple_extent_dims error.");
-	}
-	hid_t memspace = H5Screate_simple(dimension, &shape[0], NULL);
+    hid_t dataset = H5Dopen(groupHandle, datasetName.c_str(), H5P_DEFAULT);
+    if(dataset < 0) {
+        throw std::runtime_error("Marray cannot open dataset.");
+    }
+    hid_t filespace = H5Dget_space(dataset);
+    hid_t type = H5Dget_type(dataset);
+    hid_t nativeType = H5Tget_native_type(type, H5T_DIR_DESCEND);
+    if(!H5Tequal(nativeType, hdf5Type<T>())) {
+        H5Dclose(dataset);
+        H5Tclose(nativeType);
+        H5Tclose(type);
+        H5Sclose(filespace);
+        throw std::runtime_error("Data types not equal error.");
+    }
+    int dimension = H5Sget_simple_extent_ndims(filespace);
+    std::vector<hsize_t> shape(dimension);
+    herr_t status = H5Sget_simple_extent_dims(filespace, &shape[0], NULL);
+    if(status < 0) {
+        H5Dclose(dataset);
+        H5Tclose(nativeType);
+        H5Tclose(type);
+        H5Sclose(filespace);
+        throw std::runtime_error("H5Sget_simple_extent_dims error.");
+    }
+    hid_t memspace = H5Screate_simple(dimension, &shape[0], NULL);
 
-	// resize marray
-	marray::Vector<size_t> newShape((size_t)(dimension));
-	for(size_t j=0; j<newShape.size(); ++j) {
-		newShape(j) = (size_t)(shape[j]);
-	}
-	if(H5Aexists(dataset, reverseShapeAttributeName) > 0) {
-		// reverse shape
-		out = Marray<T>(SkipInitialization, newShape.rbegin(), 
-			newShape.rend(), LastMajorOrder);
-	}
-	else {
-		// don't reverse shape
-		out = Marray<T>(SkipInitialization, newShape.begin(),
-			newShape.end(), FirstMajorOrder);
-	}
+    // resize marray
+    std::vector<std::size_t> newShape((std::size_t)(dimension));
+    for(std::size_t j=0; j<newShape.size(); ++j) {
+        newShape[j] = (std::size_t)(shape[j]);
+    }
+    if(H5Aexists(dataset, reverseShapeAttributeName) > 0) {
+        // reverse shape
+        out = Marray<T>(SkipInitialization, newShape.rbegin(), 
+            newShape.rend(), LastMajorOrder);
+    }
+    else {
+        // don't reverse shape
+        out = Marray<T>(SkipInitialization, newShape.begin(),
+            newShape.end(), FirstMajorOrder);
+    }
 
-	// read
-	status = H5Dread(dataset, nativeType, memspace, filespace,
-		H5P_DEFAULT, &out(0));
+    // read
+    status = H5Dread(dataset, nativeType, memspace, filespace,
+        H5P_DEFAULT, &out(0));
     H5Dclose(dataset);
     H5Tclose(nativeType);
-	H5Tclose(type);
-	H5Sclose(memspace);
-	H5Sclose(filespace);
-	if(status < 0) {
-		throw std::runtime_error("Marray cannot read from dataset.");
-	}
+    H5Tclose(type);
+    H5Sclose(memspace);
+    H5Sclose(filespace);
+    if(status < 0) {
+        throw std::runtime_error("Marray cannot read from dataset.");
+    }
 
-	handleCheck.check();
+    handleCheck.check();
 }
 
 /// Load the shape of an HDF5 dataset.
@@ -507,45 +598,45 @@ template<class T>
 void loadShape(
    const hid_t& groupHandle,
    const std::string& datasetName,
-   Vector<T>& out
+   std::vector<T>& out
 ) {
-	marray_detail::Assert(MARRAY_NO_ARG_TEST || groupHandle >= 0);
-	HandleCheck<MARRAY_NO_DEBUG> handleCheck;
+    marray_detail::Assert(MARRAY_NO_ARG_TEST || groupHandle >= 0);
+    HandleCheck<MARRAY_NO_DEBUG> handleCheck;
 
-	// load shape from HDF5 file
-	hid_t dataset = H5Dopen(groupHandle, datasetName.c_str(), H5P_DEFAULT);
-	if(dataset < 0) {
-		throw std::runtime_error("Marray cannot open dataset.");
-	}
-	hid_t filespace = H5Dget_space(dataset);
-	hsize_t dimension = H5Sget_simple_extent_ndims(filespace);
-	hsize_t* shape = new hsize_t[(size_t)(dimension)];
-	herr_t status = H5Sget_simple_extent_dims(filespace, shape, NULL);
-	if(status < 0) {
-		H5Dclose(dataset);
-		H5Sclose(filespace);
-		delete[] shape;
-		throw std::runtime_error("Marray cannot get extension of dataset.");
-	}
+    // load shape from HDF5 file
+    hid_t dataset = H5Dopen(groupHandle, datasetName.c_str(), H5P_DEFAULT);
+    if(dataset < 0) {
+        throw std::runtime_error("Marray cannot open dataset.");
+    }
+    hid_t filespace = H5Dget_space(dataset);
+    hsize_t dimension = H5Sget_simple_extent_ndims(filespace);
+    hsize_t* shape = new hsize_t[(std::size_t)(dimension)];
+    herr_t status = H5Sget_simple_extent_dims(filespace, shape, NULL);
+    if(status < 0) {
+        H5Dclose(dataset);
+        H5Sclose(filespace);
+        delete[] shape;
+        throw std::runtime_error("Marray cannot get extension of dataset.");
+    }
 
-	// write shape to out
-	out = Vector<T>((size_t)(dimension));
-	if(H5Aexists(dataset, reverseShapeAttributeName) > 0) {
-		for(size_t j=0; j<out.size(); ++j) {
-		   out[out.size()-j-1] = T(shape[j]);
-		}
-	}
-	else {
-		for(size_t j=0; j<out.size(); ++j) {
-			out[j] = T(shape[j]);
-		}
-	}
+    // write shape to out
+    out = std::vector<T>(dimension);
+    if(H5Aexists(dataset, reverseShapeAttributeName) > 0) {
+        for(std::size_t j=0; j<out.size(); ++j) {
+           out[out.size()-j-1] = T(shape[j]);
+        }
+    }
+    else {
+        for(std::size_t j=0; j<out.size(); ++j) {
+            out[j] = T(shape[j]);
+        }
+    }
 
-	// clean up
-	delete[] shape;
-	H5Dclose(dataset);
-	H5Sclose(filespace);
-	handleCheck.check();
+    // clean up
+    delete[] shape;
+    H5Dclose(dataset);
+    H5Sclose(filespace);
+    handleCheck.check();
 }
 
 /// Load a hyperslab from an HDF5 dataset into an Marray.
@@ -563,103 +654,103 @@ template<class T, class BaseIterator, class ShapeIterator>
 void loadHyperslab(
     const hid_t& groupHandle,
     const std::string& datasetName,
-	BaseIterator baseBegin,
-	BaseIterator baseEnd,
+    BaseIterator baseBegin,
+    BaseIterator baseEnd,
     ShapeIterator shapeBegin,
-	Marray<T>& out
+    Marray<T>& out
 ) {
-	marray_detail::Assert(MARRAY_NO_ARG_TEST || groupHandle >= 0);
-	HandleCheck<MARRAY_NO_DEBUG> handleCheck;
+    marray_detail::Assert(MARRAY_NO_ARG_TEST || groupHandle >= 0);
+    HandleCheck<MARRAY_NO_DEBUG> handleCheck;
 
-	// open dataset
-	hid_t dataset = H5Dopen(groupHandle, datasetName.c_str(), H5P_DEFAULT);
-	if(dataset < 0) {
-		throw std::runtime_error("Marray cannot open dataset.");
-	}
+    // open dataset
+    hid_t dataset = H5Dopen(groupHandle, datasetName.c_str(), H5P_DEFAULT);
+    if(dataset < 0) {
+        throw std::runtime_error("Marray cannot open dataset.");
+    }
 
-	// determine shape of hyperslab and array
-	size_t size = std::distance(baseBegin, baseEnd);
-	Vector<hsize_t> offset(size);
-	Vector<hsize_t> slabShape(size);
-	Vector<hsize_t> marrayShape(size);
-	CoordinateOrder coordinateOrder;
-	if(H5Aexists(dataset, reverseShapeAttributeName) > 0) {
-		// reverse base and shape
-		coordinateOrder = LastMajorOrder;
-		size_t j = size-1;
-		size_t k = 0;
-		for(;;) {
-			offset[j] = hsize_t(*baseBegin);
-			slabShape[j] = hsize_t(*shapeBegin);
-			marrayShape[k] = slabShape[j];
-			if(j == 0) {
-				break;
-			}
-			else {
-				++baseBegin;
-				++shapeBegin;
-				++k;
-				--j;
-			}
-		}
-	} 
-	else {
-		// don't reverse base and shape
-		coordinateOrder = FirstMajorOrder;
-		for(size_t j=0; j<size; ++j) {
-			offset[j] = hsize_t(*baseBegin);
-			slabShape[j] = hsize_t(*shapeBegin);
-			marrayShape[j] = slabShape[j];
-			++baseBegin;
-			++shapeBegin;
-		}
-	}
-	
-	// select dataspace hyperslab
-	hid_t datatype = H5Dget_type(dataset);
+    // determine shape of hyperslab and array
+    std::size_t size = std::distance(baseBegin, baseEnd);
+    std::vector<hsize_t> offset(size);
+    std::vector<hsize_t> slabShape(size);
+    std::vector<hsize_t> marrayShape(size);
+    CoordinateOrder coordinateOrder;
+    if(H5Aexists(dataset, reverseShapeAttributeName) > 0) {
+        // reverse base and shape
+        coordinateOrder = LastMajorOrder;
+        std::size_t j = size-1;
+        std::size_t k = 0;
+        for(;;) {
+            offset[j] = hsize_t(*baseBegin);
+            slabShape[j] = hsize_t(*shapeBegin);
+            marrayShape[k] = slabShape[j];
+            if(j == 0) {
+                break;
+            }
+            else {
+                ++baseBegin;
+                ++shapeBegin;
+                ++k;
+                --j;
+            }
+        }
+    } 
+    else {
+        // don't reverse base and shape
+        coordinateOrder = FirstMajorOrder;
+        for(std::size_t j=0; j<size; ++j) {
+            offset[j] = hsize_t(*baseBegin);
+            slabShape[j] = hsize_t(*shapeBegin);
+            marrayShape[j] = slabShape[j];
+            ++baseBegin;
+            ++shapeBegin;
+        }
+    }
     
-	if(!H5Tequal(datatype, hdf5Type<T>())) {
-		throw std::runtime_error("data type of stored hdf5 dataset and passed array do not match in loadHyperslab");
-	}
+    // select dataspace hyperslab
+    hid_t datatype = H5Dget_type(dataset);
     
-	hid_t dataspace = H5Dget_space(dataset);
-	herr_t status = H5Sselect_hyperslab(dataspace, H5S_SELECT_SET, 
-		&offset[0], NULL, &slabShape[0], NULL);
-	if(status < 0) {
-		H5Tclose(datatype);
-		H5Sclose(dataspace);
-		H5Dclose(dataset);
-		throw std::runtime_error("Marray cannot select hyperslab. Check offset and shape!");
-	}
+    if(!H5Tequal(datatype, hdf5Type<T>())) {
+        throw std::runtime_error("data type of stored hdf5 dataset and passed array do not match in loadHyperslab");
+    }
+    
+    hid_t dataspace = H5Dget_space(dataset);
+    herr_t status = H5Sselect_hyperslab(dataspace, H5S_SELECT_SET, 
+        &offset[0], NULL, &slabShape[0], NULL);
+    if(status < 0) {
+        H5Tclose(datatype);
+        H5Sclose(dataspace);
+        H5Dclose(dataset);
+        throw std::runtime_error("Marray cannot select hyperslab. Check offset and shape!");
+    }
 
-	// select memspace hyperslab
-	hid_t memspace = H5Screate_simple(int(size), &marrayShape[0], NULL);
-	Vector<hsize_t> offsetOut(size, 0); // no offset
-	status = H5Sselect_hyperslab(memspace, H5S_SELECT_SET, &offsetOut[0],
-		NULL, &marrayShape[0], NULL);
-	if(status < 0) {
-		H5Sclose(memspace);	
-		H5Tclose(datatype);
-		H5Sclose(dataspace);
-		H5Dclose(dataset);
-		throw std::runtime_error("Marray cannot select hyperslab. Check offset and shape!");
-	}
+    // select memspace hyperslab
+    hid_t memspace = H5Screate_simple(int(size), &marrayShape[0], NULL);
+    std::vector<hsize_t> offsetOut(size, 0); // no offset
+    status = H5Sselect_hyperslab(memspace, H5S_SELECT_SET, &offsetOut[0],
+        NULL, &marrayShape[0], NULL);
+    if(status < 0) {
+        H5Sclose(memspace); 
+        H5Tclose(datatype);
+        H5Sclose(dataspace);
+        H5Dclose(dataset);
+        throw std::runtime_error("Marray cannot select hyperslab. Check offset and shape!");
+    }
 
-	// read from dataspace into memspace
-	out = Marray<T>(SkipInitialization, &marrayShape[0], 
-		(&marrayShape[0])+size, coordinateOrder);
-	status = H5Dread(dataset, datatype, memspace, dataspace,
-		H5P_DEFAULT, &(out(0)));
+    // read from dataspace into memspace
+    out = Marray<T>(SkipInitialization, &marrayShape[0], 
+        (&marrayShape[0])+size, coordinateOrder);
+    status = H5Dread(dataset, datatype, memspace, dataspace,
+        H5P_DEFAULT, &(out(0)));
 
-	// clean up
-	H5Sclose(memspace);	
-	H5Tclose(datatype);
-	H5Sclose(dataspace);
-	H5Dclose(dataset);
-	if(status < 0) {
-		throw std::runtime_error("Marray cannot read from dataset.");
-	}
-	handleCheck.check();
+    // clean up
+    H5Sclose(memspace); 
+    H5Tclose(datatype);
+    H5Sclose(dataspace);
+    H5Dclose(dataset);
+    if(status < 0) {
+        throw std::runtime_error("Marray cannot read from dataset.");
+    }
+    handleCheck.check();
 }
 
 /// Save an Marray as a hyperslab into an HDF5 dataset.
@@ -678,96 +769,96 @@ void
 saveHyperslab(
     const hid_t& groupHandle,
     const std::string& datasetName,
-	BaseIterator baseBegin,
-	BaseIterator baseEnd,
+    BaseIterator baseBegin,
+    BaseIterator baseEnd,
     ShapeIterator shapeBegin,
-	const Marray<T>& in
+    const Marray<T>& in
 ) {
-	marray_detail::Assert(MARRAY_NO_ARG_TEST || groupHandle >= 0);
-	HandleCheck<MARRAY_NO_DEBUG> handleCheck;
+    marray_detail::Assert(MARRAY_NO_ARG_TEST || groupHandle >= 0);
+    HandleCheck<MARRAY_NO_DEBUG> handleCheck;
 
-	// open dataset
-	hid_t dataset = H5Dopen(groupHandle, datasetName.c_str(), H5P_DEFAULT);
-	if(dataset < 0) {
-		throw std::runtime_error("Marray cannot open dataset.");
-	}
+    // open dataset
+    hid_t dataset = H5Dopen(groupHandle, datasetName.c_str(), H5P_DEFAULT);
+    if(dataset < 0) {
+        throw std::runtime_error("Marray cannot open dataset.");
+    }
 
-	// determine hyperslab shape
-	Vector<hsize_t> memoryShape(in.dimension());
-	for(size_t j=0; j<in.dimension(); ++j) {
-		memoryShape[j] = in.shape(j);
-	}
-	size_t size = std::distance(baseBegin, baseEnd);
-	Vector<hsize_t> offset(size);
-	Vector<hsize_t> slabShape(size);
-	bool reverseShapeAttribute = 
-		(H5Aexists(dataset, reverseShapeAttributeName) > 0);
-	if(reverseShapeAttribute && in.coordinateOrder() == LastMajorOrder) {
-		// reverse base and shape
-		size_t j = size-1;
-		for(;;) {
-			offset[j] = hsize_t(*baseBegin);
-			slabShape[j] = hsize_t(*shapeBegin);
-			if(j == 0) {
-				break;
-			}
-			else {
-				++baseBegin;
-				++shapeBegin;
-				--j;
-			}
-		}
-	}
-	else if(!reverseShapeAttribute && in.coordinateOrder() == FirstMajorOrder) {
-		for(size_t j=0; j<size; ++j) {
-			offset[j] = hsize_t(*baseBegin);
-			slabShape[j] = hsize_t(*shapeBegin);
-			++baseBegin;
-			++shapeBegin;
-		}
-	}
-	else {
-		H5Dclose(dataset);
-		throw std::runtime_error("Marray cannot write to HDF5 file. A different order was used when the file was created.");
-	}
+    // determine hyperslab shape
+    std::vector<hsize_t> memoryShape(in.dimension());
+    for(std::size_t j=0; j<in.dimension(); ++j) {
+        memoryShape[j] = in.shape(j);
+    }
+    std::size_t size = std::distance(baseBegin, baseEnd);
+    std::vector<hsize_t> offset(size);
+    std::vector<hsize_t> slabShape(size);
+    bool reverseShapeAttribute = 
+        (H5Aexists(dataset, reverseShapeAttributeName) > 0);
+    if(reverseShapeAttribute && in.coordinateOrder() == LastMajorOrder) {
+        // reverse base and shape
+        std::size_t j = size-1;
+        for(;;) {
+            offset[j] = hsize_t(*baseBegin);
+            slabShape[j] = hsize_t(*shapeBegin);
+            if(j == 0) {
+                break;
+            }
+            else {
+                ++baseBegin;
+                ++shapeBegin;
+                --j;
+            }
+        }
+    }
+    else if(!reverseShapeAttribute && in.coordinateOrder() == FirstMajorOrder) {
+        for(std::size_t j=0; j<size; ++j) {
+            offset[j] = hsize_t(*baseBegin);
+            slabShape[j] = hsize_t(*shapeBegin);
+            ++baseBegin;
+            ++shapeBegin;
+        }
+    }
+    else {
+        H5Dclose(dataset);
+        throw std::runtime_error("Marray cannot write to HDF5 file. A different order was used when the file was created.");
+    }
 
-	// select dataspace hyperslab
-	hid_t datatype = H5Dget_type(dataset);
-	hid_t dataspace = H5Dget_space(dataset);
-	herr_t status = H5Sselect_hyperslab(dataspace, H5S_SELECT_SET, 
-		&offset[0], NULL, &slabShape[0], NULL);
-	if(status < 0) {
-		H5Tclose(datatype);
-		H5Sclose(dataspace);
-		H5Dclose(dataset);
-		throw std::runtime_error("Marray cannot select hyperslab. Check offset and shape!");
-	}
+    // select dataspace hyperslab
+    hid_t datatype = H5Dget_type(dataset);
+    hid_t dataspace = H5Dget_space(dataset);
+    herr_t status = H5Sselect_hyperslab(dataspace, H5S_SELECT_SET, 
+        &offset[0], NULL, &slabShape[0], NULL);
+    if(status < 0) {
+        H5Tclose(datatype);
+        H5Sclose(dataspace);
+        H5Dclose(dataset);
+        throw std::runtime_error("Marray cannot select hyperslab. Check offset and shape!");
+    }
 
-	// select memspace hyperslab
-	hid_t memspace = H5Screate_simple(int(in.dimension()), &memoryShape[0], NULL);
-	Vector<hsize_t> memoryOffset(int(in.dimension()), 0); // no offset
-	status = H5Sselect_hyperslab(memspace, H5S_SELECT_SET, &memoryOffset[0], NULL,
-		&memoryShape[0], NULL);
-	if(status < 0) {
-		H5Sclose(memspace);	
-		H5Tclose(datatype);
-		H5Sclose(dataspace);
-		H5Dclose(dataset);
-		throw std::runtime_error("Marray cannot select hyperslab. Check offset and shape!");
-	}
+    // select memspace hyperslab
+    hid_t memspace = H5Screate_simple(int(in.dimension()), &memoryShape[0], NULL);
+    std::vector<hsize_t> memoryOffset(int(in.dimension()), 0); // no offset
+    status = H5Sselect_hyperslab(memspace, H5S_SELECT_SET, &memoryOffset[0], NULL,
+        &memoryShape[0], NULL);
+    if(status < 0) {
+        H5Sclose(memspace); 
+        H5Tclose(datatype);
+        H5Sclose(dataspace);
+        H5Dclose(dataset);
+        throw std::runtime_error("Marray cannot select hyperslab. Check offset and shape!");
+    }
 
-	// write from memspace to dataspace
-	status = H5Dwrite(dataset, datatype, memspace, dataspace, H5P_DEFAULT, &(in(0)));
+    // write from memspace to dataspace
+    status = H5Dwrite(dataset, datatype, memspace, dataspace, H5P_DEFAULT, &(in(0)));
 
-	// clean up
-	H5Sclose(memspace);	
-	H5Tclose(datatype);
-	H5Sclose(dataspace);
-	H5Dclose(dataset);
-	if(status < 0) {
-		throw std::runtime_error("Marray cannot write to dataset.");
-	}
-	handleCheck.check();
+    // clean up
+    H5Sclose(memspace); 
+    H5Tclose(datatype);
+    H5Sclose(dataspace);
+    H5Dclose(dataset);
+    if(status < 0) {
+        throw std::runtime_error("Marray cannot write to dataset.");
+    }
+    handleCheck.check();
 }
 
 /// Create an HDF5 file.
@@ -903,16 +994,14 @@ openGroup
 /// \sa openGroup(), createGroup()
 ///
 inline void 
-closeGroup
-(
+closeGroup(
     const hid_t& handle
-)
-{
+) {
     H5Gclose(handle);
 }
 
 } // namespace hdf5
-} // namespace marray
+} // namespace andres
 
 #endif // #ifndef MARRAY_HDF5_HXX
 

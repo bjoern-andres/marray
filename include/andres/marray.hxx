@@ -1,66 +1,8 @@
 /// \mainpage
 /// Marray: Fast Runtime-Flexible Multi-dimensional Arrays and Views in C++.
-/// \newline
 ///
-/// Copyright (c) 2014 by Bjoern Andres, bjoern@andres.sc
+/// http://www.andres.sc/marray.html
 ///
-/// \section section_abstract Short Description
-/// Marray is a single header file for fast multi-dimensional arrays and views 
-/// in C++. Unlike in other implementations such as boost MultiArray and 
-/// Blitz++, the dimension of Marray views and arrays can be set and changed at 
-/// runtime. Dimension is not a template parameter in Marray. Arrays and views 
-/// that have the same type of entries but different dimension are therefore of 
-/// the same C++ type. In conjunction with the comprehensive and 
-/// convenient Marray interface, this brings some of the flexibility known from 
-/// high-level languages such as Python, R and MATLAB to C++.
-///
-/// \section section_features Features
-/// - Multi-dimensional arrays and views whose dimension, shape, size and 
-///   indexing order (first or last coordinate major order) can be set and 
-///   changed at runtime.
-/// - Access to entries via coordinates, scalar indices, STL-compliant random 
-///   access iterators and C++11 initializer lists.
-/// - Arithmetic operators with expression templates and automatic type 
-///   promotion.
-/// - Support for STL-compliant allocators.
-/// 
-/// \section section_tutorial Tutorial
-/// - An introductory tutorial can be found at src/tutorial/tutorial.cxx
-///
-/// \section section_cpp0x C++11 Extensions
-/// - C++11 extensions are enabled by defining
-///   - HAVE_CPP11_VARIADIC_TEMPLATES
-///   - HAVE_CPP11_INITIALIZER_LISTS
-///   - HAVE_CPP11_TEMPLATE_ALIASES
-///   .
-/// 
-/// \section section_license License
-/// Copyright (c) 2013 by Bjoern Andres.
-/// 
-/// This software was developed by Bjoern Andres.
-/// Enquiries shall be directed to bjoern@andres.sc.
-///
-/// Redistribution and use in source and binary forms, with or without 
-/// modification, are permitted provided that the following conditions are met:
-/// - Redistributions of source code must retain the above copyright notice,
-///   this list of conditions and the following disclaimer.
-/// - Redistributions in binary form must reproduce the above copyright notice, 
-///   this list of conditions and the following disclaimer in the documentation
-///   and/or other materials provided with the distribution.
-/// - The name of the author must not be used to endorse or promote products 
-///   derived from this software without specific prior written permission.
-///
-/// THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR IMPLIED 
-/// WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF 
-/// MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO 
-/// EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
-/// SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
-/// PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; 
-/// OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, 
-/// WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR 
-/// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF 
-/// ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-/// 
 #pragma once
 #ifndef ANDRES_MARRAY_HXX
 #define ANDRES_MARRAY_HXX

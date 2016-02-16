@@ -12,6 +12,9 @@ if(MSVC)
     add_definitions(-D_CRT_SECURE_NO_DEPRECATE -D_HDF5USEDLL_)
 endif()
 
+# ------------------------------------------------------------------------------
+# doxygen
+# ------------------------------------------------------------------------------
 find_package(Doxygen QUIET)
 if(DOXYGEN_FOUND)
     message(STATUS "Doxygen found.")
@@ -19,6 +22,9 @@ else()
     message("doxygen not found.")
 endif()
 
+# ------------------------------------------------------------------------------
+# C++11
+# ------------------------------------------------------------------------------
 set(WITH_CPP11 CACHE BOOL "Compile with C++11 features.")
 if(WITH_CPP11)
     if(CMAKE_COMPILER_IS_GNUCXX)
@@ -35,10 +41,24 @@ else()
     message(STATUS "C++11 support disabled.")
 endif()
 
+# ------------------------------------------------------------------------------
+# hdf5
+# ------------------------------------------------------------------------------
+find_package(HDF5)
+
+# ------------------------------------------------------------------------------
+# targets
+# ------------------------------------------------------------------------------
 add_executable(tutorial-marray src/tutorial/tutorial.cxx ${headers})
 
 add_executable(test-marray src/unittest/marray.cxx ${headers})
 add_test(test-marray test-marray)
+
+if(HDF5_FOUND)
+    add_executable(test-marray-hdf5 src/unittest/marray-hdf5.cxx ${headers})
+    target_link_libraries(test-marray-hdf5 ${HDF5_LIBRARIES})
+    add_test(test-marray-hdf5 test-marray-hdf5)
+endif()
 
 if(DOXYGEN_FOUND)
     configure_file("${marray_SOURCE_DIR}/doxygen/Doxyfile.in" "${marray_BINARY_DIR}/Doxyfile" @ONLY IMMEDIATE)
