@@ -144,21 +144,21 @@ void MarrayHDF5Test::fileHandlingTest()
 
     {
         hid_t handle = andres::hdf5::createFile(
-            filename_, andres::hdf5::LATEST_HDF5_VERSION);
+            filename_, andres::hdf5::HDF5_VERSION_LATEST);
         test(handle > 0);
         andres::hdf5::closeFile(handle);
     }
     {
         hid_t handle = andres::hdf5::openFile(
             filename_, andres::hdf5::READ_ONLY,
-            andres::hdf5::LATEST_HDF5_VERSION);
+            andres::hdf5::HDF5_VERSION_LATEST);
         test(handle > 0);
         andres::hdf5::closeFile(handle);
     }
     {
         hid_t handle = andres::hdf5::openFile(
             filename_, andres::hdf5::READ_WRITE,
-            andres::hdf5::LATEST_HDF5_VERSION);
+            andres::hdf5::HDF5_VERSION_LATEST);
         test(handle > 0);
         andres::hdf5::closeFile(handle);
     }

@@ -1,52 +1,11 @@
-// Copyright (c) 2011-2013 by Bjoern Andres.
-// 
-// This software was developed by Bjoern Andres.
-// Enquiries shall be directed to bjoern@andres.sc.
-//
-// All advertising materials mentioning features or use of this software must
-// display the following acknowledgement: ``This product includes 
-// andres::marray developed by Bjoern Andres. Please direct enquiries 
-// concerning andres::marray to bjoern@andres.sc''.
-//
-// Redistribution and use in source and binary forms, with or without 
-// modification, are permitted provided that the following conditions are met:
-//
-// - Redistributions of source code must retain the above copyright notice,
-//   this list of conditions and the following disclaimer.
-// - Redistributions in binary form must reproduce the above copyright notice, 
-//   this list of conditions and the following disclaimer in the documentation
-//   and/or other materials provided with the distribution.
-// - All advertising materials mentioning features or use of this software must 
-//   display the following acknowledgement: ``This product includes 
-//   andres::marray developed by Bjoern Andres. Please direct enquiries 
-//   concerning andres::marray to bjoern@andres.sc''.
-// - The name of the author must not be used to endorse or promote products 
-//   derived from this software without specific prior written permission.
-//
-// THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR IMPLIED 
-// WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF 
-// MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO 
-// EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
-// SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
-// PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; 
-// OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, 
-// WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR 
-// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF 
-// ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-// 
+/// \mainpage
+/// Marray: Fast Runtime-Flexible Multi-dimensional Arrays and Views in C++.
+///
+/// http://www.andres.sc/marray.html
+///
 #pragma once
-#ifndef MARRAY_HDF5_HXX
-#define MARRAY_HDF5_HXX
-
-// compat fix for buggy hdf5 1.8 versions
-#include <H5version.h>
-#if (H5_VERS_MAJOR == 1 && H5_VERS_MINOR >= 8 && defined(H5_USE_16_API_DEFAULT))
-#define H5Gcreate_vers 2
-#define H5Gopen_vers 2
-#define H5Dopen_vers 2
-#define H5Dcreate_vers 2
-#define H5Acreate_vers 2
-#endif
+#ifndef ANDRES_MARRAY_HDF5_HXX
+#define ANDRES_MARRAY_HDF5_HXX
 
 #include <cstddef>
 #include <cstring>
@@ -84,10 +43,10 @@ const char reverseShapeAttributeName[14] = "reverse-shape";
 // prototypes
 
 enum FileAccessMode {READ_ONLY, READ_WRITE};
-enum HDF5Version {DEFAULT_HDF5_VERSION, LATEST_HDF5_VERSION};
+enum HDF5Version {HDF5_VERSION_DEFAULT, HDF5_VERSION_LATEST};
 
-hid_t createFile(const std::string&, HDF5Version = DEFAULT_HDF5_VERSION);
-hid_t openFile(const std::string&, FileAccessMode = READ_ONLY, HDF5Version = DEFAULT_HDF5_VERSION);
+hid_t createFile(const std::string&, HDF5Version = HDF5_VERSION_DEFAULT);
+hid_t openFile(const std::string&, FileAccessMode = READ_ONLY, HDF5Version = HDF5_VERSION_DEFAULT);
 void closeFile(const hid_t&);
 
 hid_t createGroup(const hid_t&, const std::string&);
@@ -109,25 +68,13 @@ template<class T, class ShapeIterator>
 
 template<class T>
     void load(const hid_t&, const std::string&, Marray<T>&);
-// TODO: implement the following functions that throw an error 
-// if the dimension is not correct
-// template<class T>
-//     void load(const hid_t&, const std::string&, Vector<T>&);
-// template<class T>
-//     void load(const hid_t&, const std::string&, Matrix<T>&);
 template<class T>
     void load(const hid_t&, const std::string&, std::vector<T>&);
 
 template<class T>
-    void load(const std::string&, const std::string&, Marray<T>&, HDF5Version = DEFAULT_HDF5_VERSION);
-// TODO: implement the following functions that throw an error 
-// if the dimension is not correct
-// template<class T>
-//     void load(const std::string&, const std::string&, Vector<T>&, HDF5Version = DEFAULT_HDF5_VERSION);
-// template<class T>
-//     void load(const std::string&, const std::string&, Matrix<T>&, HDF5Version = DEFAULT_HDF5_VERSION);
+    void load(const std::string&, const std::string&, Marray<T>&, HDF5Version = HDF5_VERSION_DEFAULT);
 template<class T>
-    void load(const std::string&, const std::string&, std::vector<T>&, HDF5Version = DEFAULT_HDF5_VERSION);
+    void load(const std::string&, const std::string&, std::vector<T>&, HDF5Version = HDF5_VERSION_DEFAULT);
 
 template<class T>
     void loadShape(const hid_t&, const std::string&, std::vector<T>&);
@@ -878,7 +825,7 @@ createFile
 )
 {
     hid_t version = H5P_DEFAULT;
-    if(hdf5version == LATEST_HDF5_VERSION) {
+    if(hdf5version == HDF5_VERSION_LATEST) {
         version = H5Pcreate(H5P_FILE_ACCESS);
         H5Pset_libver_bounds(version, H5F_LIBVER_LATEST, H5F_LIBVER_LATEST);
     }
@@ -915,7 +862,7 @@ openFile
     }
 
     hid_t version = H5P_DEFAULT;
-    if(hdf5version == LATEST_HDF5_VERSION) {
+    if(hdf5version == HDF5_VERSION_LATEST) {
         version = H5Pcreate(H5P_FILE_ACCESS);
         H5Pset_libver_bounds(version, H5F_LIBVER_LATEST, H5F_LIBVER_LATEST);
     }
@@ -1003,5 +950,4 @@ closeGroup(
 } // namespace hdf5
 } // namespace andres
 
-#endif // #ifndef MARRAY_HDF5_HXX
-
+#endif

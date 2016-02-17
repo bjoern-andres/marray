@@ -5919,4 +5919,4 @@ inline void operate
 
 } // namespace andres
 
-#endif // #ifndef ANDRES_MARRAY_HXX
+#endif
