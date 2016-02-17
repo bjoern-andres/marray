@@ -7,11 +7,8 @@
 #ifndef ANDRES_MARRAY_HDF5_HXX
 #define ANDRES_MARRAY_HDF5_HXX
 
-#include <cstddef>
-#include <cstring>
-
 #include "marray.hxx"
-#include "hdf5.h"
+#include "hdf5.hxx"
 
 namespace andres {
 /// HDF5 import/export support.
@@ -41,9 +38,6 @@ public:
 const char reverseShapeAttributeName[14] = "reverse-shape";
 
 // prototypes
-
-enum FileAccessMode {READ_ONLY, READ_WRITE};
-enum HDF5Version {HDF5_VERSION_DEFAULT, HDF5_VERSION_LATEST};
 
 hid_t createFile(const std::string&, HDF5Version = HDF5_VERSION_DEFAULT);
 hid_t openFile(const std::string&, FileAccessMode = READ_ONLY, HDF5Version = HDF5_VERSION_DEFAULT);
@@ -81,88 +75,6 @@ template<class T>
 template<class T, class BaseIterator, class ShapeIterator>
     void loadHyperslab(const hid_t&, const std::string&,
         BaseIterator, BaseIterator, ShapeIterator, Marray<T>&);
-
-// type conversion from C++ to HDF5
-
-// \cond suppress doxygen
-template<class T>
-inline hid_t uintTypeHelper() {
-   switch(sizeof(T)) {
-       case 1:
-           return H5T_STD_U8LE;
-       case 2:
-           return H5T_STD_U16LE;
-       case 4:
-           return H5T_STD_U32LE;
-       case 8:
-           return H5T_STD_U64LE;
-       default:
-           throw std::runtime_error("No matching HDF5 type.");
-   }
-}
-
-template<class T>
-inline hid_t intTypeHelper() {
-   switch(sizeof(T)) {
-       case 1:
-           return H5T_STD_I8LE;
-       case 2:
-           return H5T_STD_I16LE;
-       case 4:
-           return H5T_STD_I32LE;
-       case 8:
-           return H5T_STD_I64LE;
-       default:
-           throw std::runtime_error("No matching HDF5 type.");
-   }
-}
-
-template<class T>
-inline hid_t floatingTypeHelper() {
-   switch(sizeof(T)) {
-       case 4:
-           return H5T_IEEE_F32LE;
-       case 8:
-           return H5T_IEEE_F64LE;
-       default:
-           throw std::runtime_error("No matching HDF5 type.");
-   }
-}
-
-template<class T>
-inline hid_t hdf5Type();
-
-template<> inline hid_t hdf5Type<unsigned char>()
-    { return uintTypeHelper<unsigned char>(); }
-template<> inline hid_t hdf5Type<unsigned short>()
-    { return uintTypeHelper<unsigned short>(); }
-template<> inline hid_t hdf5Type<unsigned int>()
-    { return uintTypeHelper<unsigned int>(); }
-template<> inline hid_t hdf5Type<unsigned long>()
-    { return uintTypeHelper<unsigned long>(); }
-template<> inline hid_t hdf5Type<unsigned long long>()
-    { return uintTypeHelper<unsigned long long>(); }
-
-template<> inline hid_t hdf5Type<signed char>()
-    { return intTypeHelper<signed char>(); }
-template<> inline hid_t hdf5Type<char>()
-    { return uintTypeHelper<char>(); }
-template<> inline hid_t hdf5Type<short>()
-    { return intTypeHelper<short>(); }
-template<> inline hid_t hdf5Type<int>()
-    { return intTypeHelper<int>(); }
-template<> inline hid_t hdf5Type<long>()
-    { return intTypeHelper<long>(); }
-template<> inline hid_t hdf5Type<long long>()
-    { return intTypeHelper<long long>(); }
-
-template<> inline hid_t hdf5Type<float>()
-    { return floatingTypeHelper<float>(); }
-template<> inline hid_t hdf5Type<double>()
-    { return floatingTypeHelper<double>(); }
-// \endcond
-
-// implementation
 
 /// Create and close an HDF5 dataset to store Marray data.
 ///
