@@ -233,7 +233,6 @@ closeGroup(
     H5Gclose(handle);
 }
 
-/*
 /// Save an std::vector to an HDF5 dataset.
 ///
 template<class T>
@@ -254,9 +253,9 @@ save(
         throw std::runtime_error("could not create HDF5 dataset.");
     }
     hid_t status = H5Dwrite(dataset, hdf5Type<T>(), H5S_ALL, H5S_ALL, H5P_DEFAULT, data.data());
+    H5Dclose(dataset);
+    H5Sclose(dataspace);
     if(status < 0) {
-        H5Dclose(dataset);
-        H5Sclose(dataspace);
         throw std::runtime_error("could not write to HDF5 dataset.");
     }
 }
@@ -327,7 +326,6 @@ load(
     load(file, datasetName, out);
     closeFile(file);
 }
-*/
 
 } // namespace hdf5
 } // namespace andres

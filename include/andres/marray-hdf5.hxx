@@ -20,8 +20,6 @@ template<class T>
     void save(const hid_t&, const std::string&, const Marray<T>&);
 template<class T, bool isConst>
     void save(const hid_t&, const std::string&, const View<T, isConst>&);
-template<class T>
-    void save(const hid_t&, const std::string&, const std::vector<T>&);
 template<class T, class BaseIterator, class ShapeIterator>
     void saveHyperslab(const hid_t&, const std::string&,
         BaseIterator, BaseIterator, ShapeIterator, const Marray<T>&);
@@ -30,14 +28,9 @@ template<class T, class ShapeIterator>
         ShapeIterator, CoordinateOrder);
 
 template<class T>
-    void load(const hid_t&, const std::string&, Marray<T>&);
-template<class T>
-    void load(const hid_t&, const std::string&, std::vector<T>&);
-
+   void load(const hid_t&, const std::string&, Marray<T>&);
 template<class T>
     void load(const std::string&, const std::string&, Marray<T>&, HDF5Version = HDF5_VERSION_DEFAULT);
-template<class T>
-    void load(const std::string&, const std::string&, std::vector<T>&, HDF5Version = HDF5_VERSION_DEFAULT);
 
 template<class T>
     void loadShape(const hid_t&, const std::string&, std::vector<T>&);
@@ -247,29 +240,6 @@ inline void save(
     save(groupHandle, datasetName, m);
 }
 
-/// Save an std::vector as an HDF5 dataset.
-/// 
-/// \param groupHandle Handle of the parent HDF5 file or group.
-/// \param datasetName Name of the HDF5 dataset.
-/// \param in std::vector.
-///
-/// \sa saveHyperslab()
-///
-template<class T>
-void save(
-    const hid_t& groupHandle,
-    const std::string& datasetName,
-    const std::vector<T>& in
-)
-{
-    std::size_t shape[] = {in.size()};
-    andres::Marray<T> mvector(shape, shape + 1);
-    for(size_t j=0; j<in.size(); ++j) {
-        mvector(j) = in[j];
-    }
-    save(groupHandle, datasetName, mvector);
-}
-
 /// Open an HDF5 file (read only), load an Marray from an HDF5 dataset, and close the file.
 ///
 /// \param filename Name of the file.
@@ -291,53 +261,6 @@ load(
     hid_t file = openFile(filename, READ_ONLY, hdf5version);
     load(file, datasetName, out);
     closeFile(file);
-}
-
-/// Open an HDF5 file (read only), load an std::vector from an HDF5 dataset, and close the file.
-///
-/// \param filename Name of the file.
-/// \param datasetName Name of the HDF5 dataset.
-/// \param out std::vector.
-/// \param hdf5version HDF5 version tag.
-///
-/// \sa load(), loadHyperslab()
-///
-/// TODO: write a unit test for this function
-template<class T>
-inline void 
-load(
-    const std::string& filename,
-    const std::string& datasetName,
-    std::vector<T>& out,
-    HDF5Version hdf5version
-) {
-    hid_t file = openFile(filename, READ_ONLY, hdf5version);
-    load(file, datasetName, out);
-    closeFile(file);
-}
-
-/// Load an std::vector from an HDF5 dataset.
-///
-/// \param groupHandle Handle of the parent HDF5 file or group.
-/// \param datasetName Name of the HDF5 dataset.
-/// \param out std::vector.
-///
-/// \sa load(), loadHyperslab()
-///
-/// TODO: write a unit test for this function
-template<class T>
-inline void 
-load(
-    const hid_t& groupHandle, 
-    const std::string& datasetName, 
-    std::vector<T>& out
-) {
-    Marray<T> in;
-    load(groupHandle, datasetName, in);
-    if(in.dimension() != 1) {
-        throw std::runtime_error("dataset is not 1-dimensional.");
-    }
-    out.assign(in.begin(), in.end());
 }
 
 /// Load an Marray from an HDF5 dataset.
