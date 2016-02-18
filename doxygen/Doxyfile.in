@@ -31,7 +31,7 @@ PROJECT_NAME           = Marray
 # This could be handy for archiving the generated documentation or
 # if some version control system is used.
 
-PROJECT_NUMBER         = 3.0
+PROJECT_NUMBER         = 
 
 # The OUTPUT_DIRECTORY tag is used to specify the (relative or absolute) 
 # base path where the generated documentation will be put. 
@@ -574,7 +574,7 @@ WARN_LOGFILE           =
 # directories like "/usr/src/myproject". Separate the files or directories 
 # with spaces.
 
-INPUT                  = "@marray_SOURCE_DIR@/include/andres/marray.hxx" "@marray_SOURCE_DIR@/src/tutorial/tutorial.cxx"
+INPUT                  = "@marray_SOURCE_DIR@/include/andres/marray.hxx" "@marray_SOURCE_DIR@/src/tutorial/tutorial.cxx" "@marray_SOURCE_DIR@/include/andres/marray-hdf5.hxx" "@marray_SOURCE_DIR@/include/andres/hdf5.hxx"
 
 # This tag can be used to specify the character encoding of the source files 
 # that doxygen parses. Internally doxygen uses the UTF-8 encoding, which is 

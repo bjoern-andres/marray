@@ -46,7 +46,6 @@ template<class T, class BaseIterator, class ShapeIterator>
 /// \param datasetName Name of the HDF5 dataset.
 /// \param begin Iterator to the beginning of a sequence that determines the shape of the dataset.
 /// \param end Iterator to the end of a sequence that determines the shape of the dataset.
-/// \param coordinateOrder Coordinate order of the Marray.
 ///
 /// \sa save(), saveHyperslab()
 ///

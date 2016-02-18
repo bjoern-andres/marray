@@ -11,11 +11,12 @@ Makefile
 Doxyfile
 doc/
 tutorial-marray
+tutorial-marray-hdf5
 
 # testing
 Testing
+test-hdf5
 test-marray
 test-marray-hdf5
 test.h5
-testfile.h5
 
