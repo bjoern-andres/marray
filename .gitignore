@@ -1,16 +1,18 @@
-#cmake generated files
+CMakeLists.txt.user
+
+# cmake generated files
 CMakeCache.txt
 CMakeFiles
 CTestTestfile.cmake
 cmake_install.cmake
 Makefile
 
-#documentation
+# documentation
 Doxyfile
 doc/
 tutorial-marray
 
-#testing
+# testing
 Testing
 test-marray
 test-marray-hdf5

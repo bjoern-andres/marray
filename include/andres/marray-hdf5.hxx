@@ -11,7 +11,6 @@
 #include "hdf5.hxx"
 
 namespace andres {
-/// HDF5 import/export support.
 namespace hdf5 {
 
 const char reverseShapeAttributeName[14] = "reverse-shape";
