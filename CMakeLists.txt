@@ -62,6 +62,9 @@ if(HDF5_FOUND)
     add_executable(test-marray-hdf5 src/unittest/marray-hdf5.cxx ${headers})
     target_link_libraries(test-marray-hdf5 ${HDF5_LIBRARIES})
     add_test(test-marray-hdf5 test-marray-hdf5)
+
+    add_executable(tutorial-marray-hdf5 src/tutorial/tutorial-hdf5.cxx ${headers})
+    target_link_libraries(tutorial-marray-hdf5 ${HDF5_LIBRARIES})
 endif()
 
 if(DOXYGEN_FOUND)

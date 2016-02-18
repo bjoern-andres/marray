@@ -1,4 +1,5 @@
 // http://www.andres.sc/marray.html
+//
 #include <iostream>
 
 #include "andres/marray.hxx"

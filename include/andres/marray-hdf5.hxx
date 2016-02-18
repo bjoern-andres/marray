@@ -1,4 +1,5 @@
 // http://www.andres.sc/marray.html
+//
 #pragma once
 #ifndef ANDRES_MARRAY_HDF5_HXX
 #define ANDRES_MARRAY_HDF5_HXX
