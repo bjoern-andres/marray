@@ -1,7 +1,10 @@
+// http://www.andres.sc
+//
 #pragma once
 #ifndef ANDRES_HDF5_HXX
 #define ANDRES_HDF5_HXX
 
+#include <cassert>
 #include <string>
 #include <vector>
 #include <stdexcept>
@@ -22,7 +25,7 @@ public:
     HandleCheck()
         { counter_ = H5Fget_obj_count(H5F_OBJ_ALL, H5F_OBJ_ALL); }
     void check()
-        { marray_detail::Assert( counter_ == H5Fget_obj_count(H5F_OBJ_ALL, H5F_OBJ_ALL)); }
+        { assert(counter_ == H5Fget_obj_count(H5F_OBJ_ALL, H5F_OBJ_ALL)); }
 private:
     ssize_t counter_;
 };
