@@ -355,9 +355,13 @@ public:
     #ifdef HAVE_CPP11_INITIALIZER_LISTS
         void view(std::initializer_list<std::size_t>,
             std::initializer_list<std::size_t>, View<T, isConst, A>&) const;
+        View<T, isConst, A> view(std::initializer_list<std::size_t>,
+            std::initializer_list<std::size_t>) const;
         void view(std::initializer_list<std::size_t>,
             std::initializer_list<std::size_t>, const CoordinateOrder&,
             View<T, isConst, A>&) const;
+        View<T, true, A> constView(std::initializer_list<std::size_t>,
+            std::initializer_list<std::size_t>) const;
         void constView(std::initializer_list<std::size_t>,
             std::initializer_list<std::size_t>, View<T, true, A>&) const;
         void constView(std::initializer_list<std::size_t>,
@@ -2091,6 +2095,28 @@ View<T, isConst, A>::view
     view(b.begin(), s.begin(), coordinateOrder(), out);
 }
 
+
+/// Get a sub-view with the same coordinate order.
+///
+/// \param b Initializer list coordinate sequence
+/// that determines the start position of the sub-view.
+/// \param s Initializer list coordinate sequence
+/// that determines the stop position of the sub-view.
+///
+template<class T, bool isConst, class A>
+inline View<T, isConst, A>
+View<T, isConst, A>::view
+(
+    std::initializer_list<std::size_t> b,
+    std::initializer_list<std::size_t> s
+) const
+{
+    View<T, isConst, A> out;
+    view(b.begin(), s.begin(), coordinateOrder(), out);
+    return out;
+}
+
+
 /// Get a sub-view to constant data.
 ///
 /// \param b Initializer list coordinate sequence
@@ -2132,6 +2158,28 @@ View<T, isConst, A>::constView
 ) const
 {
     constView(b.begin(), s.begin(), coordinateOrder(), out);
+}
+
+/// Get a sub-view to constant data with the same coordinate
+/// order.
+///
+/// \param b Initializer list coordinate sequence
+/// that determines the start position of the sub-view.
+/// \param s Initializer list coordinate sequence
+/// that determines the stop position of the sub-view.
+/// \param out Sub-View (output).
+///
+template<class T, bool isConst, class A>
+inline View<T, true, A>
+View<T, isConst, A>::constView
+(
+    std::initializer_list<std::size_t> b,
+    std::initializer_list<std::size_t> s
+) const
+{
+    View<T, true, A> out;
+    constView(b.begin(), s.begin(), coordinateOrder(), out);
+    return out;
 }
 #endif
 
