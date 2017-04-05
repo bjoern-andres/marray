@@ -71,3 +71,5 @@ if(DOXYGEN_FOUND)
     configure_file("${marray_SOURCE_DIR}/doxygen/Doxyfile.in" "${marray_BINARY_DIR}/Doxyfile" @ONLY IMMEDIATE)
     add_custom_target(doc-marray ALL COMMAND ${DOXYGEN} "${marray_BINARY_DIR}/Doxyfile")
 endif()
+
+install(DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/include/andres" DESTINATION include)
