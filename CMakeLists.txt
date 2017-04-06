@@ -56,17 +56,17 @@ add_test(test-marray test-marray)
 
 if(HDF5_FOUND)
     add_executable(test-hdf5 src/unittest/hdf5.cxx ${headers})
-    target_include_directories(test-hdf5 PRIVATE ${HDF5_INCLUDE_DIRS})
+    target_include_directories(test-hdf5 PRIVATE ${HDF5_INCLUDE_DIR} ${HDF5_INCLUDE_DIRS})
     target_link_libraries(test-hdf5 ${HDF5_LIBRARIES})
     add_test(test-hdf5 test-hdf5)
 
     add_executable(test-marray-hdf5 src/unittest/marray-hdf5.cxx ${headers})
-    target_include_directories(test-marray-hdf5 PRIVATE ${HDF5_INCLUDE_DIRS})
+    target_include_directories(test-marray-hdf5 PRIVATE ${HDF5_INCLUDE_DIR} ${HDF5_INCLUDE_DIRS})
     target_link_libraries(test-marray-hdf5 ${HDF5_LIBRARIES})
     add_test(test-marray-hdf5 test-marray-hdf5)
 
     add_executable(tutorial-marray-hdf5 src/tutorial/tutorial-hdf5.cxx ${headers})
-    target_include_directories(tutorial-marray-hdf5 PRIVATE ${HDF5_INCLUDE_DIRS})
+    target_include_directories(tutorial-marray-hdf5 PRIVATE ${HDF5_INCLUDE_DIR} ${HDF5_INCLUDE_DIRS})
     target_link_libraries(tutorial-marray-hdf5 ${HDF5_LIBRARIES})
 endif()
 
