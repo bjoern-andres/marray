@@ -7,6 +7,7 @@
 #ifndef ANDRES_MARRAY_HXX
 #define ANDRES_MARRAY_HXX
 
+#include <algorithm>
 #include <cassert>
 #include <cstddef>
 #include <stdexcept>

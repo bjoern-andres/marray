@@ -34,6 +34,11 @@ if(WITH_CPP11)
         add_definitions(-DHAVE_CPP11_INITIALIZER_LISTS)
         add_definitions(-DHAVE_CPP11_VARIADIC_TEMPLATES)
         # add_definitions(-DHAVE_CPP11_TEMPLATE_ALIASES) # not supported in GNU G++ 4.4
+    elseif(MSVC AND ((MSVC_VERSION GREATER 1700) OR (MSVC_VERSION EQUAL 1700)))
+        # NOTE: enable C++11 support in MSVC 2015.
+        message(STATUS "C++11 support enabled.")
+        add_definitions(-DHAVE_CPP11_INITIALIZER_LISTS)
+        add_definitions(-DHAVE_CPP11_VARIADIC_TEMPLATES)
     else()
         message("C++11 support disabled. Add flags for your compiler in CMakeLists.txt to compile with C++11 features.")
     endif()
