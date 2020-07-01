@@ -23,25 +23,6 @@ else()
 endif()
 
 # ------------------------------------------------------------------------------
-# C++11
-# ------------------------------------------------------------------------------
-set(WITH_CPP11 CACHE BOOL "Compile with C++11 features.")
-if(WITH_CPP11)
-    if(CMAKE_COMPILER_IS_GNUCXX)
-        message(STATUS "C++11 support enabled.")
-        add_definitions(-std=gnu++0x)
-        add_definitions(-fno-deduce-init-list)
-        add_definitions(-DHAVE_CPP11_INITIALIZER_LISTS)
-        add_definitions(-DHAVE_CPP11_VARIADIC_TEMPLATES)
-        # add_definitions(-DHAVE_CPP11_TEMPLATE_ALIASES) # not supported in GNU G++ 4.4
-    else()
-        message("C++11 support disabled. Add flags for your compiler in CMakeLists.txt to compile with C++11 features.")
-    endif()
-else()
-    message(STATUS "C++11 support disabled.")
-endif()
-
-# ------------------------------------------------------------------------------
 # hdf5
 # ------------------------------------------------------------------------------
 find_package(HDF5)
@@ -71,3 +52,4 @@ if(DOXYGEN_FOUND)
     configure_file("${marray_SOURCE_DIR}/doxygen/Doxyfile.in" "${marray_BINARY_DIR}/Doxyfile" @ONLY IMMEDIATE)
     add_custom_target(doc-marray ALL COMMAND ${DOXYGEN} "${marray_BINARY_DIR}/Doxyfile")
 endif()
+

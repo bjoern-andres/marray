@@ -21,9 +21,7 @@
 #include <memory> // allocator
 #include <numeric> // accumulate
 #include <functional> // std::multiplies
-#ifdef HAVE_CPP11_INITIALIZER_LISTS
-    #include <initializer_list>
-#endif
+#include <initializer_list>
 
 /// The public API.
 namespace andres {
@@ -51,9 +49,8 @@ template<class E, class T, class S, class BinaryFunctor>
 // \endcond suppress_doxygen
 template<class T, bool isConst = false, class A = std::allocator<std::size_t> > 
     class View;
-#ifdef HAVE_CPP11_TEMPLATE_ALIASES
-    template<class T, class A> using ConstView = View<T, true, A>;
-#endif
+template<class T, class A>
+    using ConstView = View<T, true, A>;
 template<class T, bool isConst, class A = std::allocator<std::size_t> > 
     class Iterator;
 template<class T, class A = std::allocator<std::size_t> > class Marray;
@@ -235,15 +232,13 @@ public:
         View(ShapeIterator, ShapeIterator, StrideIterator,
             pointer, const CoordinateOrder&, 
             const allocator_type& = allocator_type());
-    #ifdef HAVE_CPP11_INITIALIZER_LISTS
-        View(std::initializer_list<std::size_t>, pointer,
-            const CoordinateOrder& = defaultOrder,
-            const CoordinateOrder& = defaultOrder,
-            const allocator_type& = allocator_type());
-        View(std::initializer_list<std::size_t>, std::initializer_list<std::size_t>,
-            pointer, const CoordinateOrder&, 
-            const allocator_type& = allocator_type());
-    #endif
+    View(std::initializer_list<std::size_t>, pointer,
+        const CoordinateOrder& = defaultOrder,
+        const CoordinateOrder& = defaultOrder,
+        const allocator_type& = allocator_type());
+    View(std::initializer_list<std::size_t>, std::initializer_list<std::size_t>,
+        pointer, const CoordinateOrder&,
+        const allocator_type& = allocator_type());
     
     // assignment
     View<T, isConst, A>& operator=(const T&);
@@ -265,16 +260,14 @@ public:
         void assign(ShapeIterator, ShapeIterator, StrideIterator,
             pointer, const CoordinateOrder&, 
             const allocator_type& = allocator_type());
-    #ifdef HAVE_CPP11_INITIALIZER_LISTS
-        void assign(std::initializer_list<std::size_t>, pointer,
-            const CoordinateOrder& = defaultOrder,
-            const CoordinateOrder& = defaultOrder,
-            const allocator_type& = allocator_type());
-        void assign(std::initializer_list<std::size_t>, 
-            std::initializer_list<std::size_t>, pointer,
-            const CoordinateOrder&, 
-            const allocator_type& = allocator_type());
-    #endif
+    void assign(std::initializer_list<std::size_t>, pointer,
+        const CoordinateOrder& = defaultOrder,
+        const CoordinateOrder& = defaultOrder,
+        const allocator_type& = allocator_type());
+    void assign(std::initializer_list<std::size_t>,
+        std::initializer_list<std::size_t>, pointer,
+        const CoordinateOrder&,
+        const allocator_type& = allocator_type());
         
     // query
     const std::size_t dimension() const;
@@ -293,43 +286,22 @@ public:
     // element access
     template<class U> reference operator()(U); 
     template<class U> reference operator()(U) const; 
-    #ifndef HAVE_CPP11_VARIADIC_TEMPLATES
-        reference operator()(const std::size_t, const std::size_t);
-        reference operator()(const std::size_t, const std::size_t) const;
-        reference operator()(const std::size_t, const std::size_t, const std::size_t);
-        reference operator()(const std::size_t, const std::size_t, const std::size_t) const;
-        reference operator()(const std::size_t, const std::size_t, const std::size_t, 
-            const std::size_t);
-        reference operator()(const std::size_t, const std::size_t, const std::size_t, 
-            const std::size_t) const;
-        reference operator()(const std::size_t, const std::size_t, const std::size_t, 
-             const std::size_t, const std::size_t);
-        reference operator()(const std::size_t, const std::size_t, const std::size_t, 
-            const std::size_t, const std::size_t) const;
-        reference operator()(const std::size_t, const std::size_t, const std::size_t, 
-            const std::size_t, const std::size_t, const std::size_t, const std::size_t, 
-            const std::size_t, const std::size_t, const std::size_t);
-        reference operator()(const std::size_t, const std::size_t, const std::size_t, 
-            const std::size_t, const std::size_t, const std::size_t, const std::size_t, 
-            const std::size_t, const std::size_t, const std::size_t) const;
-    #else
-        reference operator()(const std::size_t);
-        reference operator()(const std::size_t) const;
+    reference operator()(const std::size_t);
+    reference operator()(const std::size_t) const;
+    template<typename... Args>
+        reference operator()(const std::size_t, const Args...);
+    template<typename... Args>
+        reference operator()(const std::size_t, const Args...) const;
+    private:
+        std::size_t elementAccessHelper(const std::size_t, const std::size_t);
+        std::size_t elementAccessHelper(const std::size_t, const std::size_t) const;
         template<typename... Args>
-            reference operator()(const std::size_t, const Args...);
+            std::size_t elementAccessHelper(const std::size_t, const std::size_t,
+                const Args...);
         template<typename... Args>
-            reference operator()(const std::size_t, const Args...) const;
-        private:
-            std::size_t elementAccessHelper(const std::size_t, const std::size_t);
-            std::size_t elementAccessHelper(const std::size_t, const std::size_t) const;
-            template<typename... Args>
-                std::size_t elementAccessHelper(const std::size_t, const std::size_t,
-                    const Args...);
-            template<typename... Args>
-                std::size_t elementAccessHelper(const std::size_t, const std::size_t, 
-                    const Args...) const;
-        public:
-    #endif
+            std::size_t elementAccessHelper(const std::size_t, const std::size_t,
+                const Args...) const;
+    public:
 
     // sub-views
     template<class BaseIterator, class ShapeIterator>
@@ -352,18 +324,16 @@ public:
     template<class BaseIterator, class ShapeIterator>
         View<T, true, A> constView(BaseIterator, ShapeIterator, 
             const CoordinateOrder&) const;
-    #ifdef HAVE_CPP11_INITIALIZER_LISTS
-        void view(std::initializer_list<std::size_t>,
-            std::initializer_list<std::size_t>, View<T, isConst, A>&) const;
-        void view(std::initializer_list<std::size_t>,
-            std::initializer_list<std::size_t>, const CoordinateOrder&,
-            View<T, isConst, A>&) const;
-        void constView(std::initializer_list<std::size_t>,
-            std::initializer_list<std::size_t>, View<T, true, A>&) const;
-        void constView(std::initializer_list<std::size_t>,
-            std::initializer_list<std::size_t>, const CoordinateOrder&,
-            View<T, true, A>&) const;
-    #endif
+    void view(std::initializer_list<std::size_t>,
+        std::initializer_list<std::size_t>, View<T, isConst, A>&) const;
+    void view(std::initializer_list<std::size_t>,
+        std::initializer_list<std::size_t>, const CoordinateOrder&,
+        View<T, isConst, A>&) const;
+    void constView(std::initializer_list<std::size_t>,
+        std::initializer_list<std::size_t>, View<T, true, A>&) const;
+    void constView(std::initializer_list<std::size_t>,
+        std::initializer_list<std::size_t>, const CoordinateOrder&,
+        View<T, true, A>&) const;
 
     // iterator access
     iterator begin();
@@ -395,13 +365,11 @@ public:
     View<T, isConst, A> boundView(const std::size_t, const std::size_t = 0) const;
     View<T, isConst, A> squeezedView() const;
 
-    #ifdef HAVE_CPP11_INITIALIZER_LISTS
-        void reshape(std::initializer_list<std::size_t>);
-        void permute(std::initializer_list<std::size_t>);
+    void reshape(std::initializer_list<std::size_t>);
+    void permute(std::initializer_list<std::size_t>);
 
-        View<T, isConst, A> reshapedView(std::initializer_list<std::size_t>) const;
-        View<T, isConst, A> permutedView(std::initializer_list<std::size_t>) const;
-    #endif
+    View<T, isConst, A> reshapedView(std::initializer_list<std::size_t>) const;
+    View<T, isConst, A> permutedView(std::initializer_list<std::size_t>) const;
 
     // conversion between coordinates, index and offset
     template<class CoordinateIterator>
@@ -411,12 +379,10 @@ public:
     template<class CoordinateIterator>
         void indexToCoordinates(std::size_t, CoordinateIterator) const;
     void indexToOffset(std::size_t, std::size_t&) const;
-    #ifdef HAVE_CPP11_INITIALIZER_LISTS
-        void coordinatesToIndex(std::initializer_list<std::size_t>,
-            std::size_t&) const;
-        void coordinatesToOffset(std::initializer_list<std::size_t>,
-            std::size_t&) const;
-    #endif
+    void coordinatesToIndex(std::initializer_list<std::size_t>,
+        std::size_t&) const;
+    void coordinatesToOffset(std::initializer_list<std::size_t>,
+        std::size_t&) const;
 
     // output as string
     std::string asString(const StringStyle& = MatrixStyle) const; 
@@ -570,11 +536,9 @@ public:
         Marray(const InitializationSkipping&, ShapeIterator, ShapeIterator,
             const CoordinateOrder& = defaultOrder, 
             const allocator_type& = allocator_type());
-    #ifdef HAVE_CPP11_INITIALIZER_LISTS
-        Marray(std::initializer_list<std::size_t>, const T& = T(),
-            const CoordinateOrder& = defaultOrder, 
-            const allocator_type& = allocator_type());
-    #endif
+    Marray(std::initializer_list<std::size_t>, const T& = T(),
+        const CoordinateOrder& = defaultOrder,
+        const allocator_type& = allocator_type());
     Marray(const Marray<T, A>&);
     template<class E, class Te>
         Marray(const ViewExpression<E, Te>&,
@@ -597,10 +561,8 @@ public:
         void resize(ShapeIterator, ShapeIterator, const T& = T());
     template<class ShapeIterator>
         void resize(const InitializationSkipping&, ShapeIterator, ShapeIterator);
-    #ifdef HAVE_CPP11_INITIALIZER_LISTS
-        void resize(std::initializer_list<std::size_t>, const T& = T());
-        void resize(const InitializationSkipping&, std::initializer_list<std::size_t>);
-    #endif
+    void resize(std::initializer_list<std::size_t>, const T& = T());
+    void resize(const InitializationSkipping&, std::initializer_list<std::size_t>);
 
 private:
     typedef typename base::geometry_type geometry_type;
@@ -614,7 +576,6 @@ private:
 
 // implementation of View
 
-#ifdef HAVE_CPP11_INITIALIZER_LISTS
 /// Compute the index that corresponds to a sequence of coordinates.
 ///
 /// \param coordinate Coordinate given as initializer list.
@@ -631,7 +592,6 @@ View<T, isConst, A>::coordinatesToIndex
 {
     coordinatesToIndex(coordinate.begin(), out);
 }
-#endif
 
 /// Compute the index that corresponds to a sequence of coordinates.
 ///
@@ -656,7 +616,6 @@ View<T, isConst, A>::coordinatesToIndex
     }
 }
 
-#ifdef HAVE_CPP11_INITIALIZER_LISTS
 /// Compute the offset that corresponds to a sequence of coordinates.
 ///
 /// \param it An iterator to the beginning of the coordinate sequence.
@@ -673,7 +632,6 @@ View<T, isConst, A>::coordinatesToOffset
 {
     coordinatesToOffset(coordinate.begin(), out);
 }
-#endif
 
 /// Compute the offset that corresponds to a sequence of coordinates.
 ///
@@ -918,7 +876,6 @@ View<T, isConst, A>::View
     testInvariant();
 }
 
-#ifdef HAVE_CPP11_INITIALIZER_LISTS
 /// Construct unstrided View
 /// 
 /// \param shape Shape initializer list.
@@ -970,7 +927,6 @@ View<T, isConst, A>::View
 {
     testInvariant();
 }
-#endif
 
 /// Clear View.
 ///
@@ -1059,7 +1015,6 @@ View<T, isConst, A>::assign
     testInvariant();
 }
 
-#ifdef HAVE_CPP11_INITIALIZER_LISTS
 /// Initialize unstrided View
 /// 
 /// \param shape Shape initializer list.
@@ -1109,7 +1064,6 @@ View<T, isConst, A>::assign
     assign(shape.begin(), shape.end(), strides.begin(), data,
         internalCoordinateOrder, allocator);
 }
-#endif
 
 /// Reference data.
 ///
@@ -1146,307 +1100,6 @@ View<T, isConst, A>::operator()
 {
     return marray_detail::AccessOperatorHelper<std::numeric_limits<U>::is_integer>::execute(*this, u);
 }
-
-#ifndef HAVE_CPP11_VARIADIC_TEMPLATES
-
-/// Reference data in a 2-dimensional View by coordinates.
-///
-/// This function issues a runtime error if the View is not
-/// 2-dimensional.
-///
-/// \param c0 1st coordinate. 
-/// \param c1 2nd coordinate.
-///
-template<class T, bool isConst, class A> 
-inline typename View<T, isConst, A>::reference
-View<T, isConst, A>::operator()
-(
-    const std::size_t c0,
-    const std::size_t c1
-)
-{
-    testInvariant();
-    marray_detail::Assert(MARRAY_NO_DEBUG || (data_ != 0 && dimension() == 2));
-    marray_detail::Assert(MARRAY_NO_ARG_TEST || (c0 < shape(0) && c1 < shape(1)));
-    return data_[c0*strides(0) + c1*strides(1)];
-}
-
-/// Reference data in a 2-dimensional View by coordinates.
-///
-/// This function issues a runtime error if the View is not
-/// 2-dimensional.
-///
-/// \param c0 1st coordinate. 
-/// \param c1 2nd coordinate.
-///
-template<class T, bool isConst, class A> 
-inline typename View<T, isConst, A>::reference
-View<T, isConst, A>::operator()
-(
-    const std::size_t c0,
-    const std::size_t c1
-) const
-{
-    testInvariant();
-    marray_detail::Assert(MARRAY_NO_DEBUG || (data_ != 0 && dimension() == 2));
-    marray_detail::Assert(MARRAY_NO_ARG_TEST || (c0 < shape(0) && c1 < shape(1)));
-    return data_[c0*strides(0) + c1*strides(1)];
-}
-
-/// Reference data in a 3-dimensional View by coordinates.
-///
-/// This function issues a runtime error if the View is not
-/// 3-dimensional.
-///
-/// \param c0 1st coordinate. 
-/// \param c1 2nd coordinate.
-/// \param c2 3rd coordinate.
-///
-template<class T, bool isConst, class A> 
-inline typename View<T, isConst, A>::reference
-View<T, isConst, A>::operator()
-(
-    const std::size_t c0,
-    const std::size_t c1,
-    const std::size_t c2
-)
-{
-    testInvariant();
-    marray_detail::Assert(MARRAY_NO_DEBUG || (data_ != 0 && dimension() == 3));
-    marray_detail::Assert(MARRAY_NO_ARG_TEST || (c0 < shape(0) && c1 < shape(1)
-        && c2 < shape(2)));
-    return data_[c0*strides(0) + c1*strides(1) + c2*strides(2)];
-}
-
-/// Reference data in a 3-dimensional View by coordinates.
-///
-/// This function issues a runtime error if the View is not
-/// 3-dimensional.
-///
-/// \param c0 1st coordinate. 
-/// \param c1 2nd coordinate.
-/// \param c2 3rd coordinate.
-///
-template<class T, bool isConst, class A> 
-inline typename View<T, isConst, A>::reference
-View<T, isConst, A>::operator()
-(
-    const std::size_t c0,
-    const std::size_t c1,
-    const std::size_t c2
-) const
-{
-    testInvariant();
-    marray_detail::Assert(MARRAY_NO_DEBUG || (data_ != 0 && dimension() == 3));
-    marray_detail::Assert(MARRAY_NO_ARG_TEST || (c0 < shape(0) && c1 < shape(1)
-        && c2 < shape(2)));
-    return data_[c0*strides(0) + c1*strides(1) + c2*strides(2)];
-}
-
-/// Reference data in a 4-dimensional View by coordinates.
-///
-/// This function issues a runtime error if the View is not
-/// 4-dimensional.
-///
-/// \param c0 1st coordinate. 
-/// \param c1 2nd coordinate.
-/// \param c2 3rd coordinate.
-/// \param c3 4th coordinate.
-///
-template<class T, bool isConst, class A> 
-inline typename View<T, isConst, A>::reference
-View<T, isConst, A>::operator()
-(
-    const std::size_t c0,
-    const std::size_t c1,
-    const std::size_t c2,
-    const std::size_t c3
-)
-{
-    testInvariant();
-    marray_detail::Assert(MARRAY_NO_DEBUG || (data_ != 0 && dimension() == 4));
-    marray_detail::Assert(MARRAY_NO_ARG_TEST || (c0 < shape(0) && c1 < shape(1)
-        && c2 < shape(2) && c3 < shape(3)));
-    return data_[c0*strides(0) + c1*strides(1) + c2*strides(2) 
-        + c3*strides(3)];
-}
-
-/// Reference data in a 4-dimensional View by coordinates.
-///
-/// This function issues a runtime error if the View is not
-/// 4-dimensional.
-///
-/// \param c0 1st coordinate. 
-/// \param c1 2nd coordinate.
-/// \param c2 3rd coordinate.
-/// \param c3 4th coordinate.
-///
-template<class T, bool isConst, class A> 
-inline typename View<T, isConst, A>::reference
-View<T, isConst, A>::operator()
-(
-    const std::size_t c0,
-    const std::size_t c1,
-    const std::size_t c2,
-    const std::size_t c3
-) const
-{
-    testInvariant();
-    marray_detail::Assert(MARRAY_NO_DEBUG || (data_ != 0 && dimension() == 4));
-    marray_detail::Assert(MARRAY_NO_ARG_TEST || (c0 < shape(0) && c1 < shape(1)
-        && c2 < shape(2) && c3 < shape(3)));
-    return data_[c0*strides(0) + c1*strides(1) + c2*strides(2) 
-        + c3*strides(3)];
-}
-
-/// Reference data in a 5-dimensional View by coordinates.
-///
-/// This function issues a runtime error if the View is not
-/// 5-dimensional.
-///
-/// \param c0 1st coordinate. 
-/// \param c1 2nd coordinate.
-/// \param c2 3rd coordinate.
-/// \param c3 4th coordinate.
-/// \param c4 5th coordinate.
-///
-template<class T, bool isConst, class A> 
-inline typename View<T, isConst, A>::reference
-View<T, isConst, A>::operator()
-(
-    const std::size_t c0,
-    const std::size_t c1,
-    const std::size_t c2,
-    const std::size_t c3,
-    const std::size_t c4
-)
-{
-    testInvariant();
-    marray_detail::Assert(MARRAY_NO_DEBUG || (data_ != 0 && dimension() == 5));
-    marray_detail::Assert(MARRAY_NO_ARG_TEST || (c0 < shape(0) && c1 < shape(1)
-        && c2 < shape(2) && c3 < shape(3) && c4 < shape(4)));
-    return data_[c0*strides(0) + c1*strides(1) + c2*strides(2) 
-        + c3*strides(3) + c4*strides(4)];
-}
-
-/// Reference data in a 5-dimensional View by coordinates.
-///
-/// This function issues a runtime error if the View is not
-/// 5-dimensional.
-///
-/// \param c0 1st coordinate. 
-/// \param c1 2nd coordinate.
-/// \param c2 3rd coordinate.
-/// \param c3 4th coordinate.
-/// \param c4 5th coordinate.
-///
-template<class T, bool isConst, class A> 
-inline typename View<T, isConst, A>::reference
-View<T, isConst, A>::operator()
-(
-    const std::size_t c0,
-    const std::size_t c1,
-    const std::size_t c2,
-    const std::size_t c3,
-    const std::size_t c4
-) const
-{
-    testInvariant();
-    marray_detail::Assert(MARRAY_NO_DEBUG || (data_ != 0 && dimension() == 5));
-    marray_detail::Assert(MARRAY_NO_ARG_TEST || (c0 < shape(0) && c1 < shape(1)
-        && c2 < shape(2) && c3 < shape(3) && c4 < shape(4)));
-    return data_[c0*strides(0) + c1*strides(1) + c2*strides(2) 
-        + c3*strides(3) + c4*strides(4)];
-}
-
-/// Reference data in a 10-dimensional View by coordinates.
-///
-/// This function issues a runtime error if the View is not
-
-/// 5-dimensional.
-///
-/// \param c0 1st coordinate. 
-/// \param c1 2nd coordinate.
-/// \param c2 3rd coordinate.
-/// \param c3 4th coordinate.
-/// \param c4 5th coordinate.
-/// \param c5 6th coordinate.
-/// \param c6 7th coordinate.
-/// \param c7 8th coordinate.
-/// \param c8 9th coordinate.
-/// \param c9 10th coordinate.
-///
-template<class T, bool isConst, class A> 
-inline typename View<T, isConst, A>::reference
-View<T, isConst, A>::operator()
-(
-    const std::size_t c0,
-    const std::size_t c1,
-    const std::size_t c2,
-    const std::size_t c3,
-    const std::size_t c4,
-    const std::size_t c5,
-    const std::size_t c6,
-    const std::size_t c7,
-    const std::size_t c8,
-    const std::size_t c9
-) 
-{
-    testInvariant();
-    marray_detail::Assert(MARRAY_NO_DEBUG || (data_ != 0 && dimension() == 10));
-    marray_detail::Assert(MARRAY_NO_ARG_TEST || (c0 < shape(0) && c1 < shape(1)
-        && c2 < shape(2) && c3 < shape(3) && c4 < shape(4)
-        && c5 < shape(5) && c6 < shape(6) && c7 < shape(7)
-        && c8 < shape(8) && c9 < shape(9)));
-    return data_[c0*strides(0) + c1*strides(1) + c2*strides(2)
-        + c3*strides(3) + c4*strides(4) + c5*strides(5) + c6*strides(6) 
-        + c7*strides(7) + c8*strides(8) + c9*strides(9)];
-}
-
-/// Reference data in a 10-dimensional View by coordinates.
-///
-/// This function issues a runtime error if the View is not
-/// 5-dimensional.
-///
-/// \param c0 1st coordinate. 
-/// \param c1 2nd coordinate.
-/// \param c2 3rd coordinate.
-/// \param c3 4th coordinate.
-/// \param c4 5th coordinate.
-/// \param c5 6th coordinate.
-/// \param c6 7th coordinate.
-/// \param c7 8th coordinate.
-/// \param c8 9th coordinate.
-/// \param c9 10th coordinate.
-///
-template<class T, bool isConst, class A> 
-inline typename View<T, isConst, A>::reference
-View<T, isConst, A>::operator()
-(
-    const std::size_t c0,
-    const std::size_t c1,
-    const std::size_t c2,
-    const std::size_t c3,
-    const std::size_t c4,
-    const std::size_t c5,
-    const std::size_t c6,
-    const std::size_t c7,
-    const std::size_t c8,
-    const std::size_t c9
-) const
-{
-    testInvariant();
-    marray_detail::Assert(MARRAY_NO_DEBUG || (data_ != 0 && dimension() == 10));
-    marray_detail::Assert(MARRAY_NO_ARG_TEST || (c0 < shape(0) && c1 < shape(1)
-        && c2 < shape(2) && c3 < shape(3) && c4 < shape(4)
-        && c5 < shape(5) && c6 < shape(6) && c7 < shape(7)
-        && c8 < shape(8) && c9 < shape(9)));
-    return data_[c0*strides(0) + c1*strides(1) + c2*strides(2)
-        + c3*strides(3) + c4*strides(4) + c5*strides(5) + c6*strides(6) 
-        + c7*strides(7) + c8*strides(8) + c9*strides(9)];
-}
-
-#else
 
 template<class T, bool isConst, class A>
 inline std::size_t
@@ -1566,8 +1219,6 @@ View<T, isConst, A>::operator()
     return data_[ strides(0) * static_cast<std::size_t>(value) 
         + static_cast<std::size_t>(elementAccessHelper(sizeof...(args)+1, args...)) ];
 }
-
-#endif // #ifndef HAVE_CPP11_VARIADIC_TEMPLATES
 
 /// Get the number of data items.
 ///
@@ -2048,7 +1699,6 @@ View<T, isConst, A>::constView
     return v;
 }
 
-#ifdef HAVE_CPP11_INITIALIZER_LISTS
 /// Get a sub-view.
 ///
 /// \param b Initializer list defining the coordinate sequence
@@ -2133,7 +1783,6 @@ View<T, isConst, A>::constView
 {
     constView(b.begin(), s.begin(), coordinateOrder(), out);
 }
-#endif
 
 /// Reshape the View.
 /// 
@@ -2195,7 +1844,6 @@ View<T, isConst, A>::reshapedView
     return out;
 }
 
-#ifdef HAVE_CPP11_INITIALIZER_LISTS
 /// Reshape the View.
 /// 
 /// Two conditions have to be fulfilled in order for reshape to work:
@@ -2237,7 +1885,6 @@ View<T, isConst, A>::reshapedView
 {
     return reshapedView(shape.begin(), shape.end());
 }
-#endif
 
 /// Get a View where one coordinate is bound to a value.
 ///
@@ -2339,7 +1986,6 @@ View<T, isConst, A>::squeezedView() const
     return v;
 }
 
-#ifdef HAVE_CPP11_INITIALIZER_LISTS
 /// Permute dimensions.
 ///
 /// \param begin Iterator to the beginning of a sequence which
@@ -2357,7 +2003,6 @@ View<T, isConst, A>::permute
 {
     permute(permutation.begin());
 }
-#endif
 
 /// Permute dimensions.
 ///
@@ -3457,7 +3102,6 @@ Marray<T, A>::Marray
     testInvariant();
 }
 
-#ifdef HAVE_CPP11_INITIALIZER_LISTS
 /// Construct Marray with initialization.
 ///
 /// \param begin Shape given as initializer list.
@@ -3486,7 +3130,6 @@ Marray<T, A>::Marray
     std::fill(this->data_, this->data_+size, value);
     testInvariant();
 }
-#endif
 
 /// Destructor.
 ///
@@ -3792,7 +3435,6 @@ Marray<T, A>::resize
     resizeHelper<true>(begin, end);
 }
 
-#ifdef HAVE_CPP11_INITIALIZER_LISTS
 /// Resize (existing entries are preserved, new entries are initialized).
 ///
 /// \param shape Shape given as initializer list.
@@ -3824,7 +3466,6 @@ Marray<T, A>::resize
 {
     resizeHelper<true>(shape.begin(), shape.end());
 }
-#endif
 
 /// Invariant test.
 ///
