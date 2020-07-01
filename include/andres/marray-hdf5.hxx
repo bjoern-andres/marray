@@ -14,7 +14,7 @@ const std::string errorMessageLastMajorOrder =
     "HDF5 up to at least version 1.8.16 does not support LastMajorOrder. "
     "(Quote from the HDF5 1.8.16 manual: \"HDF5 uses C storage conventions, "
     "assuming that the last listed dimension is the fastest-changing dimension "
-    "and the first-listed dimension is the slowest chang­ing.\") "
+    "and the first-listed dimension is the slowest changing.\") "
     "The indexing order of the Marray or View at hand is LastMajorOrder. "
     "In order to avoid confusion, such Marrays and Views are not saved directly to HDF5. "
     "Consider copying to an Marray in FirstMajorOrder or a one-dimensional Marray";
