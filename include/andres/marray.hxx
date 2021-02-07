@@ -2265,7 +2265,7 @@ inline typename View<T, isConst, A>::const_iterator
 View<T, isConst, A>::begin() const
 {
     testInvariant();
-    return Iterator<T, true>(*this, 0);
+    return Iterator<T, true, A>(*this, 0);
 }
 
 /// Get the end-iterator.
@@ -2279,7 +2279,7 @@ inline typename View<T, isConst, A>::const_iterator
 View<T, isConst, A>::end() const
 {
     testInvariant();
-    return Iterator<T, true>(*this, geometry_.size());
+    return Iterator<T, true, A>(*this, geometry_.size());
 }
 
 /// Get a reserve iterator to the beginning.
