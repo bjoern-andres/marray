@@ -12,9 +12,7 @@ if(MSVC)
     add_definitions(-D_CRT_SECURE_NO_DEPRECATE -D_HDF5USEDLL_)
 endif()
 
-# ------------------------------------------------------------------------------
 # doxygen
-# ------------------------------------------------------------------------------
 find_package(Doxygen QUIET)
 if(DOXYGEN_FOUND)
     message(STATUS "Doxygen found.")
@@ -22,21 +20,26 @@ else()
     message("doxygen not found.")
 endif()
 
-# ------------------------------------------------------------------------------
 # hdf5
-# ------------------------------------------------------------------------------
 find_package(HDF5)
 if(HDF5_FOUND)
     include_directories(${HDF5_INCLUDE_DIR})
 endif()
 
-# ------------------------------------------------------------------------------
+# png
+find_package(PNG)
+if(PNG_FOUND)
+    include_directories(${PNG_INCLUDE_DIR})
+endif()
+
 # targets
-# ------------------------------------------------------------------------------
 add_executable(tutorial-marray src/tutorial/tutorial.cxx ${headers})
 
 add_executable(test-marray src/unittest/marray.cxx ${headers})
 add_test(test-marray test-marray)
+
+add_executable(test-marray-bmp src/unittest/marray-bmp.cxx ${headers})
+add_test(test-marray-bmp test-marray-bmp)
 
 if(HDF5_FOUND)
     add_executable(test-hdf5 src/unittest/hdf5.cxx ${headers})
@@ -49,6 +52,12 @@ if(HDF5_FOUND)
 
     add_executable(tutorial-marray-hdf5 src/tutorial/tutorial-hdf5.cxx ${headers})
     target_link_libraries(tutorial-marray-hdf5 ${HDF5_LIBRARIES})
+endif()
+
+if(PNG_FOUND)
+    add_executable(test-marray-png src/unittest/marray-png.cxx ${headers})
+    target_link_libraries(test-marray-png ${PNG_LIBRARIES})
+    add_test(test-marray-png test-marray-png)
 endif()
 
 if(DOXYGEN_FOUND)
